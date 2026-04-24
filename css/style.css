@@ -272,7 +272,8 @@ ul {
 
 .hero-subtitle {
     font-size: 1.25rem;
-    color: var(--color-text-dark); /* text should be dark towards the bottom of the gradient */
+    color: #ffffff; /* changed to white for contrast against dark overlay */
+    text-shadow: 0 2px 8px rgba(0,0,0,0.5);
     max-width: 600px;
     margin: 0 auto 2.5rem;
     font-weight: 500;
