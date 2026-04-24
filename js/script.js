@@ -173,19 +173,53 @@ function prevStep(step) {
     nextStep(step);
 }
 
-function initiateRedsysPayment() {
+async function initiateRedsysPayment() {
     const payBtn = document.getElementById('pay-button');
     if(!payBtn) return;
     
     payBtn.innerText = 'Conectando con TPV Seguro...';
     payBtn.disabled = true;
 
-    // Simulación de proceso Redsys
-    console.log('Iniciando pago Redsys para:', bookingData);
-    
-    setTimeout(() => {
-        alert('Simulación: Redirigiendo a la pasarela de Redsys TPV...\n\nEn producción, aquí llamaríamos a la Netlify Function que genera la firma HMAC SHA-256.');
+    try {
+        const name = document.getElementById('cust-name').value;
+        const email = document.getElementById('cust-email').value;
+        const phone = document.getElementById('cust-phone').value;
+
+        const response = await fetch('/.netlify/functions/create-payment', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                customerName: name,
+                customerEmail: email,
+                customerPhone: phone,
+                flightType: bookingData.flightType,
+                date: bookingData.date,
+                pax: bookingData.pax,
+                total: bookingData.total
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Error al conectar con el servidor de pagos');
+        }
+
+        const data = await response.json();
+        
+        // Fill the hidden form
+        const form = document.getElementById('redsys-form');
+        form.action = data.redsysUrl; // Dynamic URL based on environment
+        document.getElementById('ds-parameters').value = data.merchantParameters;
+        document.getElementById('ds-signature').value = data.signature;
+
+        // Auto-submit the form to redirect the user to the bank
+        form.submit();
+
+    } catch (error) {
+        console.error('Error initiating payment:', error);
+        alert('Ocurrió un error al intentar iniciar el pago. Por favor, inténtalo de nuevo.');
         payBtn.innerText = 'Pagar con Tarjeta / Apple Pay';
         payBtn.disabled = false;
-    }, 1500);
+    }
 }
