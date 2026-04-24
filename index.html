@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vuelos en Globo en Segovia | Voyager Balloons EU</title>
+    <meta name="description" content="Experimenta la aventura definitiva sobrevolando Segovia en globo aerostático. Reserva hoy vuelos exclusivos, paquetes de lujo y vuelos privados con Voyager Balloons.">
+    <meta name="robots" content="index, follow">
+
+    <!-- Preconnect to Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Optimized Font Loading (font-display: swap) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    
+    <!-- Critical CSS for instant rendering of above-the-fold content -->
+    <style>
+        body { margin: 0; padding: 0; font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #2C3539; }
+        .hero { height: 100vh; width: 100%; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+        .hero-content { position: relative; z-index: 2; text-align: center; padding: 0 20px; }
+        h1 { font-family: 'Montserrat', sans-serif; font-size: 3rem; margin-bottom: 1rem; color: #ffffff; text-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+    </style>
+</head>
+<body>
+    <!-- Navbar (Glassmorphism) -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo">Voyager<span>Balloons</span></a>
+            <div class="nav-links">
+                <a href="#experience">La Experiencia</a>
+                <a href="#packages">Paquetes de Vuelo</a>
+                <a href="#reviews">Reseñas</a>
+                <a href="#booking" class="btn btn-primary nav-btn">Reservar Ahora</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero">
+        <!-- Lazy loaded video background placeholder -->
+        <!-- In a real scenario, this would be an actual video tag -->
+        <div class="hero-bg-placeholder"></div>
+        <div class="hero-overlay"></div>
+        
+        <div class="hero-content fade-in-up">
+            <span class="eyebrow">La mejor web del mundo para volar</span>
+            <h1>Eleva tus sueños sobre<br>la ciudad de los reyes</h1>
+            <p class="hero-subtitle">Vuelos exclusivos en globo aerostático sobre el Acueducto y Alcázar de Segovia.</p>
+            <div class="hero-actions">
+                <a href="#booking" class="btn btn-primary btn-large">Ver Disponibilidad</a>
+            </div>
+            
+            <!-- Social Proof Micro-strip -->
+            <div class="trust-strip">
+                <div class="trust-item">
+                    <span class="stars">★★★★★</span>
+                    <span>5.0 (600+ Reseñas)</span>
+                </div>
+            </div>
+        </div>
+        
+        <a href="#experience" class="scroll-down-indicator" aria-label="Scroll down">
+            <span></span>
+        </a>
+    </header>
+
+    <!-- Explainer Section: Why Segovia & Why Us -->
+    <section id="experience" class="section experience-section">
+        <div class="container">
+            <div class="section-header fade-in">
+                <h2>¿Por qué Segovia es el Destino Top 10 Mundial?</h2>
+                <p>No es solo un vuelo, es un viaje en el tiempo sobre 2000 años de historia.</p>
+            </div>
+            
+            <div class="grid-3-col">
+                <div class="feature-card glass-panel fade-in slide-up" style="--delay: 1">
+                    <div class="icon-wrapper">🏰</div>
+                    <h3>Vistas al Alcázar</h3>
+                    <p>Contempla el castillo que inspiró los cuentos de hadas desde una perspectiva que pocos tienen el privilegio de ver.</p>
+                </div>
+                <div class="feature-card glass-panel fade-in slide-up" style="--delay: 2">
+                    <div class="icon-wrapper">🏛️</div>
+                    <h3>El Acueducto a vista de pájaro</h3>
+                    <p>Sobrevuela esta maravilla de la ingeniería romana con las primeras luces del amanecer bañando sus piedras.</p>
+                </div>
+                <div class="feature-card glass-panel fade-in slide-up" style="--delay: 3">
+                    <div class="icon-wrapper">🥂</div>
+                    <h3>Brindis Cava y Desayuno</h3>
+                    <p>Al aterrizar, celebramos la vida con el tradicional brindis aeronáutico y un desayuno Segoviano de lujo.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Packages Section (Tiering) -->
+    <section id="packages" class="section packages-section">
+        <div class="container">
+            <div class="section-header fade-in">
+                <h2>Elige tu Nivel de Excelencia</h2>
+                <p>Desde la aventura clásica hasta exclusividad privada, tenemos la cápsula perfecta para ti.</p>
+            </div>
+            
+            <div class="pricing-grid">
+                <!-- Tier 1: Classic -->
+                <div class="price-card fade-in slide-up" style="--delay: 1">
+                    <div class="card-header">
+                        <h3>Classic Adventure</h3>
+                        <p class="card-desc">La experiencia Segoviana perfecta.</p>
+                        <div class="price">120€ <span>/ pasajero</span></div>
+                    </div>
+                    <ul class="features-list">
+                        <li>✓ Vuelo de 1 hora al amanecer</li>
+                        <li>✓ Cesta compartida (Max 10-12)</li>
+                        <li>✓ Brindis con Cava y Picnic</li>
+                        <li>✓ Diploma de vuelo</li>
+                        <li>✓ Reportaje fotográfico digital</li>
+                    </ul>
+                    <a href="#booking" class="btn btn-outline btn-full">Reservar Classic</a>
+                </div>
+
+                <!-- Tier 2: Premium (Highlighted) -->
+                <div class="price-card premium-card glass-panel fade-in slide-up" style="--delay: 2">
+                    <div class="badge">Más Popular</div>
+                    <div class="card-header">
+                        <h3>Imperial Segovia</h3>
+                        <p class="card-desc">Confort superior y gastronomía local.</p>
+                        <div class="price">205€ <span>/ pasajero</span></div>
+                    </div>
+                    <ul class="features-list">
+                        <li>✓ Todo lo del Classic</li>
+                        <li>✓ Cestas más amplias (menos pasajeros)</li>
+                        <li>✓ Desayuno gourmet post-vuelo en restaurante The Alcázar</li>
+                        <li>✓ Recogida VIP en hotel de Segovia</li>
+                        <li>✓ Video editado del vuelo en 4K</li>
+                    </ul>
+                    <a href="#booking" class="btn btn-primary btn-full">Reservar Imperial</a>
+                </div>
+
+                <!-- Tier 3: Luxury -->
+                <div class="price-card fade-in slide-up" style="--delay: 3">
+                    <div class="card-header">
+                        <h3>Private Suite</h3>
+                        <p class="card-desc">Exclusividad total para parejas o VIPs.</p>
+                        <div class="price">Desde 850€ <span>/ total</span></div>
+                    </div>
+                    <ul class="features-list">
+                        <li>✓ Vuelo privado (Solo tú y el piloto)</li>
+                        <li>✓ Botella de champagne francés a bordo</li>
+                        <li>✓ Opción de ruta personalizada (si el viento lo permite)</li>
+                        <li>✓ Concierge personal 24/7</li>
+                        <li>✓ Accesos exclusivos opcionales (Bodegas locales)</li>
+                    </ul>
+                    <a href="#booking" class="btn btn-outline btn-full">Consultar Suite</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Social Proof Section -->
+    <section id="reviews" class="section reviews-section bg-darker">
+        <div class="container">
+            <div class="section-header fade-in">
+                <h2>Historias de Cielos Conquistados</h2>
+                <p>No nos creas a nosotros, cree a los cientos de pasajeros que ya han volado.</p>
+            </div>
+            
+            <div class="reviews-slider glass-panel fade-in">
+                <!-- Mock Review -->
+                <div class="review-item">
+                    <div class="review-stars">★★★★★</div>
+                    <p class="review-text">"La mejor experiencia de mi vida. El trato desde que nos recogieron fue de 5 estrellas. Volar casi tocando el Alcázar y el desayuno posterior fue simplemente mágico. ¡Nivel Seattle Ballooning o superior!"</p>
+                    <div class="review-author">
+                        <strong>María Sánchez</strong>
+                        <span>Viajera desde Madrid</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="trust-badges mt-8 text-center flex justify-center gap-4">
+               <!-- Placeholders for actual trust badges images -->
+               <div class="trust-badge">Google 5.0</div>
+               <div class="trust-badge">TripAdvisor Excellence</div>
+               <div class="trust-badge">ISO 9001:2015</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Booking Engine (Mock UI) -->
+    <section id="booking" class="section booking-section">
+        <div class="container">
+            <div class="booking-container glass-panel fade-in">
+                <div class="booking-content text-center">
+                    <h2>Comienza tu Aventura</h2>
+                    <p class="mb-8">Reserva en menos de 2 minutos. Confirmación inmediata.</p>
+                    
+                    <form class="booking-step-form" onsubmit="event.preventDefault(); alert('Booking form submitted! Integration with FareHarbor/similar pending.');">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="date">Fecha del Vuelo</label>
+                                <input type="date" id="date" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="passengers">Pasajeros</label>
+                                <select id="passengers" required>
+                                    <option value="1">1 Persona</option>
+                                    <option value="2" selected>2 Personas</option>
+                                    <option value="3">3 Personas</option>
+                                    <option value="4">4+ Personas</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="package-select">Paquete</label>
+                                <select id="package-select" required>
+                                    <option value="classic">Classic Adventure - 120€</option>
+                                    <option value="imperial" selected>Imperial Segovia - 205€</option>
+                                    <option value="private">Private Suite - Consultar</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-large mt-6 w-full">Comprobar Disponibilidad</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="#" class="logo">Voyager<span>Balloons</span></a>
+                    <p>Elevando corazones en Segovia desde hace más de 25 años. La mejor experiencia garantizada.</p>
+                </div>
+                <div class="footer-links">
+                    <h3>Explorar</h3>
+                    <ul>
+                        <li><a href="#experience">La Ruta</a></li>
+                        <li><a href="#packages">Tarifas</a></li>
+                        <li><a href="#">Preguntas Frecuentes</a></li>
+                        <li><a href="#">Blog</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h3>Pasajeros</h3>
+                    <ul>
+                        <li><a href="#">Portal del Pasajero</a></li>
+                        <li><a href="#">Descargar Fotos</a></li>
+                        <li><a href="#">Certificado de Vuelo</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h3>Contacto</h3>
+                    <p>📧 info@voyagerballoons.eu</p>
+                    <p>📞 +34 600 000 000</p>
+                    <p>📍 Pl. del Azoguejo, 1, Segovia, España</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Voyager Balloons EU. Todos los derechos reservados.</p>
+                <div class="legal-links">
+                    <a href="#">Aviso Legal</a>
+                    <a href="#">Privacidad</a>
+                    <a href="#">Cookies</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- WhatsApp Floating Button -->
+    <a href="#" class="whatsapp-float" aria-label="Chat with Concierge on WhatsApp">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32" fill="currentColor"><path d="M12.01 2.00195c-5.52 0-9.99 4.47-9.99 9.99 0 1.93.55 3.75 1.49 5.3l-1.5 5.51 5.64-1.48c1.51.88 3.27 1.39 5.15 1.39 5.52 0 9.99-4.47 9.99-9.99 0-5.52-4.47-9.99-9.99-9.99zm5.35 14.19c-.23.63-1.32 1.21-1.84 1.27-.47.05-1.07.1-3.3-1.33-2.67-1.72-4.38-4.48-4.51-4.66-.13-.18-1.07-1.43-1.07-2.72 0-1.29.67-1.92.9-2.16.23-.24.51-.31.68-.31.17 0 .34 0 .49.01.16.01.35-.06.54.41.2.49.68 1.66.74 1.78.06.12.1.26.02.43-.08.17-.12.28-.24.43-.12.14-.25.32-.35.43-.11.12-.23.25-.1.47.13.22.58.96 1.25 1.56.86.77 1.59 1 1.8.11.22.12.33-.05.52-.22.19-.17.38-.49.6-.58.22-.09 1.14-.54 1.31-.6.18-.06.31-.09.45.12.14.21.54.68.68.82.14.14.28.16.51.27z"/></svg>
+    </a>
+
+    <!-- Scripts -->
+    <script src="js/script.js" defer></script>
+</body>
+</html>
