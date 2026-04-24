@@ -201,40 +201,138 @@
         </div>
     </section>
 
-    <!-- Booking Engine (Mock UI) -->
+    <!-- Custom Booking Engine Section -->
     <section id="booking" class="section booking-section">
         <div class="container">
-            <div class="booking-container glass-panel fade-in">
-                <div class="booking-content text-center">
-                    <h2>Comienza tu Aventura</h2>
-                    <p class="mb-8">Reserva en menos de 2 minutos. Confirmación inmediata.</p>
-                    
-                    <form class="booking-step-form" onsubmit="event.preventDefault(); alert('Booking form submitted! Integration with FareHarbor/similar pending.');">
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label for="date">Fecha del Vuelo</label>
-                                <input type="date" id="date" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="passengers">Pasajeros</label>
-                                <select id="passengers" required>
-                                    <option value="1">1 Persona</option>
-                                    <option value="2" selected>2 Personas</option>
-                                    <option value="3">3 Personas</option>
-                                    <option value="4">4+ Personas</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="package-select">Paquete</label>
-                                <select id="package-select" required>
-                                    <option value="classic">Classic Adventure - 120€</option>
-                                    <option value="imperial" selected>Imperial Segovia - 205€</option>
-                                    <option value="private">Private Suite - Consultar</option>
-                                </select>
+            <div class="section-header fade-in">
+                <h2>Reserva tu Plaza en el Cielo</h2>
+                <p>Elige tu fecha y prepárate para una experiencia que recordarás toda la vida.</p>
+            </div>
+
+            <div class="booking-wizard glass-panel fade-in slide-up">
+                <!-- Progress Bar -->
+                <div class="wizard-progress">
+                    <div class="progress-step active" data-step="1"><span>1</span> Fecha y Vuelo</div>
+                    <div class="progress-step" data-step="2"><span>2</span> Pasajeros</div>
+                    <div class="progress-step" data-step="3"><span>3</span> Pago Seguro</div>
+                </div>
+
+                <!-- Step 1: Selection -->
+                <div class="wizard-content active" id="step-1">
+                    <div class="booking-grid">
+                        <div class="calendar-container">
+                            <label class="input-label">Selecciona tu Fecha</label>
+                            <div id="booking-calendar"></div>
+                            <input type="hidden" id="selected-date">
+                        </div>
+                        <div class="flight-selection">
+                            <label class="input-label">Tipo de Experiencia</label>
+                            <div class="flight-options-vertical">
+                                <div class="flight-option active" data-type="classic" data-price="120">
+                                    <div class="option-info">
+                                        <h4>Classic Adventure</h4>
+                                        <p>Vuelo compartido al amanecer</p>
+                                    </div>
+                                    <div class="option-price">120€</div>
+                                </div>
+                                <div class="flight-option" data-type="imperial" data-price="205">
+                                    <div class="option-info">
+                                        <h4>Imperial Segovia</h4>
+                                        <p>Confort VIP y desayuno gourmet</p>
+                                    </div>
+                                    <div class="option-price">205€</div>
+                                </div>
+                                <div class="flight-option" data-type="private" data-price="850">
+                                    <div class="option-info">
+                                        <h4>Private Suite</h4>
+                                        <p>Vuelo privado exclusivo</p>
+                                    </div>
+                                    <div class="option-price">850€</div>
+                                </div>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary btn-large mt-6 w-full">Comprobar Disponibilidad</button>
+                    </div>
+                    <div class="wizard-actions">
+                        <button class="btn btn-primary btn-large" onclick="nextStep(2)">Continuar <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left:8px"><path d="m9 18 6-6-6-6"/></svg></button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Passenger Data -->
+                <div class="wizard-content" id="step-2">
+                    <div class="passenger-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="cust-name">Nombre Completo</label>
+                                <input type="text" id="cust-name" placeholder="Ej: Juan Pérez">
+                            </div>
+                            <div class="form-group">
+                                <label for="cust-email">Email de Confirmación</label>
+                                <input type="email" id="cust-email" placeholder="juan@ejemplo.com">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="cust-phone">Teléfono de contacto</label>
+                                <input type="tel" id="cust-phone" placeholder="+34 600 000 000">
+                            </div>
+                            <div class="form-group">
+                                <label for="pax-count">Número de Pasajeros</label>
+                                <div class="counter-input">
+                                    <button onclick="updatePax(-1)">-</button>
+                                    <span id="pax-display">1</span>
+                                    <button onclick="updatePax(1)">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="wizard-actions">
+                        <button class="btn btn-outline" onclick="prevStep(1)">Atrás</button>
+                        <button class="btn btn-primary btn-large" onclick="nextStep(3)">Ir al Pago <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left:8px"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Checkout Summary -->
+                <div class="wizard-content" id="step-3">
+                    <div class="summary-card">
+                        <div class="summary-item">
+                            <span>Vuelo:</span>
+                            <strong id="summary-flight">Classic Adventure</strong>
+                        </div>
+                        <div class="summary-item">
+                            <span>Fecha:</span>
+                            <strong id="summary-date">-</strong>
+                        </div>
+                        <div class="summary-item">
+                            <span>Pasajeros:</span>
+                            <strong id="summary-pax">1</strong>
+                        </div>
+                        <div class="summary-total">
+                            <span>Total a Pagar:</span>
+                            <strong id="summary-total">120€</strong>
+                        </div>
+                    </div>
+                    
+                    <!-- Redsys Payment Form (Hidden) -->
+                    <form id="redsys-form" method="POST" action="https://sis-t.redsys.es/sis/realizarPago" style="display:none">
+                        <!-- We will fill these via JS before submitting -->
+                        <input type="hidden" name="Ds_SignatureVersion" value="HMAC_SHA256_V1">
+                        <input type="hidden" name="Ds_MerchantParameters" id="ds-parameters">
+                        <input type="hidden" name="Ds_Signature" id="ds-signature">
                     </form>
+
+                    <div class="payment-methods">
+                        <div class="payment-badges">
+                            <img src="https://brand.mastercard.com/content/dam/mccom/brandcenter/thumbnails/mastercard_vrt_pos_92px_2x.png" alt="Mastercard" height="30">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/2560px-Visa_Inc._logo.svg.png" alt="Visa" height="20">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Apple_Pay_logo.svg/2560px-Apple_Pay_logo.svg.png" alt="Apple Pay" height="25">
+                        </div>
+                        <p class="secure-text">🔒 Pago seguro procesado por Redsys TPV Virtual</p>
+                    </div>
+
+                    <div class="wizard-actions">
+                        <button class="btn btn-outline" onclick="prevStep(2)">Atrás</button>
+                        <button class="btn btn-primary btn-large" id="pay-button" onclick="initiateRedsysPayment()">Pagar con Tarjeta / Apple Pay</button>
+                    </div>
                 </div>
             </div>
         </div>

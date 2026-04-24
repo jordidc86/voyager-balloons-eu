@@ -511,51 +511,286 @@ ul {
 }
 
 /* ==========================================================================
-   Booking Section
+   Booking Wizard (Custom Engine)
    ========================================================================== */
 .booking-section {
-    background: linear-gradient(to top, var(--color-bg-alt), var(--color-bg-light));
+    background: radial-gradient(circle at top, #fff 0%, var(--color-bg-alt) 100%);
 }
 
-.booking-container {
-    max-width: 800px;
+.booking-wizard {
+    max-width: 900px;
     margin: 0 auto;
-    padding: 4rem 3rem;
+    padding: 3rem;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.6);
+    border-radius: 24px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+}
+
+.wizard-progress {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4rem;
+    position: relative;
+    padding: 0 10%;
+}
+
+.wizard-progress::before {
+    content: '';
+    position: absolute;
+    top: 15px;
+    left: 15%;
+    right: 15%;
+    height: 2px;
+    background: #e2e8f0;
+    z-index: 0;
+}
+
+.progress-step {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    transition: var(--transition-smooth);
+}
+
+.progress-step span {
+    width: 32px;
+    height: 32px;
     background: #fff;
+    border: 2px solid #e2e8f0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    transition: var(--transition-smooth);
 }
 
-.form-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-    text-align: left;
+.progress-step.active {
+    color: var(--color-text-dark);
 }
 
-.form-group label {
+.progress-step.active span {
+    border-color: var(--color-primary);
+    background: var(--color-primary);
+    color: #fff;
+    box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.2);
+}
+
+.wizard-content {
+    display: none;
+    animation: fadeInScale 0.4s ease-out;
+}
+
+.wizard-content.active {
     display: block;
-    margin-bottom: 0.5rem;
+}
+
+@keyframes fadeInScale {
+    from { opacity: 0; transform: scale(0.98) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Step 1: Selection Grid */
+.booking-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 3rem;
+}
+
+.input-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 1.5rem;
+}
+
+/* Custom Calendar Overrides (Flatpickr Theme) */
+#booking-calendar {
+    background: #fff;
+    border-radius: 12px;
+    padding: 1rem;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+/* Flight Options */
+.flight-options-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.flight-option {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    background: #fff;
+    border: 2px solid #f1f5f9;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+.flight-option:hover {
+    border-color: #e2e8f0;
+    transform: translateX(4px);
+}
+
+.flight-option.active {
+    border-color: var(--color-primary);
+    background: rgba(212, 175, 55, 0.05);
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.1);
+}
+
+.flight-option h4 {
+    font-size: 1.125rem;
+    margin-bottom: 0.25rem;
+}
+
+.flight-option p {
     font-size: 0.875rem;
     color: var(--color-text-muted);
 }
 
-.form-group input,
-.form-group select {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    background: #fff;
-    border: 1px solid rgba(0,0,0,0.1);
-    border-radius: 8px;
-    color: var(--color-text-dark);
-    font-family: var(--font-body);
-    font-size: 1rem;
-    appearance: none;
+.option-price {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-primary);
 }
 
-.form-group input:focus,
-.form-group select:focus {
+/* Step 2: Form Styling */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+    color: var(--color-text-dark);
+}
+
+.form-group input {
+    width: 100%;
+    padding: 1rem;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: var(--transition-smooth);
+}
+
+.form-group input:focus {
     outline: none;
     border-color: var(--color-primary);
-    box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
+    box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.1);
+}
+
+.counter-input {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 0.5rem;
+    background: #f8fafc;
+    border-radius: 12px;
+    width: fit-content;
+}
+
+.counter-input button {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: #fff;
+    color: var(--color-text-dark);
+    font-size: 1.25rem;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    transition: var(--transition-smooth);
+}
+
+.counter-input button:hover {
+    background: var(--color-primary);
+    color: #fff;
+}
+
+.counter-input span {
+    font-size: 1.25rem;
+    font-weight: 700;
+    min-width: 20px;
+    text-align: center;
+}
+
+/* Step 3: Summary */
+.summary-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid #e2e8f0;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.summary-total {
+    display: flex;
+    justify-content: space-between;
+    padding: 1.5rem 0 0;
+    font-size: 1.5rem;
+    color: var(--color-text-dark);
+}
+
+.summary-total strong {
+    color: var(--color-primary);
+}
+
+.payment-methods {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.payment-badges {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 1rem;
+    opacity: 0.8;
+}
+
+.secure-text {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+}
+
+.wizard-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 3rem;
+}
+
+.wizard-actions:only-child,
+#step-1 .wizard-actions {
+    justify-content: flex-end;
 }
 
 /* ==========================================================================
