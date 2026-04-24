@@ -183,6 +183,8 @@ ul {
     color: #fff;
     letter-spacing: -0.5px;
     transition: color 0.3s;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .logo span {
@@ -193,7 +195,8 @@ ul {
 .nav-links {
     display: flex;
     align-items: center;
-    gap: 2rem;
+    gap: 1.5rem;
+    flex-shrink: 0;
 }
 
 .nav-links a:not(.btn) {
@@ -384,6 +387,15 @@ ul {
     position: relative;
     transition: var(--transition-smooth);
     box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.card-content-wrapper {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .premium-card {
@@ -435,6 +447,7 @@ ul {
 
 .features-list {
     margin-bottom: 2.5rem;
+    flex-grow: 1;
 }
 
 .features-list li {
