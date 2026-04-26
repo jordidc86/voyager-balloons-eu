@@ -475,15 +475,21 @@ ul {
    Reviews Section
    ========================================================================== */
 .bg-darker {
-    background-color: #fff; /* Re-using white for contrast over alt */
+    background-color: #121212; /* Dark premium background to blend with widget */
+    color: #fff;
+}
+
+.reviews-section .section-header h2,
+.reviews-section .section-header p {
+    color: #fff;
 }
 
 .reviews-slider {
-    max-width: 800px;
+    max-width: 1000px;
     margin: 0 auto;
-    padding: 3rem;
+    padding: 0;
     text-align: center;
-    background: var(--color-bg-alt);
+    background: transparent;
     border: none;
 }
 
