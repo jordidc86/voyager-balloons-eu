@@ -475,13 +475,13 @@ ul {
    Reviews Section
    ========================================================================== */
 .bg-darker {
-    background-color: #121212; /* Dark premium background to blend with widget */
-    color: #fff;
+    background-color: var(--color-bg-light); /* Or #fff if preferred */
+    color: var(--color-text-dark);
 }
 
 .reviews-section .section-header h2,
 .reviews-section .section-header p {
-    color: #fff;
+    color: var(--color-text-dark);
 }
 
 .reviews-slider {
