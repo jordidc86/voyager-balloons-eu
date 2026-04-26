@@ -110,7 +110,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
         });
-    });
     // ==========================================================================
     // 4. FAQ Accordion Logic
     // ==========================================================================
@@ -135,8 +134,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Initialize UI
-    renderPassengerFields();
 });
 
 function updatePax(delta) {
@@ -145,56 +142,6 @@ function updatePax(delta) {
         bookingData.pax = newPax;
         document.getElementById('pax-display').innerText = newPax;
         updateSummary();
-        renderPassengerFields();
-    }
-}
-
-function renderPassengerFields() {
-    const container = document.getElementById('passenger-details-container');
-    if (!container) return;
-    
-    const currentData = [];
-    const existingRows = container.querySelectorAll('.form-row');
-    existingRows.forEach((row, index) => {
-        const nameInput = document.getElementById(`pax-name-${index}`);
-        const weightInput = document.getElementById(`pax-weight-${index}`);
-        currentData.push({
-            name: nameInput ? nameInput.value : '',
-            weight: weightInput ? weightInput.value : ''
-        });
-    });
-
-    container.innerHTML = '';
-    
-    const title = document.createElement('h4');
-    title.innerText = 'Detalles de los Pasajeros';
-    title.style.marginTop = '1.5rem';
-    title.style.marginBottom = '1rem';
-    container.appendChild(title);
-
-    for (let i = 0; i < bookingData.pax; i++) {
-        const row = document.createElement('div');
-        row.className = 'form-row';
-        
-        const nameGroup = document.createElement('div');
-        nameGroup.className = 'form-group';
-        nameGroup.innerHTML = `<label for="pax-name-${i}">Nombre Pasajero ${i + 1}</label>
-                               <input type="text" id="pax-name-${i}" placeholder="Nombre completo" required>`;
-        if(currentData[i] && currentData[i].name) {
-            nameGroup.querySelector('input').value = currentData[i].name;
-        }
-
-        const weightGroup = document.createElement('div');
-        weightGroup.className = 'form-group';
-        weightGroup.innerHTML = `<label for="pax-weight-${i}">Peso Pasajero ${i + 1} (kg)</label>
-                                 <input type="number" id="pax-weight-${i}" placeholder="Ej: 75" required min="10" max="150">`;
-        if(currentData[i] && currentData[i].weight) {
-            weightGroup.querySelector('input').value = currentData[i].weight;
-        }
-
-        row.appendChild(nameGroup);
-        row.appendChild(weightGroup);
-        container.appendChild(row);
     }
 }
 
@@ -214,7 +161,7 @@ function updateSummary() {
 }
 
 function nextStep(step) {
-    if (step === 2 && !bookingData.date && bookingData.flightType !== 'billete-regalo') {
+    if (step === 2 && !bookingData.date) {
         alert('Por favor, selecciona una fecha para continuar.');
         return;
     }
@@ -224,20 +171,6 @@ function nextStep(step) {
         const email = document.getElementById('cust-email').value;
         if (!name || !email) {
             alert('Por favor, completa tus datos de contacto.');
-            return;
-        }
-        
-        let passengersValid = true;
-        for (let i = 0; i < bookingData.pax; i++) {
-            const pName = document.getElementById(`pax-name-${i}`);
-            const pWeight = document.getElementById(`pax-weight-${i}`);
-            if(!pName || !pWeight || !pName.value || !pWeight.value) {
-                passengersValid = false;
-                break;
-            }
-        }
-        if(!passengersValid) {
-            alert('Por favor, completa el nombre y peso de todos los pasajeros.');
             return;
         }
     }

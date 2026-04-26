@@ -176,6 +176,14 @@ ul {
     transition: var(--transition-smooth);
 }
 
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    flex-wrap: nowrap;
+}
+
 /* Make initial navbar text white so it reads over the dark hero overlay */
 .logo {
     font-size: 1.5rem;
@@ -197,6 +205,7 @@ ul {
     align-items: center;
     gap: 1.5rem;
     flex-shrink: 0;
+    white-space: nowrap;
 }
 
 .nav-links a:not(.btn) {
@@ -1102,6 +1111,19 @@ ul {
     
     h1 {
         font-size: 2.5rem;
+    }
+
+    .nav-links {
+        gap: 1rem;
+    }
+
+    .nav-links a:not(.btn) {
+        font-size: 0.85rem;
+    }
+    
+    .nav-links .btn {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.9rem;
     }
 }
 
