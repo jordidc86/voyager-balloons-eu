@@ -1,9 +1,7 @@
 /**
  * Voyager Balloons EU - Main JavaScript
- * Focus on non-blocking performance and native Web APIs
  */
 
-// Booking Wizard Logic
 let currentStep = 1;
 let bookingData = {
     date: '',
@@ -11,43 +9,37 @@ let bookingData = {
     flightName: 'Classic Adventure',
     pricePerPax: 120,
     pax: 1,
-    total: 120
+    total: 120,
+    isTestDiscount: false
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-    
-    // ==========================================================================
-    // 1. Sticky Navbar Logic
-    // ==========================================================================
+    // 1. Sticky Navbar
     const navbar = document.getElementById('navbar');
-    
     const toggleNavbarState = () => {
-        if (window.scrollY > 50) {
-            navbar.classList.add('scrolled');
-        } else {
-            navbar.classList.remove('scrolled');
-        }
+        if (window.scrollY > 50) navbar.classList.add('scrolled');
+        else navbar.classList.remove('scrolled');
     };
-
-    // Initial check and scroll event listener
+    window.addEventListener('scroll', () => window.requestAnimationFrame(toggleNavbarState));
     toggleNavbarState();
-    window.addEventListener('scroll', () => {
-        // Use requestAnimationFrame for performance
-        window.requestAnimationFrame(toggleNavbarState);
-    });
 
-    // Initialize Calendar
-    const calendar = flatpickr("#booking-calendar", {
-        inline: true,
-        minDate: "today",
-        dateFormat: "Y-m-d",
-        onChange: function(selectedDates, dateStr) {
-            bookingData.date = dateStr;
-            updateSummary();
-        }
-    });
+    // 2. Initialize Calendar (Spanish, Monday start)
+    if (document.getElementById('booking-calendar')) {
+        flatpickr("#booking-calendar", {
+            locale: "es",
+            minDate: "today",
+            inline: true,
+            dateFormat: "Y-m-d",
+            "locale": { "firstDayOfWeek": 1 },
+            onChange: function(selectedDates, dateStr) {
+                document.getElementById('selected-date').value = dateStr;
+                bookingData.date = dateStr;
+                updateSummary();
+            }
+        });
+    }
 
-    // Flight Option Selection
+    // 3. Flight Option Selection
     const options = document.querySelectorAll('.flight-option');
     options.forEach(opt => {
         opt.addEventListener('click', () => {
@@ -62,71 +54,29 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // ==========================================================================
-    // 2. Scroll Animations (Intersection Observer)
-    // ==========================================================================
-    // Configure observer options
-    const observerOptions = {
-        root: null, // viewport
-        rootMargin: '0px 0px -50px 0px', // Trigger slightly before the element hits the bottom
-        threshold: 0.1 // Trigger when 10% of the element is visible
-    };
-
-    // Create the observer
-    const fadeInObserver = new IntersectionObserver((entries, observer) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                // Add the animation class
-                entry.target.classList.add('is-visible');
-                // Unobserve after animating to improve performance
-                observer.unobserve(entry.target);
-            }
-        });
-    }, observerOptions);
-
-    // Select elements to animate and observe them
-    const elementsToAnimate = document.querySelectorAll('.fade-in');
-    elementsToAnimate.forEach(element => {
-        fadeInObserver.observe(element);
-    });
-
-    // ==========================================================================
-    // 3. Smooth Scrolling for Navigation Links
-    // ==========================================================================
+    // 4. Smooth Scrolling
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             const targetId = this.getAttribute('href');
-            
-            // Skip if it's just "#"
             if (targetId === '#') return;
-            
             const targetElement = document.querySelector(targetId);
-            
             if (targetElement) {
                 e.preventDefault();
-                targetElement.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
+                targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         });
     });
-    // ==========================================================================
-    // 4. FAQ Accordion Logic
-    // ==========================================================================
+
+    // 5. FAQ Accordion
     const faqItems = document.querySelectorAll('.faq-item');
     faqItems.forEach(item => {
         const question = item.querySelector('.faq-question');
         question.addEventListener('click', () => {
             const isActive = item.classList.contains('active');
-            
-            // Close all other items
-            faqItems.forEach(otherItem => {
-                otherItem.classList.remove('active');
-                otherItem.querySelector('.faq-answer').style.maxHeight = null;
+            faqItems.forEach(oi => {
+                oi.classList.remove('active');
+                oi.querySelector('.faq-answer').style.maxHeight = null;
             });
-            
-            // Toggle current item
             if (!isActive) {
                 item.classList.add('active');
                 const answer = item.querySelector('.faq-answer');
@@ -135,8 +85,29 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Initialize UI
+    // 6. Scroll Animations (Intersection Observer)
+    const observerOptions = {
+        root: null,
+        rootMargin: '0px 0px -50px 0px',
+        threshold: 0.1
+    };
+
+    const fadeInObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+
+    document.querySelectorAll('.fade-in, .slide-up').forEach(element => {
+        fadeInObserver.observe(element);
+    });
+
+    // Initial UI Setup
     renderPassengerFields();
+    updateSummary();
 });
 
 function updatePax(delta) {
@@ -153,162 +124,163 @@ function renderPassengerFields() {
     const container = document.getElementById('passenger-details-container');
     if (!container) return;
     
+    // Save current values to avoid losing them on re-render
     const currentData = [];
-    const existingRows = container.querySelectorAll('.form-row');
-    existingRows.forEach((row, index) => {
-        const nameInput = document.getElementById(`pax-name-${index}`);
-        const weightInput = document.getElementById(`pax-weight-${index}`);
-        currentData.push({
-            name: nameInput ? nameInput.value : '',
-            weight: weightInput ? weightInput.value : ''
-        });
-    });
+    for (let i = 0; i < 20; i++) {
+        const nInput = document.getElementById(`pax-name-${i}`);
+        const wInput = document.getElementById(`pax-weight-${i}`);
+        if (nInput) currentData[i] = { name: nInput.value, weight: wInput.value };
+    }
 
-    container.innerHTML = '';
+    container.innerHTML = `<h4 style="margin: 1.5rem 0 1rem;">Detalles de los Pasajeros</h4>`;
     
-    const title = document.createElement('h4');
-    title.innerText = 'Detalles de los Pasajeros';
-    title.style.marginTop = '1.5rem';
-    title.style.marginBottom = '1rem';
-    container.appendChild(title);
-
     for (let i = 0; i < bookingData.pax; i++) {
         const row = document.createElement('div');
         row.className = 'form-row';
-        
-        const nameGroup = document.createElement('div');
-        nameGroup.className = 'form-group';
-        nameGroup.innerHTML = `<label for="pax-name-${i}">Nombre Pasajero ${i + 1}</label>
-                               <input type="text" id="pax-name-${i}" placeholder="Nombre completo" required>`;
-        if(currentData[i] && currentData[i].name) {
-            nameGroup.querySelector('input').value = currentData[i].name;
-        }
-
-        const weightGroup = document.createElement('div');
-        weightGroup.className = 'form-group';
-        weightGroup.innerHTML = `<label for="pax-weight-${i}">Peso Pasajero ${i + 1} (kg)</label>
-                                 <input type="number" id="pax-weight-${i}" placeholder="Ej: 75" required min="10" max="150">`;
-        if(currentData[i] && currentData[i].weight) {
-            weightGroup.querySelector('input').value = currentData[i].weight;
-        }
-
-        row.appendChild(nameGroup);
-        row.appendChild(weightGroup);
+        row.innerHTML = `
+            <div class="form-group">
+                <label>Nombre Pasajero ${i + 1}</label>
+                <input type="text" id="pax-name-${i}" placeholder="Nombre completo" required value="${currentData[i]?.name || ''}">
+            </div>
+            <div class="form-group">
+                <label>Peso Pasajero ${i + 1} (kg)</label>
+                <input type="number" id="pax-weight-${i}" placeholder="Ej: 75" required min="10" max="150" value="${currentData[i]?.weight || ''}">
+            </div>
+        `;
         container.appendChild(row);
     }
 }
 
 function updateSummary() {
-    bookingData.total = bookingData.pricePerPax * bookingData.pax;
+    if (bookingData.isTestDiscount) bookingData.total = 1;
+    else bookingData.total = bookingData.pricePerPax * bookingData.pax;
     
-    // Update Step 3 Summary
-    const summaryFlight = document.getElementById('summary-flight');
-    const summaryDate = document.getElementById('summary-date');
-    const summaryPax = document.getElementById('summary-pax');
-    const summaryTotal = document.getElementById('summary-total');
+    const dateStr = bookingData.date || 'Selecciona fecha';
+    
+    // Step 3 Summary
+    const sFlight = document.getElementById('summary-flight');
+    const sDate = document.getElementById('summary-date');
+    const sPax = document.getElementById('summary-pax');
+    const sTotal = document.getElementById('summary-total');
 
-    if(summaryFlight) summaryFlight.innerText = bookingData.flightName;
-    if(summaryDate) summaryDate.innerText = bookingData.date || 'Selecciona una fecha';
-    if(summaryPax) summaryPax.innerText = bookingData.pax;
-    if(summaryTotal) summaryTotal.innerText = bookingData.total + '€';
+    if (sFlight) sFlight.innerText = bookingData.flightName;
+    if (sDate) sDate.innerText = dateStr;
+    if (sPax) sPax.innerText = bookingData.pax;
+    if (sTotal) {
+        sTotal.innerText = `${bookingData.total}€`;
+        if (bookingData.isTestDiscount) sTotal.innerHTML += ' <small style="color:#27ae60">(Test)</small>';
+    }
+
+    // Live Bar Summary
+    const lTotal = document.getElementById('live-total');
+    const pillDate = document.getElementById('pill-date');
+    const pillFlight = document.getElementById('pill-flight');
+    const pillPax = document.getElementById('pill-pax');
+
+    if (lTotal) lTotal.innerText = `${bookingData.total}€`;
+    if (pillDate) pillDate.innerHTML = `<i class="icon">📅</i> ${dateStr}`;
+    if (pillFlight) pillFlight.innerHTML = `<i class="icon">🎈</i> ${bookingData.flightName}`;
+    if (pillPax) pillPax.innerHTML = `<i class="icon">👤</i> ${bookingData.pax} pax`;
+}
+
+function applyPromoCode() {
+    const code = document.getElementById('promo-code').value.trim().toUpperCase();
+    const msg = document.getElementById('promo-message');
+    if (code === 'VOYAGER1') {
+        bookingData.isTestDiscount = true;
+        msg.innerText = '¡Código aplicado! (1€ para pruebas)';
+        msg.style.color = '#27ae60';
+    } else {
+        bookingData.isTestDiscount = false;
+        msg.innerText = code === '' ? '' : 'Código no válido';
+        msg.style.color = '#e74c3c';
+    }
+    updateSummary();
 }
 
 function nextStep(step) {
-    if (step === 2 && !bookingData.date && bookingData.flightType !== 'billete-regalo') {
-        alert('Por favor, selecciona una fecha para continuar.');
+    if (step === 2 && !bookingData.date) {
+        alert("Por favor, selecciona una fecha.");
         return;
     }
-    
     if (step === 3) {
         const name = document.getElementById('cust-name').value;
         const email = document.getElementById('cust-email').value;
-        if (!name || !email) {
-            alert('Por favor, completa tus datos de contacto.');
+        const phone = document.getElementById('cust-phone').value;
+        if (!name || !email || !phone) {
+            alert("Por favor, completa tus datos de contacto.");
             return;
         }
-        
-        let passengersValid = true;
         for (let i = 0; i < bookingData.pax; i++) {
-            const pName = document.getElementById(`pax-name-${i}`);
-            const pWeight = document.getElementById(`pax-weight-${i}`);
-            if(!pName || !pWeight || !pName.value || !pWeight.value) {
-                passengersValid = false;
-                break;
+            if (!document.getElementById(`pax-name-${i}`).value || !document.getElementById(`pax-weight-${i}`).value) {
+                alert("Completa los datos de todos los pasajeros.");
+                return;
             }
-        }
-        if(!passengersValid) {
-            alert('Por favor, completa el nombre y peso de todos los pasajeros.');
-            return;
         }
     }
 
-    // Switch screens
-    document.querySelectorAll('.wizard-content').forEach(c => c.classList.remove('active'));
-    const targetStep = document.getElementById(`step-${step}`);
-    if(targetStep) targetStep.classList.add('active');
-    
-    // Update progress bar
-    document.querySelectorAll('.progress-step').forEach(s => {
-        if (parseInt(s.dataset.step) <= step) s.classList.add('active');
-        else s.classList.remove('active');
-    });
-    
     currentStep = step;
-    const bookingSection = document.getElementById('booking');
-    if(bookingSection) window.scrollTo({ top: bookingSection.offsetTop - 100, behavior: 'smooth' });
+    document.querySelectorAll('.wizard-content').forEach(c => c.classList.remove('active'));
+    document.getElementById(`step-${step}`).classList.add('active');
+    document.querySelectorAll('.progress-step').forEach(ps => {
+        if (parseInt(ps.dataset.step) <= step) ps.classList.add('active');
+        else ps.classList.remove('active');
+    });
+
+    const wizard = document.querySelector('.booking-wizard');
+    if (wizard) {
+        const rect = wizard.getBoundingClientRect();
+        if (rect.top < 0 || rect.top > 200) window.scrollTo({ top: window.scrollY + rect.top - 80, behavior: 'smooth' });
+    }
 }
 
 function prevStep(step) {
     nextStep(step);
 }
 
-async function initiateRedsysPayment() {
-    const payBtn = document.getElementById('pay-button');
-    if(!payBtn) return;
-    
-    payBtn.innerText = 'Conectando con TPV Seguro...';
-    payBtn.disabled = true;
+async function initiatePayment() {
+    // Defaulting to Stripe for validation as requested
+    await initiateStripePayment();
+}
+
+async function initiateStripePayment() {
+    const btn = document.getElementById('pay-button');
+    btn.disabled = true;
+    btn.innerText = 'Redirigiendo a Stripe...';
+
+    const passengers = [];
+    for (let i = 0; i < bookingData.pax; i++) {
+        passengers.push({
+            name: document.getElementById(`pax-name-${i}`).value,
+            weight: document.getElementById(`pax-weight-${i}`).value
+        });
+    }
+
+    const payload = {
+        date: bookingData.date,
+        flightType: bookingData.flightType,
+        pax: bookingData.pax,
+        passengers: passengers,
+        customer: {
+            name: document.getElementById('cust-name').value,
+            email: document.getElementById('cust-email').value,
+            phone: document.getElementById('cust-phone').value
+        },
+        total: bookingData.total
+    };
 
     try {
-        const name = document.getElementById('cust-name').value;
-        const email = document.getElementById('cust-email').value;
-        const phone = document.getElementById('cust-phone').value;
-
-        const response = await fetch('/.netlify/functions/create-payment', {
+        const response = await fetch('/.netlify/functions/create-stripe-session', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                customerName: name,
-                customerEmail: email,
-                customerPhone: phone,
-                flightType: bookingData.flightType,
-                date: bookingData.date,
-                pax: bookingData.pax,
-                total: bookingData.total
-            })
+            body: JSON.stringify(payload)
         });
-
-        if (!response.ok) {
-            throw new Error('Error al conectar con el servidor de pagos');
-        }
-
-        const data = await response.json();
-        
-        // Fill the hidden form
-        const form = document.getElementById('redsys-form');
-        form.action = data.redsysUrl; // Dynamic URL based on environment
-        document.getElementById('ds-parameters').value = data.merchantParameters;
-        document.getElementById('ds-signature').value = data.signature;
-
-        // Auto-submit the form to redirect the user to the bank
-        form.submit();
-
-    } catch (error) {
-        console.error('Error initiating payment:', error);
-        alert('Ocurrió un error al intentar iniciar el pago. Por favor, inténtalo de nuevo.');
-        payBtn.innerText = 'Pagar con Tarjeta / Apple Pay';
-        payBtn.disabled = false;
+        const session = await response.json();
+        if (session.url) window.location.href = session.url;
+        else throw new Error(session.error || 'Error en Stripe');
+    } catch (err) {
+        console.error(err);
+        alert('Error: ' + err.message);
+        btn.disabled = false;
+        btn.innerText = 'Pagar con Tarjeta / Apple Pay';
     }
 }

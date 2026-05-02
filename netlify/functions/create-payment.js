@@ -44,7 +44,7 @@ exports.handler = async (event, context) => {
 
     try {
         const body = JSON.parse(event.body);
-        const { customerName, customerEmail, customerPhone, flightType, date, pax, total } = body;
+        const { customerName, customerEmail, customerPhone, flightType, date, pax, total, passengers } = body;
 
         if (!customerName || !customerEmail || !flightType || !date || !total) {
             return { statusCode: 400, body: JSON.stringify({ error: 'Missing required fields' }) };
@@ -54,11 +54,11 @@ exports.handler = async (event, context) => {
         const supabaseUrl = process.env.SUPABASE_URL;
         const supabaseKey = process.env.SUPABASE_KEY;
         
-        // Generate a unique order ID for Redsys (Must be up to 12 chars, alphanumeric)
-        // Format: VB + timestamp (last 8 digits) + 2 random chars = 12 chars
-        const timestamp = Date.now().toString().slice(-8);
-        const randomStr = Math.random().toString(36).substring(2, 4).toUpperCase();
-        const orderId = `VB${timestamp}${randomStr}`;
+        // Generate a unique order ID for Redsys (Must be exactly 12 chars, numeric recommended for max compatibility)
+        // Format: timestamp (10 digits) + 2 random digits = 12 chars
+        const timestamp = Date.now().toString().slice(-10);
+        const randomDigits = Math.floor(Math.random() * 100).toString().padStart(2, '0');
+        const orderId = `${timestamp}${randomDigits}`;
 
         // Create booking record if Supabase is configured
         if (supabaseUrl && supabaseKey) {
@@ -74,6 +74,7 @@ exports.handler = async (event, context) => {
                     flight_date: date,
                     pax: pax,
                     total_price: total,
+                    passengers: passengers || [],
                     status: 'pending'
                 }]);
             
@@ -83,14 +84,15 @@ exports.handler = async (event, context) => {
         }
 
         // 2. Setup Redsys Parameters
-        const merchantCode = process.env.REDSYS_MERCHANT_CODE || '999008881'; // Default test FUC
-        const terminal = process.env.REDSYS_TERMINAL || '1';
+        const merchantCode = process.env.REDSYS_MERCHANT_CODE || '999008881'; 
+        const terminal = process.env.REDSYS_TERMINAL || '001';
         const secretKey = process.env.REDSYS_SECRET_KEY || 'sq7HjrUOBfKmC576ILgskD5srU870gJ7'; // Default test key
         const currency = '978'; // Euros
         const transactionType = '0'; // Authorization
         
         // Convert total to cents for Redsys
-        const amountCents = Math.round(total * 100).toString();
+        // Convert total to cents for Redsys (Must be a number in the JSON for some versions)
+        const amountCents = Math.round(parseFloat(total) * 100);
         
         const hostUrl = process.env.URL || 'http://localhost:8888';
 
@@ -106,10 +108,21 @@ exports.handler = async (event, context) => {
             DS_MERCHANT_URLKO: `${hostUrl}/error.html`
         };
 
+        console.log('Redsys Parameters:', merchantParameters);
+
         const merchantParamsJson = JSON.stringify(merchantParameters);
         const merchantParamsBase64 = base64Encode(merchantParamsJson);
 
         const signature = generateRedsysSignature(orderId, merchantParamsBase64, secretKey);
+
+        console.log('Payment Request Generated:', {
+            orderId,
+            amount: amountCents,
+            merchantCode,
+            terminal,
+            signature,
+            paramsB64: merchantParamsBase64
+        });
 
         return {
             statusCode: 200,

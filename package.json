@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/jordidc86/voyager-balloons-eu#readme",
   "dependencies": {
-    "@supabase/supabase-js": "^2.104.1"
+    "@supabase/supabase-js": "^2.104.1",
+    "stripe": "^22.1.0"
   }
 }

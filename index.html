@@ -41,6 +41,7 @@
     <!-- Flatpickr (Calendar) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
 
     <!-- CSS -->
     <link rel="stylesheet" href="css/style.css">
@@ -451,6 +452,16 @@
                         <div id="passenger-details-container">
                             <!-- Dynamic passenger fields will be injected here via JS -->
                         </div>
+                        <div class="form-row" style="margin-top: 2rem; border-top: 1px solid #eee; padding-top: 1.5rem;">
+                            <div class="form-group">
+                                <label for="promo-code">¿Tienes un código de descuento?</label>
+                                <div style="display: flex; gap: 10px;">
+                                    <input type="text" id="promo-code" placeholder="Introduce tu código">
+                                    <button class="btn btn-outline" type="button" onclick="applyPromoCode()">Aplicar</button>
+                                </div>
+                                <p id="promo-message" style="font-size: 0.85rem; margin-top: 5px; min-height: 1.2rem;"></p>
+                            </div>
+                        </div>
                     </div>
                     <div class="wizard-actions">
                         <button class="btn btn-outline" onclick="prevStep(1)">Atrás</button>
@@ -488,17 +499,31 @@
                     </form>
 
                     <div class="payment-methods">
-                        <div class="payment-badges">
+                        <div class="payment-badges" style="display: flex; justify-content: center; gap: 1.5rem; align-items: center; margin-bottom: 0.5rem;">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Stripe_Logo%2C_revised_2016.svg/2560px-Stripe_Logo%2C_revised_2016.svg.png" alt="Stripe" height="25" style="opacity: 0.8;">
                             <img src="https://brand.mastercard.com/content/dam/mccom/brandcenter/thumbnails/mastercard_vrt_pos_92px_2x.png" alt="Mastercard" height="30">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/2560px-Visa_Inc._logo.svg.png" alt="Visa" height="20">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/2560px-Visa_Inc._logo.svg.png" alt="Visa" height="15">
                             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Apple_Pay_logo.svg/2560px-Apple_Pay_logo.svg.png" alt="Apple Pay" height="25">
                         </div>
-                        <p class="secure-text">🔒 Pago seguro procesado por Redsys TPV Virtual</p>
+                        <p class="secure-text">🔒 Pago seguro procesado por Stripe</p>
                     </div>
 
                     <div class="wizard-actions">
                         <button class="btn btn-outline" onclick="prevStep(2)">Atrás</button>
-                        <button class="btn btn-primary btn-large" id="pay-button" onclick="initiateRedsysPayment()">Pagar con Tarjeta / Apple Pay</button>
+                        <button class="btn btn-primary btn-large" id="pay-button" onclick="initiatePayment()">Pagar con Tarjeta / Apple Pay</button>
+                    </div>
+                </div>
+
+                <!-- Live Summary Bar -->
+                <div class="wizard-live-summary" id="live-summary">
+                    <div class="summary-pills">
+                        <span id="pill-date"><i class="icon">📅</i> Selecciona fecha</span>
+                        <span id="pill-flight"><i class="icon">🎈</i> Classic Adventure</span>
+                        <span id="pill-pax"><i class="icon">👤</i> 1 pax</span>
+                    </div>
+                    <div class="summary-price-box">
+                        <div class="label">Total Estimado</div>
+                        <div class="value" id="live-total">120€</div>
                     </div>
                 </div>
             </div>
