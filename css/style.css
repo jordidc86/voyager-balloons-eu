@@ -559,6 +559,17 @@ ul {
     text-align: center;
 }
 
+.booking-cta .wizard-actions {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-top: -1.5rem;
+}
+
+.booking-cta .btn {
+    min-width: 260px;
+}
+
 .wizard-progress {
     display: flex;
     justify-content: space-between;
@@ -890,6 +901,10 @@ ul {
 .wizard-actions:only-child,
 #step-1 .wizard-actions {
     justify-content: flex-end;
+}
+
+.booking-cta .wizard-actions:only-child {
+    justify-content: center;
 }
 
 /* ==========================================================================
