@@ -3,12 +3,12 @@
 
 [[redirects]]
   from = "/shop"
-  to = "https://shop.voyagerballoons.eu/"
+  to = "https://jordidiazcasaubon.wpcomstaging.com/"
   status = 301
   force = true
 
 [[redirects]]
   from = "/shop/*"
-  to = "https://shop.voyagerballoons.eu/:splat"
+  to = "https://jordidiazcasaubon.wpcomstaging.com/:splat"
   status = 301
   force = true
