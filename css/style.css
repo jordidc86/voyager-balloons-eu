@@ -492,6 +492,7 @@ ul {
 
 .reviews-slider {
     max-width: 1000px;
+    min-height: 280px;
     margin: 0 auto;
     padding: 0;
     text-align: center;
