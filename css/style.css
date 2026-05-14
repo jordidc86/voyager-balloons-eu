@@ -537,7 +537,8 @@ ul {
    Booking Wizard (Custom Engine)
    ========================================================================== */
 .booking-section {
-    background: radial-gradient(circle at top, #fff 0%, var(--color-bg-alt) 100%);
+    background: radial-gradient(circle at top, #fff 0%, var(--color-bg-alt) 70%, #f0ede4 100%);
+    padding-bottom: 5rem;
 }
 
 .booking-wizard {
@@ -552,29 +553,10 @@ ul {
 }
 
 .booking-cta {
-    max-width: 780px;
+    max-width: 760px;
     margin: 0 auto;
-    padding: 3rem;
+    padding: 0;
     text-align: center;
-    background: rgba(255, 255, 255, 0.84);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255,255,255,0.6);
-    border-radius: 20px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.08);
-}
-
-.booking-cta h3 {
-    font-size: 1.75rem;
-    margin-bottom: 1rem;
-    color: var(--color-text-dark);
-}
-
-.booking-cta p {
-    max-width: 620px;
-    margin: 0 auto 2rem;
-    color: var(--color-text-muted);
-    font-size: 1.05rem;
-    line-height: 1.7;
 }
 
 .wizard-progress {
@@ -900,8 +882,9 @@ ul {
 
 .wizard-actions {
     display: flex;
-    justify-content: space-between;
-    margin-top: 3rem;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 0;
 }
 
 .wizard-actions:only-child,
