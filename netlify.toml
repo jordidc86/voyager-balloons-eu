@@ -1,0 +1,14 @@
+[build]
+  publish = "."
+
+[[redirects]]
+  from = "/shop"
+  to = "https://shop.voyagerballoons.eu/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/shop/*"
+  to = "https://shop.voyagerballoons.eu/:splat"
+  status = 301
+  force = true
