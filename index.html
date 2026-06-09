@@ -23,12 +23,7 @@
       "name": "Voyager Balloons",
       "image": "https://voyagerballoons.eu/assets/img/segovia-alcazar.jpg",
       "description": "Vuelos en globo aerostático exclusivos sobre Segovia.",
-      "address": {
-        "@type": "PostalAddress",
-        "addressLocality": "Segovia",
-        "addressCountry": "ES"
-      },
-      "telephone": "+34605087478",
+      "telephone": "+34921801005",
       "url": "https://voyagerballoons.eu"
     }
     </script>    <!-- Preconnect to Google Fonts -->
@@ -53,12 +48,19 @@
     <!-- Navbar (Glassmorphism) -->
     <nav class="navbar" id="navbar">
         <div class="nav-container container">
-            <a href="#" class="logo">Voyager<span>Balloons</span></a>
-            <div class="nav-links">
+            <a href="index.html" class="logo">Voyager<span>Balloons</span></a>
+            <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" aria-label="Abrir menú">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <div class="nav-links" id="primary-navigation">
                 <a href="#experience">La Experiencia</a>
                 <a href="#packages">Paquetes</a>
+                <a href="#faq">FAQs</a>
+                <a href="blog.html">Blog</a>
 
-                <a href="https://jordidiazcasaubon.wpcomstaging.com/" class="btn btn-primary nav-btn">Reservar Ahora</a>
+                <a href="https://shop.voyagerballoons.eu/" class="btn btn-primary nav-btn">Reservar Ahora</a>
             </div>
         </div>
     </nav>
@@ -75,7 +77,7 @@
             <h1>Sobrevuela el Acueducto<br>y el Alcázar</h1>
             <p class="hero-subtitle">Conviértete en privilegiado testigo de 2.000 años de historia desde el silencio del cielo. El amanecer de Segovia solo se vive así.</p>
             <div class="hero-actions">
-                <a href="https://jordidiazcasaubon.wpcomstaging.com/" class="btn btn-primary btn-large">Ver Disponibilidad</a>
+                <a href="https://shop.voyagerballoons.eu/" class="btn btn-primary btn-large">Ver Disponibilidad</a>
             </div>
             
 
@@ -107,8 +109,8 @@
                 </div>
                 <div class="feature-card glass-panel fade-in slide-up" style="--delay: 3">
                     <div class="icon-wrapper">🥂</div>
-                    <h3>Brindis Cava y Desayuno</h3>
-                    <p>Al aterrizar, celebramos la vida con el tradicional brindis aeronáutico y un desayuno Segoviano de lujo.</p>
+                    <h3>Brindis con Cava</h3>
+                    <p>Al aterrizar, celebramos la vida con el tradicional brindis aeronáutico con cava.</p>
                 </div>
             </div>
         </div>
@@ -141,8 +143,8 @@
                         </ul>
                     </div>
                     <div class="card-footer">
-                        <a href="https://jordidiazcasaubon.wpcomstaging.com/?add-to-cart=2127" class="btn btn-primary btn-full">Regalar Ahora</a>
-                        <a href="https://jordidiazcasaubon.wpcomstaging.com/?add-to-cart=2127" class="btn btn-outline btn-full">Reservar Classic</a>
+                        <a href="https://shop.voyagerballoons.eu/?add-to-cart=2127" class="btn btn-primary btn-full">Regalar Ahora</a>
+                        <a href="https://shop.voyagerballoons.eu/?add-to-cart=2127" class="btn btn-outline btn-full">Reservar Classic</a>
                     </div>
                 </div>
 
@@ -163,7 +165,7 @@
                         </ul>
                     </div>
                     <div class="card-footer">
-                        <a href="https://jordidiazcasaubon.wpcomstaging.com/" class="btn btn-outline btn-full">Consultar Suite</a>
+                        <a href="https://shop.voyagerballoons.eu/" class="btn btn-outline btn-full">Consultar Suite</a>
                     </div>
                 </div>
 
@@ -236,7 +238,7 @@
                         <div class="faq-icon">+</div>
                     </button>
                     <div class="faq-answer">
-                        <p>El vuelo en sí dura aproximadamente 1 hora. Sin embargo, toda la experiencia (encuentro, inflado del globo, vuelo, brindis, desayuno y regreso al punto de partida) tiene una duración de unas 3 a 4 horas en total. Normalmente terminamos alrededor de las 11:00 am.</p>
+                        <p>El vuelo en sí dura aproximadamente 1 hora. Sin embargo, toda la experiencia (encuentro, inflado del globo, vuelo, brindis con cava y regreso al punto de partida) tiene una duración de unas 3 a 4 horas en total. Normalmente terminamos alrededor de las 11:00 am.</p>
                     </div>
                 </div>
 
@@ -270,9 +272,9 @@
                         <div class="blog-tag">Inspiración</div>
                     </div>
                     <div class="blog-card-content">
-                        <h3><a href="blog.html">¿Por qué Segovia es el mejor lugar de España para volar en globo?</a></h3>
+                        <h3><a href="articulos/vuelo-globo-segovia.html">¿Por qué Segovia es el mejor lugar de España para volar en globo?</a></h3>
                         <p>Descubre las razones que hacen de la ciudad del Acueducto un destino top mundial para la aerostación.</p>
-                        <a href="blog.html" class="read-more">Leer artículo <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+                        <a href="articulos/vuelo-globo-segovia.html" class="read-more">Leer artículo <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
                     </div>
                 </article>
 
@@ -283,9 +285,9 @@
                         <div class="blog-tag">Guías Prácticas</div>
                     </div>
                     <div class="blog-card-content">
-                        <h3><a href="blog.html">Guía de supervivencia para tu primer vuelo en globo</a></h3>
+                        <h3><a href="articulos/primer-vuelo-globo.html">Guía de supervivencia para tu primer vuelo en globo</a></h3>
                         <p>Todo lo que necesitas saber antes de despegar: desde qué ropa llevar hasta cómo evitar mareos.</p>
-                        <a href="blog.html" class="read-more">Leer artículo <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+                        <a href="articulos/primer-vuelo-globo.html" class="read-more">Leer artículo <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
                     </div>
                 </article>
 
@@ -296,9 +298,9 @@
                         <div class="blog-tag">Regalos</div>
                     </div>
                     <div class="blog-card-content">
-                        <h3><a href="blog.html">Regalar un vuelo en globo: El regalo más original</a></h3>
+                        <h3><a href="articulos/regalar-vuelo-globo.html">Regalar un vuelo en globo: El regalo más original</a></h3>
                         <p>Por qué una experiencia en el cielo supera a cualquier regalo material para cumpleaños o aniversarios.</p>
-                        <a href="blog.html" class="read-more">Leer artículo <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+                        <a href="articulos/regalar-vuelo-globo.html" class="read-more">Leer artículo <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
                     </div>
                 </article>
             </div>
@@ -319,6 +321,7 @@
             
             <div class="reviews-slider fade-in" aria-label="Reseñas de clientes">
                 <div class="elfsight-app-fa342610-10c1-4e90-a7f6-86708c1ba563"></div>
+                <p class="reviews-consent-note">Acepta las cookies de terceros para ver las reseñas verificadas.</p>
             </div>
             
             <div class="trust-badges mt-8 text-center flex justify-center gap-4">
@@ -339,7 +342,7 @@
 
             <div class="booking-cta fade-in slide-up">
                 <div class="wizard-actions">
-                    <a href="https://jordidiazcasaubon.wpcomstaging.com/" class="btn btn-primary btn-large">Ir a la Tienda</a>
+                    <a href="https://shop.voyagerballoons.eu/" class="btn btn-primary btn-large">Ir a la Tienda</a>
                     <a href="https://wa.me/34605087478" target="_blank" class="btn btn-outline btn-large">Consultar por WhatsApp</a>
                 </div>
             </div>
@@ -351,14 +354,13 @@
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-brand">
-                    <a href="#" class="logo">Voyager<span>Balloons</span></a>
-                    <p>Elevando corazones en Segovia desde hace más de 25 años. La mejor experiencia garantizada.</p>
+                    <a href="index.html" class="logo">Voyager<span>Balloons</span></a>
+                    <p>Más de 25 años volando y creando experiencias inolvidables en globo.</p>
                 </div>
                 <div class="footer-links">
                     <ul>
-                        <li><a href="#">Portal del Pasajero</a></li>
-                        <li><a href="#">Descargar Fotos</a></li>
-                        <li><a href="#">Certificado de Vuelo</a></li>
+                        <li><a href="https://wa.me/34605087478?text=Hola%2C%20quiero%20descargar%20las%20fotos%20de%20mi%20vuelo" target="_blank" rel="noopener">Descargar Fotos</a></li>
+                        <li><a href="https://wa.me/34605087478?text=Hola%2C%20quiero%20solicitar%20mi%20certificado%20de%20vuelo" target="_blank" rel="noopener">Certificado de Vuelo</a></li>
                     </ul>
                     <div class="social-links" style="margin-top: 1rem; display: flex; gap: 1rem;">
                         <a href="https://instagram.com/voyagerballoons" target="_blank" aria-label="Instagram" style="color: var(--color-primary);"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg></a>
@@ -368,8 +370,8 @@
                 <div class="footer-contact">
                     <h3>Contacto</h3>
                     <p>📧 info@voyagerballoons.eu</p>
-                    <p>📞 +34 921 801 005</p>
-                    <p>📍 Pl. del Azoguejo, 1, Segovia, España</p>
+                    <p>📞 Llamadas: +34 921 801 005</p>
+                    <p>💬 WhatsApp: +34 605 087 478</p>
                 </div>
             </div>
             <div class="footer-bottom">
@@ -389,8 +391,19 @@
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32" fill="currentColor"><path d="M12.01 2.00195c-5.52 0-9.99 4.47-9.99 9.99 0 1.93.55 3.75 1.49 5.3l-1.5 5.51 5.64-1.48c1.51.88 3.27 1.39 5.15 1.39 5.52 0 9.99-4.47 9.99-9.99 0-5.52-4.47-9.99-9.99-9.99zm5.35 14.19c-.23.63-1.32 1.21-1.84 1.27-.47.05-1.07.1-3.3-1.33-2.67-1.72-4.38-4.48-4.51-4.66-.13-.18-1.07-1.43-1.07-2.72 0-1.29.67-1.92.9-2.16.23-.24.51-.31.68-.31.17 0 .34 0 .49.01.16.01.35-.06.54.41.2.49.68 1.66.74 1.78.06.12.1.26.02.43-.08.17-.12.28-.24.43-.12.14-.25.32-.35.43-.11.12-.23.25-.1.47.13.22.58.96 1.25 1.56.86.77 1.59 1 1.8.11.22.12.33-.05.52-.22.19-.17.38-.49.6-.58.22-.09 1.14-.54 1.31-.6.18-.06.31-.09.45.12.14.21.54.68.68.82.14.14.28.16.51.27z"/></svg>
     </a>
 
+    <div class="cookie-banner" role="dialog" aria-live="polite" aria-label="Preferencias de cookies" hidden>
+        <div>
+            <h2>Cookies y reseñas</h2>
+            <p>Usamos cookies técnicas para que la web funcione. Las reseñas de terceros solo se cargan si aceptas cookies externas.</p>
+        </div>
+        <div class="cookie-actions">
+            <button type="button" class="btn btn-outline" data-cookie-choice="reject">Solo necesarias</button>
+            <button type="button" class="btn btn-primary" data-cookie-choice="accept">Aceptar reseñas</button>
+        </div>
+    </div>
+
     <!-- Scripts -->
-    <script src="https://elfsightcdn.com/platform.js" defer></script>
+    <script type="text/plain" data-cookie-category="third-party" data-cookie-src="https://elfsightcdn.com/platform.js" data-cookie-defer="true"></script>
     <script src="js/script.js" defer></script>
 </body>
 </html>

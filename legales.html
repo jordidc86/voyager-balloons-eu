@@ -32,11 +32,16 @@
     <nav class="navbar scrolled" id="navbar" style="background: rgba(255, 255, 255, 0.95); box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
         <div class="nav-container container">
             <a href="index.html" class="logo" style="color: var(--color-primary);">Voyager<span>Balloons</span></a>
-            <div class="nav-links">
+            <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" aria-label="Abrir menú">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <div class="nav-links" id="primary-navigation">
                 <a href="index.html#experience" style="color: var(--color-primary);">La Experiencia</a>
                 <a href="index.html#packages" style="color: var(--color-primary);">Paquetes</a>
 
-                <a href="https://jordidiazcasaubon.wpcomstaging.com/" class="btn btn-primary nav-btn">Reservar Ahora</a>
+                <a href="https://shop.voyagerballoons.eu/" class="btn btn-primary nav-btn">Reservar Ahora</a>
             </div>
         </div>
     </nav>
@@ -46,7 +51,7 @@
 
         <section id="aviso-legal">
             <h2>Aviso Legal</h2>
-            <p>En cumplimiento de la Ley 34/2002, de 11 de julio, de Servicios de la Sociedad de la Información y de Comercio Electrónico (LSSI-CE), se informa que el sitio web voyagerballoons.eu es propiedad de Voyager Balloons EU, con sede en Pl. del Azoguejo, 1, Segovia, España y número de contacto +34 605 08 74 78.</p>
+            <p>En cumplimiento de la Ley 34/2002, de 11 de julio, de Servicios de la Sociedad de la Información y de Comercio Electrónico (LSSI-CE), se informa que el sitio web voyagerballoons.eu es propiedad de Voyager Balloons EU, con teléfono de atención +34 921 801 005 y WhatsApp +34 605 087 478.</p>
             <p>El uso del sitio web implica la aceptación plena de las condiciones establecidas en este aviso. El usuario se compromete a usar el portal de forma lícita, de acuerdo con la ley, la moral y el orden público.</p>
         </section>
 
@@ -63,7 +68,7 @@
             <p>Este sitio web utiliza cookies propias y de terceros para asegurar el correcto funcionamiento del portal, recoger información estadística y mejorar su experiencia de navegación.</p>
             <ul>
                 <li><strong>Cookies técnicas:</strong> Necesarias para la navegación y el buen funcionamiento de la web (ej. gestionar el proceso de compra).</li>
-                <li><strong>Cookies de análisis:</strong> Permiten el seguimiento y análisis del comportamiento de los usuarios (ej. Google Analytics).</li>
+                <li><strong>Cookies de terceros:</strong> Permiten mostrar servicios externos, como reseñas verificadas, solo cuando el usuario las acepta.</li>
             </ul>
             <p>Puede configurar su navegador para rechazar el uso de cookies, aunque esto podría afectar al correcto funcionamiento de algunas secciones de la web.</p>
         </section>
@@ -73,13 +78,14 @@
             <p>Nuestra prioridad es la seguridad de nuestros pasajeros. Debido a la naturaleza de los vuelos en globo, que dependen enteramente de las condiciones meteorológicas, se aplican las siguientes políticas:</p>
             <ul>
                 <li><strong>Cancelación por parte del operador:</strong> Si el piloto decide cancelar el vuelo por condiciones meteorológicas adversas o razones de seguridad, el pasajero tendrá derecho a reubicar su vuelo en otra fecha disponible durante los siguientes 12 meses, o al reembolso completo de la cantidad pagada.</li>
-                <li><strong>Cancelación por parte del cliente:</strong> 
+                <li><strong>Cancelación o cambio por parte del cliente:</strong>
                     <ul>
-                        <li>Cancelaciones con más de 72 horas de antelación al vuelo: Se permite reprogramar el vuelo sin coste o un reembolso (sujeto a un 10% de gastos de gestión).</li>
-                        <li>Cancelaciones con menos de 72 horas o no presentarse (No-Show): No se emitirá reembolso ni será posible reprogramar el billete, perdiendo el importe abonado.</li>
+                        <li>Solo se permitirán cambios de fecha por causa de fuerza mayor, previa presentación de un justificante acreditativo.</li>
+                        <li>Salvo en los supuestos anteriores, no se admitirán cancelaciones, cambios ni reembolsos solicitados por el cliente.</li>
+                        <li>En caso de no presentarse al vuelo (No-Show), no se emitirá reembolso ni será posible reprogramar el billete, perdiendo el importe abonado.</li>
                     </ul>
                 </li>
-                <li>Los billetes regalo tienen una validez de 1 año desde la fecha de compra y no son reembolsables.</li>
+                <li>Los billetes regalo no caducan, pero no son reembolsables.</li>
             </ul>
         </section>
 
@@ -101,13 +107,12 @@
             <div class="footer-grid">
                 <div class="footer-brand">
                     <a href="index.html" class="logo">Voyager<span>Balloons</span></a>
-                    <p>Elevando corazones en Segovia desde hace más de 25 años. La mejor experiencia garantizada.</p>
+                    <p>Más de 25 años volando y creando experiencias inolvidables en globo.</p>
                 </div>
                 <div class="footer-links">
                     <ul>
-                        <li><a href="#">Portal del Pasajero</a></li>
-                        <li><a href="#">Descargar Fotos</a></li>
-                        <li><a href="#">Certificado de Vuelo</a></li>
+                        <li><a href="https://wa.me/34605087478?text=Hola%2C%20quiero%20descargar%20las%20fotos%20de%20mi%20vuelo" target="_blank" rel="noopener">Descargar Fotos</a></li>
+                        <li><a href="https://wa.me/34605087478?text=Hola%2C%20quiero%20solicitar%20mi%20certificado%20de%20vuelo" target="_blank" rel="noopener">Certificado de Vuelo</a></li>
                     </ul>
                     <div class="social-links" style="margin-top: 1rem; display: flex; gap: 1rem;">
                         <a href="https://instagram.com/voyagerballoons" target="_blank" aria-label="Instagram" style="color: var(--color-primary);"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg></a>
@@ -117,8 +122,8 @@
                 <div class="footer-contact">
                     <h3>Contacto</h3>
                     <p>📧 info@voyagerballoons.eu</p>
-                    <p>📞 +34 605 08 74 78</p>
-                    <p>📍 Pl. del Azoguejo, 1, Segovia, España</p>
+                    <p>📞 Llamadas: +34 921 801 005</p>
+                    <p>💬 WhatsApp: +34 605 087 478</p>
                 </div>
             </div>
             <div class="footer-bottom">
