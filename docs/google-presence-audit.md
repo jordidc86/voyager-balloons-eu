@@ -1,6 +1,7 @@
 # Auditoría de presencia en Google
 
 Fecha: 2026-06-18  
+Última actualización operativa: 2026-06-19
 Sitios revisados:
 
 - Web principal: https://www.voyagerballoons.eu/
@@ -399,6 +400,171 @@ Estado revisado el 2026-06-18.
 
 Referencia oficial: Google pide información precisa y actualizada en Business Profile.  
 Fuente: https://support.google.com/business/answer/3038177
+
+## Actualización operativa 2026-06-19
+
+### Google Business Profile
+
+Acciones realizadas en el perfil `Voyager Balloons EU - Paseos en Globo`:
+
+- Teléfono principal cambiado a `+34 921 801 005`.
+- Web cambiada a `https://www.voyagerballoons.eu/`.
+- Dirección pública ocultada. El perfil queda como negocio sin ubicación pública y con área de servicio `Segovia, España`.
+- Descripción actualizada para reforzar:
+  - vuelo al amanecer en Segovia,
+  - vistas del Alcázar, Catedral y sierra,
+  - más de 25 años de experiencia volando en globo,
+  - escapadas desde Madrid,
+  - brindis con cava tras el aterrizaje.
+- Enlaces de reserva:
+  - añadido `https://shop.voyagerballoons.eu/`;
+  - marcado como enlace preferido;
+  - se mantiene `wa.me` como canal adicional.
+- Actividad `Paseo en Globo en Segovia` actualizada:
+  - URL: `https://shop.voyagerballoons.eu/`;
+  - descripción enfocada a Segovia, Alcázar, Catedral, sierra, regalo, Madrid y brindis con cava;
+  - idioma cambiado a `Spanish`;
+  - duración `3 h`;
+  - precio `120 EUR`;
+  - sin seleccionar `Cancelación gratuita`.
+- Servicios añadidos bajo la categoría `Agencia de excursiones en globo`:
+  - `Vuelo en globo en Segovia`
+  - `Paseo en globo para regalo`
+  - `Vuelo en globo para parejas`
+  - `Vuelos en globo para grupos`
+  - `Actividad de empresa en globo`
+- Cada servicio quedó con descripción propia.
+- Publicación antigua con precio `180 EUR` editada y enviada a revisión como oferta vigente:
+  - título nuevo previsto: `Vuelos en globo en Segovia desde 120 EUR`;
+  - enlace de canje: `https://shop.voyagerballoons.eu/`;
+  - fecha de fin: `31/12/2026`.
+
+Estado: Google marcó varios cambios como pendientes de revisión. Plazos mostrados:
+
+- Actividad: hasta 20 minutos.
+- Servicios: hasta 1 día.
+- Publicación: enviada a revisión.
+- Teléfono, web, descripción y dirección: pendientes de revisión en el perfil.
+
+### Search Console
+
+Propiedad trabajada:
+
+- `https://www.voyagerballoons.eu/`
+
+La propiedad de dominio `voyagerballoons.eu` sigue sin acceso porque falta la verificación DNS. Al intentar abrirla aparece que la cuenta actual no puede acceder a esa propiedad.
+
+Sitemap:
+
+- `https://www.voyagerballoons.eu/sitemap.xml` comprobado externamente con `200 OK`.
+- `robots.txt` comprobado externamente con `200 OK`.
+- Search Console seguía mostrando `No se ha podido obtener`, pero el sitemap se reenvió y Google confirmó: `Se ha enviado el sitemap correctamente`.
+
+Indexación:
+
+- La home `https://www.voyagerballoons.eu/` ya aparece como `La URL está en Google`.
+- Para la home se solicitó reindexación tras los cambios de schema/canonical/contenido.
+- Search Console detecta en la home:
+  - HTTPS válido.
+  - Fragmentos de productos: 1 elemento válido con problemas no críticos.
+  - Fichas de comerciantes: 1 elemento válido con problemas no críticos.
+- El informe de páginas todavía indica que los datos se están procesando.
+
+URLs no reconocidas por Google y enviadas a cola de indexación prioritaria:
+
+- `https://www.voyagerballoons.eu/blog`
+- `https://www.voyagerballoons.eu/articulos/vuelo-globo-segovia`
+- `https://www.voyagerballoons.eu/articulos/primer-vuelo-globo`
+- `https://www.voyagerballoons.eu/articulos/regalar-vuelo-globo`
+- `https://www.voyagerballoons.eu/articulos/como-se-dirige-globo`
+
+Acción pendiente:
+
+- Revisar en 24-72 horas si el sitemap pasa de `No se ha podido obtener` a procesado.
+- Revisar si las URLs anteriores pasan de `Google no reconoce esta URL` a `URL en Google`.
+- Añadir el TXT DNS de la propiedad de dominio para cubrir también `shop.voyagerballoons.eu`.
+
+### WordPress / tienda
+
+Comprobaciones realizadas:
+
+- `https://jordidiazcasaubon.wpcomstaging.com/` devuelve `301` a `https://shop.voyagerballoons.eu/`. Esto mitiga el resultado antiguo de Google con staging y debería hacer que desaparezca tras nuevo rastreo.
+- En WordPress, `WordPress Address (URL)` y `Site Address (URL)` están en `https://shop.voyagerballoons.eu`.
+- `https://shop.voyagerballoons.eu/wp-sitemap.xml` existe, responde `200 OK` y lista URLs correctas de `shop.voyagerballoons.eu`.
+
+Problema pendiente:
+
+- `https://shop.voyagerballoons.eu/robots.txt` sigue apuntando a:
+
+```txt
+Sitemap: https://voyagerballoons.eu/sitemap.xml
+```
+
+- `https://shop.voyagerballoons.eu/sitemap.xml` sigue listando URLs antiguas de `https://voyagerballoons.eu/...`.
+
+Interpretación:
+
+- La tienda tiene un sitemap nativo correcto en `wp-sitemap.xml`.
+- El sitemap/robots antiguo parece generado por cache/plugin o archivo heredado.
+- No conviene poner el sitio completo en noindex porque rompería la tienda.
+
+Acción recomendada:
+
+1. Cambiar el robots de la tienda para que apunte a:
+
+```txt
+Sitemap: https://shop.voyagerballoons.eu/wp-sitemap.xml
+```
+
+2. Eliminar o regenerar el sitemap antiguo `https://shop.voyagerballoons.eu/sitemap.xml`.
+3. Si no se puede editar el archivo/plugin que genera robots, añadir una regla/snippet controlado en WordPress o corregir el plugin que aparece como `Vortex Optimization`.
+4. Verificar la propiedad `https://shop.voyagerballoons.eu/` o la propiedad de dominio en Search Console y enviar `wp-sitemap.xml`.
+
+### Merchant Center
+
+Intento de acceso:
+
+- URL oficial usada: `https://accounts.google.com/Login?service=merchants`.
+- Google pidió verificación de identidad/passkey para `voyagerballoonseu@gmail.com`.
+
+Estado: bloqueado hasta que el propietario complete la verificación en navegador.
+
+Qué revisar al entrar:
+
+- Website URL de atención al cliente.
+- Teléfono `+34 921 801 005`.
+- Email `info@voyagerballoons.eu`.
+- Dominio reclamado y método de verificación.
+- Fuentes de datos con 0 productos.
+- Países de destino del feed.
+- Si WooCommerce/Google Listings sigue enviando URLs antiguas.
+- Si conviene usar Merchant para experiencias o limitarlo a producto regalo/ticket con landing y políticas muy consistentes.
+
+### SERP pública y competidores
+
+Hallazgo importante:
+
+- Google aún muestra resultados antiguos de `jordidiazcasaubon.wpcomstaging.com`, pero el dominio ya redirige 301 a `shop.voyagerballoons.eu`.
+
+Competidores visibles para búsquedas de vuelo en globo Segovia:
+
+- Siempre en las Nubes.
+- Globos Boreal.
+- Aerodifusión.
+- Aerotours.
+- TripAdvisor, Viator, Yumping, Aladinia y otros agregadores.
+
+Oportunidades detectadas:
+
+- Reforzar la diferencia de precio `desde 120 EUR` frente a competidores que muestran importes cercanos a `205 EUR`.
+- Mantener páginas de contenido y landings muy claras para:
+  - `vuelo en globo Segovia`,
+  - `paseo en globo Segovia`,
+  - `vuelo en globo desde Madrid`,
+  - `regalar vuelo en globo Segovia`,
+  - `actividades en Segovia`.
+- Conseguir enlaces/citas externas en blogs turísticos y medios locales.
+- Acelerar reseñas y fotos en Google Business Profile.
 
 ## Prioridad de acciones
 
