@@ -620,6 +620,22 @@ ul {
     min-width: 260px;
 }
 
+.sales-cta {
+    background: var(--color-bg-dark);
+    color: #fff;
+    text-align: center;
+}
+
+.sales-cta h2 {
+    color: #fff;
+}
+
+.sales-cta p {
+    max-width: 700px;
+    margin: 0 auto 2rem;
+    color: rgba(255,255,255,0.78);
+}
+
 .wizard-actions {
     display: flex;
     justify-content: center;
@@ -982,6 +998,72 @@ ul {
 
 .read-more.is-disabled:hover {
     gap: 0.5rem;
+}
+
+/* ==========================================================================
+   Trust & External Review Sources
+   ========================================================================== */
+.source-review-grid,
+.trust-source-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+}
+
+.source-review-card,
+.trust-source-card {
+    background: #fff;
+    border: 1px solid rgba(44, 53, 57, 0.08);
+    border-radius: 12px;
+    padding: 1.35rem;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.source-review-card blockquote {
+    color: var(--color-text-dark);
+    font-family: var(--font-heading);
+    font-size: 1.05rem;
+    line-height: 1.45;
+}
+
+.source-review-card p,
+.trust-source-card p {
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+}
+
+.source-link {
+    color: var(--color-primary);
+    font-weight: 700;
+    margin-top: auto;
+}
+
+.source-note {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    max-width: 760px;
+    margin: 2rem auto 0;
+    text-align: center;
+}
+
+.trust-strip-inline {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.trust-strip-inline span {
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    background: #fff;
+    border-radius: 999px;
+    padding: 0.55rem 0.85rem;
+    color: var(--color-text-dark);
+    font-size: 0.92rem;
 }
 
 /* ==========================================================================

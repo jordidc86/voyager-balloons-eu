@@ -2,6 +2,12 @@
   publish = "."
 
 [[redirects]]
+  from = "/index.html"
+  to = "/"
+  status = 301
+  force = true
+
+[[redirects]]
   from = "/blog.html"
   to = "/blog"
   status = 301
@@ -16,6 +22,18 @@
 [[redirects]]
   from = "/vuelo-en-globo-segovia.html"
   to = "/vuelo-en-globo-segovia"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/vuelo-en-globo-segovia-desde-madrid.html"
+  to = "/vuelo-en-globo-segovia-desde-madrid"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/seguridad-pilotos.html"
+  to = "/seguridad-pilotos"
   status = 301
   force = true
 

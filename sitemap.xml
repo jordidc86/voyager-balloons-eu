@@ -25,6 +25,18 @@
     <priority>0.95</priority>
   </url>
   <url>
+    <loc>https://www.voyagerballoons.eu/vuelo-en-globo-segovia-desde-madrid</loc>
+    <lastmod>2026-06-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://www.voyagerballoons.eu/seguridad-pilotos</loc>
+    <lastmod>2026-06-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+  <url>
     <loc>https://www.voyagerballoons.eu/articulos/vuelo-globo-segovia</loc>
     <lastmod>2026-06-18</lastmod>
     <changefreq>monthly</changefreq>
