@@ -2,6 +2,48 @@
   publish = "."
 
 [[redirects]]
+  from = "/blog.html"
+  to = "/blog"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/actividades-segovia.html"
+  to = "/actividades-segovia"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/vuelo-en-globo-segovia.html"
+  to = "/vuelo-en-globo-segovia"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/articulos/vuelo-globo-segovia.html"
+  to = "/articulos/vuelo-globo-segovia"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/articulos/primer-vuelo-globo.html"
+  to = "/articulos/primer-vuelo-globo"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/articulos/regalar-vuelo-globo.html"
+  to = "/articulos/regalar-vuelo-globo"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/articulos/como-se-dirige-globo.html"
+  to = "/articulos/como-se-dirige-globo"
+  status = 301
+  force = true
+
+[[redirects]]
   from = "/shop"
   to = "https://shop.voyagerballoons.eu/"
   status = 301
