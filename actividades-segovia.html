@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google tag: Ads attribution + cross-domain checkout tracking -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=GT-55NTF5CN"></script>
+    <script src="/js/google-ads-tracking.js"></script>
+    <title>Qué hacer en Segovia: vuelo en globo y planes únicos | Voyager Balloons</title>
+    <meta name="description" content="Guía para elegir actividades en Segovia: vuelo en globo al amanecer, Alcázar, Acueducto, gastronomía y planes regalo para visitantes desde Madrid.">
+    <link rel="canonical" href="https://www.voyagerballoons.eu/actividades-segovia">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Qué hacer en Segovia: vuelo en globo y planes únicos">
+    <meta property="og:description" content="Una guía práctica para elegir actividades memorables en Segovia, desde el Alcázar y el Acueducto hasta un vuelo en globo al amanecer.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://www.voyagerballoons.eu/actividades-segovia">
+    <meta property="og:image" content="https://www.voyagerballoons.eu/assets/img/segovia-alcazar.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .guide-hero {
+            min-height: 78vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(rgba(11, 15, 25, 0.68), rgba(11, 15, 25, 0.4)), url('assets/img/segovia-alcazar.jpg') center/cover no-repeat;
+            color: #fff;
+        }
+
+        .guide-hero .container {
+            position: relative;
+            z-index: 1;
+            padding-top: 6rem;
+            padding-bottom: 4rem;
+        }
+
+        .guide-hero h1 {
+            max-width: 860px;
+            font-size: 3.5rem;
+            color: #fff;
+            margin-bottom: 1.25rem;
+            text-shadow: 0 4px 18px rgba(0,0,0,0.42);
+        }
+
+        .guide-hero p {
+            max-width: 720px;
+            font-size: 1.2rem;
+            color: rgba(255,255,255,0.92);
+            margin-bottom: 2rem;
+        }
+
+        .answer-box {
+            max-width: 980px;
+            margin: -4rem auto 0;
+            position: relative;
+            z-index: 2;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 20px 55px rgba(44, 53, 57, 0.16);
+            padding: 2rem;
+            border: 1px solid rgba(44, 53, 57, 0.08);
+        }
+
+        .answer-box strong {
+            color: var(--color-text-dark);
+        }
+
+        .answer-box p {
+            color: var(--color-text-muted);
+            margin-top: 0.75rem;
+        }
+
+        .fact-grid,
+        .activity-grid,
+        .audience-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+        }
+
+        .fact-card,
+        .activity-card,
+        .audience-card {
+            background: #fff;
+            border: 1px solid rgba(44, 53, 57, 0.08);
+            border-radius: 12px;
+            padding: 1.25rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .fact-card span {
+            display: block;
+            color: var(--color-primary);
+            font-weight: 700;
+            font-family: var(--font-heading);
+            margin-bottom: 0.35rem;
+        }
+
+        .activity-card h3,
+        .audience-card h3 {
+            font-size: 1.15rem;
+            margin-bottom: 0.65rem;
+        }
+
+        .activity-card p,
+        .audience-card p,
+        .editorial-copy p {
+            color: var(--color-text-muted);
+        }
+
+        .highlight-card {
+            border-color: rgba(212, 175, 55, 0.45);
+            box-shadow: 0 16px 38px rgba(212, 175, 55, 0.16);
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid rgba(44, 53, 57, 0.08);
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(44, 53, 57, 0.08);
+            vertical-align: top;
+        }
+
+        .comparison-table th {
+            background: var(--color-bg-alt);
+            font-family: var(--font-heading);
+        }
+
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .guide-cta {
+            background: var(--color-bg-dark);
+            color: #fff;
+            text-align: center;
+        }
+
+        .guide-cta h2 {
+            color: #fff;
+        }
+
+        .guide-cta p {
+            color: rgba(255,255,255,0.78);
+            max-width: 700px;
+            margin: 0 auto 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .guide-hero {
+                min-height: 70vh;
+            }
+
+            .guide-hero h1 {
+                font-size: 2.25rem;
+            }
+
+            .answer-box {
+                margin-top: -2rem;
+                padding: 1.5rem;
+            }
+
+            .comparison-table,
+            .comparison-table tbody,
+            .comparison-table tr,
+            .comparison-table td {
+                display: block;
+                width: 100%;
+            }
+
+            .comparison-table thead {
+                display: none;
+            }
+
+            .comparison-table td {
+                border-bottom: none;
+                padding: 0.85rem 1rem;
+            }
+
+            .comparison-table tr {
+                border-bottom: 1px solid rgba(44, 53, 57, 0.08);
+            }
+
+            .comparison-table td::before {
+                content: attr(data-label);
+                display: block;
+                font-weight: 700;
+                color: var(--color-text-dark);
+                margin-bottom: 0.25rem;
+            }
+        }
+    </style>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebPage",
+          "@id": "https://www.voyagerballoons.eu/actividades-segovia#webpage",
+          "url": "https://www.voyagerballoons.eu/actividades-segovia",
+          "name": "Qué hacer en Segovia: vuelo en globo y planes únicos",
+          "description": "Guía para elegir actividades en Segovia: vuelo en globo al amanecer, Alcázar, Acueducto, gastronomía y planes regalo para visitantes desde Madrid.",
+          "inLanguage": "es-ES",
+          "isPartOf": {
+            "@id": "https://www.voyagerballoons.eu/#website"
+          },
+          "about": [
+            { "@type": "Thing", "name": "actividades en Segovia" },
+            { "@type": "Thing", "name": "vuelo en globo en Segovia" },
+            { "@type": "Thing", "name": "planes cerca de Madrid" },
+            { "@type": "Thing", "name": "regalos experiencia" }
+          ]
+        },
+        {
+          "@type": "Article",
+          "@id": "https://www.voyagerballoons.eu/actividades-segovia#article",
+          "headline": "Qué hacer en Segovia: vuelo en globo y planes únicos",
+          "description": "Una guía práctica para elegir actividades memorables en Segovia, desde el Alcázar y el Acueducto hasta un vuelo en globo al amanecer.",
+          "image": "https://www.voyagerballoons.eu/assets/img/segovia-alcazar.jpg",
+          "datePublished": "2026-06-18",
+          "dateModified": "2026-06-18",
+          "inLanguage": "es-ES",
+          "author": {
+            "@type": "Organization",
+            "name": "Voyager Balloons",
+            "url": "https://www.voyagerballoons.eu/"
+          },
+          "publisher": {
+            "@type": "Organization",
+            "name": "Voyager Balloons",
+            "url": "https://www.voyagerballoons.eu/"
+          },
+          "mainEntityOfPage": {
+            "@id": "https://www.voyagerballoons.eu/actividades-segovia#webpage"
+          }
+        },
+        {
+          "@type": "Product",
+          "@id": "https://www.voyagerballoons.eu/actividades-segovia#vuelo-globo-segovia",
+          "name": "Vuelo en globo en Segovia",
+          "image": "https://www.voyagerballoons.eu/assets/img/balloon-takeoff.jpg",
+          "description": "Actividad de turismo activo en Segovia: vuelo en globo al amanecer con vistas al Alcázar, el Acueducto y el paisaje castellano, finalizando con brindis con cava.",
+          "brand": {
+            "@type": "Organization",
+            "name": "Voyager Balloons"
+          },
+          "category": "Actividad turística en Segovia",
+          "areaServed": [
+            { "@type": "City", "name": "Segovia" },
+            { "@type": "City", "name": "Madrid" }
+          ],
+          "offers": {
+            "@type": "Offer",
+            "url": "https://shop.voyagerballoons.eu/?add-to-cart=2127",
+            "priceCurrency": "EUR",
+            "price": "120",
+            "availability": "https://schema.org/InStock",
+            "seller": {
+              "@type": "Organization",
+              "name": "Voyager Balloons"
+            }
+          }
+        },
+        {
+          "@type": "ItemList",
+          "@id": "https://www.voyagerballoons.eu/actividades-segovia#actividades",
+          "name": "Mejores actividades que hacer en Segovia",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Vuelo en globo al amanecer sobre Segovia",
+              "url": "https://www.voyagerballoons.eu/actividades-segovia#vuelo-globo"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Visitar el Acueducto y el casco histórico",
+              "url": "https://www.voyagerballoons.eu/actividades-segovia#planes"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Recorrer el Alcázar de Segovia",
+              "url": "https://www.voyagerballoons.eu/actividades-segovia#planes"
+            },
+            {
+              "@type": "ListItem",
+              "position": 4,
+              "name": "Completar la escapada con gastronomía local",
+              "url": "https://www.voyagerballoons.eu/actividades-segovia#planes"
+            }
+          ]
+        },
+        {
+          "@type": "FAQPage",
+          "@id": "https://www.voyagerballoons.eu/actividades-segovia#faq",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "¿Cuál es una actividad especial que hacer en Segovia?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Un vuelo en globo al amanecer es una de las actividades más especiales en Segovia porque permite ver el Alcázar, el Acueducto, la ciudad histórica y el paisaje castellano desde una perspectiva difícil de repetir."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "¿Es buena actividad para una excursión desde Madrid?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Sí. Segovia es una escapada habitual desde Madrid y el vuelo en globo se realiza al amanecer, dejando el resto del día libre para visitar el centro histórico, comer y volver con calma."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "¿Se puede regalar un vuelo en globo en Segovia?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Sí. Voyager Balloons ofrece billetes regalo para vuelo en globo en Segovia. Los billetes regalo no caducan, aunque no son reembolsables."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "¿Qué ocurre si el tiempo no permite volar?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Si la meteorología no permite volar con seguridad, el piloto cancela el vuelo y se propone una nueva fecha sin coste adicional."
+              }
+            }
+          ]
+        },
+        {
+          "@type": "BreadcrumbList",
+          "@id": "https://www.voyagerballoons.eu/actividades-segovia#breadcrumb",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Inicio",
+              "item": "https://www.voyagerballoons.eu/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Qué hacer en Segovia",
+              "item": "https://www.voyagerballoons.eu/actividades-segovia"
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+</head>
+<body>
+    <nav class="navbar" id="navbar">
+        <div class="nav-container container">
+            <a href="index.html" class="logo">Voyager<span>Balloons</span></a>
+            <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" aria-label="Abrir menú">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <div class="nav-links" id="primary-navigation">
+                <a href="index.html#experience">La Experiencia</a>
+                <a href="actividades-segovia.html">Qué hacer en Segovia</a>
+                <a href="index.html#packages">Paquetes</a>
+                <a href="blog.html">Blog</a>
+                <a href="https://shop.voyagerballoons.eu/" class="btn btn-primary nav-btn">Reservar Ahora</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="guide-hero">
+        <div class="container">
+            <span class="eyebrow">Guía para visitantes y regalos experiencia</span>
+            <h1>Qué hacer en Segovia si buscas una actividad que se recuerde de verdad</h1>
+            <p>Segovia se puede visitar caminando, comiendo bien y entrando en sus monumentos. Pero si quieres convertir la escapada en una experiencia difícil de olvidar, verla desde un globo al amanecer cambia por completo la manera de entender la ciudad.</p>
+            <div class="hero-actions">
+                <a href="https://shop.voyagerballoons.eu/" class="btn btn-primary btn-large">Ver disponibilidad</a>
+                <a href="#planes" class="btn btn-outline btn-large">Comparar planes</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="section" aria-labelledby="respuesta-rapida">
+            <div class="container">
+                <div class="answer-box">
+                    <span class="eyebrow">Respuesta rápida</span>
+                    <h2 id="respuesta-rapida">Una de las mejores actividades en Segovia es volar en globo al amanecer</h2>
+                    <p><strong>Para viajeros de Madrid, parejas, familias y personas que buscan un regalo especial, el vuelo en globo sobre Segovia combina paisaje, historia y emoción en una sola mañana.</strong> Es una actividad tranquila, visual y muy fotogénica: ves el Alcázar, el Acueducto, la muralla, la catedral y los campos de Castilla desde una perspectiva que no se consigue desde ningún mirador terrestre.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" aria-labelledby="datos-clave">
+            <div class="container">
+                <div class="section-header fade-in">
+                    <h2 id="datos-clave">Datos clave para decidir rápido</h2>
+                    <p>Información pensada para quien está comparando planes en Segovia o preparando una escapada desde Madrid.</p>
+                </div>
+                <div class="fact-grid">
+                    <div class="fact-card fade-in slide-up" style="--delay: 1">
+                        <span>Tipo de plan</span>
+                        <p>Actividad turística premium, tranquila y apta para regalo.</p>
+                    </div>
+                    <div class="fact-card fade-in slide-up" style="--delay: 2">
+                        <span>Mejor momento</span>
+                        <p>Al amanecer, cuando las condiciones del aire son más estables.</p>
+                    </div>
+                    <div class="fact-card fade-in slide-up" style="--delay: 3">
+                        <span>Duración completa</span>
+                        <p>Aproximadamente 3 a 4 horas, incluyendo preparación, vuelo y cierre.</p>
+                    </div>
+                    <div class="fact-card fade-in slide-up" style="--delay: 4">
+                        <span>Precio orientativo</span>
+                        <p>Classic Adventure desde 120 euros por pasajero.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="planes" class="section packages-section" aria-labelledby="mejores-planes">
+            <div class="container">
+                <div class="section-header fade-in">
+                    <h2 id="mejores-planes">Mejores actividades que hacer en Segovia</h2>
+                    <p>Una buena visita a Segovia no tiene por qué elegir entre monumentos, gastronomía y aventura. Lo ideal es combinarlos bien.</p>
+                </div>
+                <div class="activity-grid">
+                    <article class="activity-card highlight-card fade-in slide-up" style="--delay: 1" id="vuelo-globo">
+                        <h3>Vuelo en globo sobre Segovia</h3>
+                        <p>La opción más memorable si quieres ver la ciudad completa desde el aire. Encaja especialmente bien en escapadas románticas, regalos importantes y visitas desde Madrid.</p>
+                    </article>
+                    <article class="activity-card fade-in slide-up" style="--delay: 2">
+                        <h3>Acueducto y casco histórico</h3>
+                        <p>Imprescindible para una primera visita. Es el recorrido más reconocible, cómodo y fácil de combinar con cualquier otro plan del día.</p>
+                    </article>
+                    <article class="activity-card fade-in slide-up" style="--delay: 3">
+                        <h3>Alcázar de Segovia</h3>
+                        <p>Una parada esencial para quienes buscan historia, arquitectura y una de las siluetas más icónicas de Castilla.</p>
+                    </article>
+                    <article class="activity-card fade-in slide-up" style="--delay: 4">
+                        <h3>Gastronomía local</h3>
+                        <p>Perfecta para cerrar la mañana después del vuelo o completar una excursión de día completo con calma.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" aria-labelledby="comparativa">
+            <div class="container">
+                <div class="section-header fade-in">
+                    <h2 id="comparativa">Qué plan elegir según el tipo de viaje</h2>
+                    <p>Una comparativa clara ayuda a escoger sin perderse entre opciones.</p>
+                </div>
+                <table class="comparison-table fade-in slide-up">
+                    <thead>
+                        <tr>
+                            <th>Situación</th>
+                            <th>Actividad recomendada</th>
+                            <th>Por qué encaja</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td data-label="Situación">Escapada especial desde Madrid</td>
+                            <td data-label="Actividad recomendada">Vuelo en globo + paseo por el centro</td>
+                            <td data-label="Por qué encaja">Aprovechas el amanecer para la experiencia principal y dejas el resto del día para visitar Segovia sin prisas.</td>
+                        </tr>
+                        <tr>
+                            <td data-label="Situación">Cumpleaños, aniversario o regalo</td>
+                            <td data-label="Actividad recomendada">Billete regalo de vuelo en globo</td>
+                            <td data-label="Por qué encaja">Es un regalo experiencia, no caduca y se vive en una ciudad muy reconocible visualmente.</td>
+                        </tr>
+                        <tr>
+                            <td data-label="Situación">Primera vez en Segovia</td>
+                            <td data-label="Actividad recomendada">Acueducto, Alcázar, casco histórico y gastronomía</td>
+                            <td data-label="Por qué encaja">Cubre los iconos esenciales de la ciudad en una visita clásica.</td>
+                        </tr>
+                        <tr>
+                            <td data-label="Situación">Pareja o celebración privada</td>
+                            <td data-label="Actividad recomendada">Vuelo privado o experiencia personalizada</td>
+                            <td data-label="Por qué encaja">Permite adaptar el ritmo, el grupo y el cierre de la experiencia.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="section packages-section" aria-labelledby="por-que-globo">
+            <div class="container editorial-copy">
+                <div class="section-header fade-in">
+                    <h2 id="por-que-globo">Por qué el vuelo en globo destaca entre los planes de Segovia</h2>
+                    <p>Hay muchas formas de mirar Segovia, pero muy pocas permiten entenderla entera en una sola imagen.</p>
+                </div>
+                <div class="grid-3-col">
+                    <div class="feature-card fade-in slide-up" style="--delay: 1">
+                        <h3>Une paisaje e historia</h3>
+                        <p>Desde el aire se entiende mejor la relación entre la ciudad monumental, los campos de Castilla, la muralla y los grandes hitos como el Alcázar y el Acueducto.</p>
+                    </div>
+                    <div class="feature-card fade-in slide-up" style="--delay: 2">
+                        <h3>No exige esfuerzo físico</h3>
+                        <p>Es una actividad calmada, silenciosa y guiada por pilotos profesionales. La emoción viene de la altura, la luz y la perspectiva, no de la exigencia deportiva.</p>
+                    </div>
+                    <div class="feature-card fade-in slide-up" style="--delay: 3">
+                        <h3>Funciona como recuerdo y como regalo</h3>
+                        <p>El vuelo termina con brindis con cava, diploma y fotos de la tripulación para complementar las tuyas, lo que ayuda a convertir la experiencia en recuerdo tangible.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" aria-labelledby="para-quien">
+            <div class="container">
+                <div class="section-header fade-in">
+                    <h2 id="para-quien">Para quién recomendamos esta actividad</h2>
+                    <p>No todos los planes sirven para todo el mundo. Este encaja especialmente bien en estos casos.</p>
+                </div>
+                <div class="audience-grid">
+                    <div class="audience-card fade-in slide-up" style="--delay: 1">
+                        <h3>Visitantes de Madrid</h3>
+                        <p>Segovia permite una escapada de día completo. El vuelo abre la jornada y deja tiempo para monumentos y comida.</p>
+                    </div>
+                    <div class="audience-card fade-in slide-up" style="--delay: 2">
+                        <h3>Compradores de regalos</h3>
+                        <p>Ideal para aniversarios, cumpleaños, jubilaciones o regalos de pareja cuando quieres evitar algo material.</p>
+                    </div>
+                    <div class="audience-card fade-in slide-up" style="--delay: 3">
+                        <h3>Parejas y familias</h3>
+                        <p>La experiencia compartida funciona muy bien para celebrar algo juntos sin depender de una actividad de alta intensidad.</p>
+                    </div>
+                    <div class="audience-card fade-in slide-up" style="--delay: 4">
+                        <h3>Empresas y grupos pequeños</h3>
+                        <p>Los vuelos privados permiten crear una experiencia más cuidada para incentivos, celebraciones o grupos cerrados.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section packages-section" aria-labelledby="faq-actividades">
+            <div class="container">
+                <div class="section-header fade-in">
+                    <h2 id="faq-actividades">Preguntas frecuentes sobre actividades en Segovia</h2>
+                    <p>Respuestas directas para viajeros que están decidiendo qué reservar.</p>
+                </div>
+                <div class="faq-accordion glass-panel fade-in slide-up">
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>¿Cuál es una actividad especial que hacer en Segovia?</span>
+                            <div class="faq-icon">+</div>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Un vuelo en globo al amanecer es una de las actividades más especiales en Segovia porque combina vistas al Alcázar, el Acueducto, la catedral, la ciudad histórica y el paisaje castellano en una sola experiencia.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>¿Es buena idea si voy desde Madrid?</span>
+                            <div class="faq-icon">+</div>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Sí. Segovia es una escapada habitual desde Madrid. Como el vuelo se realiza al amanecer, después puedes visitar el centro histórico, comer y volver sin convertir el día en una carrera.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>¿Se puede regalar un vuelo en globo?</span>
+                            <div class="faq-icon">+</div>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Sí. Los billetes regalo de Voyager Balloons no caducan, aunque no son reembolsables. Es una opción muy adecuada para cumpleaños, aniversarios y celebraciones importantes.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>¿Qué ocurre si hace mal tiempo?</span>
+                            <div class="faq-icon">+</div>
+                        </button>
+                        <div class="faq-answer">
+                            <p>La seguridad manda. Si el piloto cancela por viento, lluvia, niebla u otra condición meteorológica, se propone una nueva fecha sin coste adicional.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>¿El vuelo en globo sustituye a visitar Segovia?</span>
+                            <div class="faq-icon">+</div>
+                        </button>
+                        <div class="faq-answer">
+                            <p>No, lo complementa. El vuelo es perfecto al principio del día porque te da una visión general de la ciudad y después puedes recorrer a pie el Acueducto, el Alcázar y el casco histórico.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section guide-cta">
+            <div class="container fade-in">
+                <h2>Convierte tu visita a Segovia en una experiencia aérea</h2>
+                <p>Reserva online tu vuelo compartido o escríbenos por WhatsApp si quieres organizar una experiencia privada, un regalo o una fecha especial.</p>
+                <div class="wizard-actions">
+                    <a href="https://shop.voyagerballoons.eu/" class="btn btn-primary btn-large">Ver disponibilidad</a>
+                    <a href="https://wa.me/34605087478" target="_blank" rel="noopener" class="btn btn-outline btn-large">Consultar por WhatsApp</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="index.html" class="logo">Voyager<span>Balloons</span></a>
+                    <p>Más de 25 años volando y creando experiencias inolvidables en globo.</p>
+                </div>
+                <div class="footer-links">
+                    <h3>Experiencias</h3>
+                    <ul>
+                        <li><a href="actividades-segovia.html">Qué hacer en Segovia</a></li>
+                        <li><a href="index.html#packages">Vuelos y regalos</a></li>
+                        <li><a href="blog.html">Blog de vuelos</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h3>Pasajeros</h3>
+                    <ul>
+                        <li><a href="https://wa.me/34605087478?text=Hola%2C%20quiero%20descargar%20las%20fotos%20de%20mi%20vuelo" target="_blank" rel="noopener">Descargar Fotos</a></li>
+                        <li><a href="https://wa.me/34605087478?text=Hola%2C%20quiero%20solicitar%20mi%20certificado%20de%20vuelo" target="_blank" rel="noopener">Certificado de Vuelo</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h3>Contacto</h3>
+                    <p>📧 info@voyagerballoons.eu</p>
+                    <p>📞 Llamadas: +34 921 801 005</p>
+                    <p>💬 WhatsApp: +34 605 087 478</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Voyager Balloons EU. Todos los derechos reservados.</p>
+                <div class="legal-links">
+                    <a href="legales.html#aviso-legal">Aviso Legal</a>
+                    <a href="legales.html#privacidad">Política de Privacidad</a>
+                    <a href="legales.html#cookies">Política de Cookies</a>
+                    <a href="legales.html#cancelacion">Devoluciones y Cancelación</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <a href="https://wa.me/34605087478" target="_blank" class="whatsapp-float" aria-label="Consultar por WhatsApp">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32" fill="currentColor"><path d="M12.01 2.00195c-5.52 0-9.99 4.47-9.99 9.99 0 1.93.55 3.75 1.49 5.3l-1.5 5.51 5.64-1.48c1.51.88 3.27 1.39 5.15 1.39 5.52 0 9.99-4.47 9.99-9.99 0-5.52-4.47-9.99-9.99-9.99zm5.35 14.19c-.23.63-1.32 1.21-1.84 1.27-.47.05-1.07.1-3.3-1.33-2.67-1.72-4.38-4.48-4.51-4.66-.13-.18-1.07-1.43-1.07-2.72 0-1.29.67-1.92.9-2.16.23-.24.51-.31.68-.31.17 0 .34 0 .49.01.16.01.35-.06.54.41.2.49.68 1.66.74 1.78.06.12.1.26.02.43-.08.17-.12.28-.24.43-.12.14-.25.32-.35.43-.11.12-.23.25-.1.47.13.22.58.96 1.25 1.56.86.77 1.59 1 1.8.11.22.12.33-.05.52-.22.19-.17.38-.49.6-.58.22-.09 1.14-.54 1.31-.6.18-.06.31-.09.45.12.14.21.54.68.68.82.14.14.28.16.51.27z"/></svg>
+    </a>
+
+    <script src="js/script.js" defer></script>
+</body>
+</html>
