@@ -104,7 +104,81 @@ Acción recomendada en WordPress:
 
 ## Search Console: auditoría pendiente dentro de cuenta
 
-Necesito acceso o pantalla compartida para revisar:
+Estado revisado el 2026-06-18 con la cuenta `voyagerballoonseu@gmail.com`.
+
+### Propiedad principal verificada
+
+Se ha verificado la propiedad de prefijo:
+
+- `https://www.voyagerballoons.eu/`
+
+Método usado:
+
+- Archivo HTML de verificación: `google53c3d717e983d08d.html`
+- URL pública comprobada: `https://www.voyagerballoons.eu/google53c3d717e983d08d.html`
+
+Importante: no borrar este archivo, porque Google puede volver a comprobar la verificación.
+
+### Propiedad de dominio pendiente
+
+Google también ofreció verificación DNS para la propiedad de dominio `voyagerballoons.eu`. Esta es la mejor opción porque cubriría:
+
+- `www.voyagerballoons.eu`
+- `shop.voyagerballoons.eu`
+- URLs con y sin `www`
+
+TXT a añadir en DNS:
+
+```txt
+google-site-verification=0goY5168v8tX2270vhLT5m_iWZTrT5Z03pOBFfcK5hY
+```
+
+Nameservers detectados:
+
+- `dns1.p09.nsone.net`
+- `dns2.p09.nsone.net`
+- `dns3.p09.nsone.net`
+- `dns4.p09.nsone.net`
+
+### Sitemap principal enviado
+
+Enviado en Search Console:
+
+- `https://www.voyagerballoons.eu/sitemap.xml`
+
+Estado inicial mostrado por Google:
+
+- `No se ha podido obtener`
+- URLs descubiertas: `0`
+
+Comprobación externa:
+
+- El sitemap público responde `200 OK`.
+- El contenido XML es válido y accesible.
+
+Interpretación: al ser una propiedad recién verificada, puede ser un estado temporal de procesamiento. Revisar en 24-48 horas. Si sigue igual, volver a enviarlo y comprobar el informe de sitemaps.
+
+### Indexación solicitada manualmente
+
+Se ha solicitado indexación en URL Inspection para:
+
+- `https://www.voyagerballoons.eu/vuelo-en-globo-segovia`
+- `https://www.voyagerballoons.eu/vuelo-en-globo-segovia-desde-madrid`
+- `https://www.voyagerballoons.eu/actividades-segovia`
+- `https://www.voyagerballoons.eu/seguridad-pilotos`
+
+Estado previo observado:
+
+- `La URL no está en Google`
+- `Google no reconoce esta URL`
+
+Siguiente revisión:
+
+- Esperar 24-72 horas.
+- Comprobar si Google elige la canonical declarada.
+- Solicitar también la home y `/blog` si no aparecen procesadas con el sitemap.
+
+## Search Console: revisión futura
 
 ### Propiedades
 
@@ -157,6 +231,40 @@ Fuente: https://support.google.com/webmasters/answer/9012289
 
 ## Google Merchant Center / Shopping
 
+Estado revisado el 2026-06-18 con la cuenta `voyagerballoonseu@gmail.com`.
+
+### Cuenta detectada
+
+- Nombre: `Voyager Balloons EU - vuelos en globo`
+- ID: `5530552212`
+
+### Estado actual
+
+- Clics últimos 28 días: `131`
+- Variación mostrada: `+59,8%`
+- Productos totales: `0`
+- Productos aprobados: `0`
+- Productos limitados: `0`
+- Productos rechazados: `0`
+- Productos en revisión: `0`
+
+### Fuentes de producto configuradas
+
+Found by Google:
+
+- Fuente: `voyagerballoons.eu`
+- Tipo: tienda online
+- Productos: `0`
+- Frecuencia: cada 24 horas
+- Países mostrados en detalle: `Cambodia, Cameroon, Chile +47`
+
+Provided by you:
+
+- `Content API`, feed label `ES`, idioma inglés, productos `0`, última actualización `-`
+- `Content API`, feed label `ES`, idioma español, productos `0`, última actualización `-`
+
+Problema principal: Merchant tiene fuentes creadas, pero no está recibiendo productos. Además, los países aparecen demasiado amplios y no alineados con España como mercado prioritario.
+
 ### Hallazgos públicos
 
 La tienda está en WordPress/WooCommerce y existe producto de vuelo desde 120 euros. También aparecen señales externas como GetYourGuide, Viator, Aladinia y Yumping.
@@ -187,6 +295,13 @@ La tienda está en WordPress/WooCommerce y existe producto de vuelo desde 120 eu
 4. Revisar configuración de envío si aplica.
 5. Revisar política de devoluciones/cancelación.
 6. Revisar si el producto debería estar en Merchant.
+7. Completar datos de atención al cliente:
+   - Website URL: `https://www.voyagerballoons.eu/`
+   - Email: `info@voyagerballoons.eu`
+   - Teléfono: `+34 921 801 005`
+   - Método preferido: teléfono o email, según operación real.
+8. Limitar países de venta/listing a España salvo que haya una estrategia real para otros mercados.
+9. Reconectar WooCommerce/Google Listings con `shop.voyagerballoons.eu`, no con el dominio principal antiguo.
 
 Nota: Google Merchant está pensado para productos y servicios vendibles online. Las experiencias/tickets pueden funcionar, pero conviene asegurarse de que las políticas y landing pages coinciden exactamente con el feed.
 
@@ -198,6 +313,37 @@ Fuentes:
 - https://developers.google.com/search/docs/appearance/structured-data/merchant-listing
 
 ## Google Business Profile / Maps
+
+Estado revisado el 2026-06-18.
+
+### Estado actual observado
+
+- Perfil gestionado desde la cuenta actual.
+- Nombre visible: `Voyager Balloons EU - Paseos en Globo`
+- Categoría visible: `Agencia de excursiones en globo en España`
+- Valoración: `4,9/5`
+- Reseñas: `364`
+- Interacciones mostradas: `1.314`
+- Perfil indica `18 reseñas nuevas`.
+- Google indica que las fotos se añadieron por última vez hace `262 días`.
+- Website visible: `https://voyagerballoons.eu/`
+- Teléfono visible: `605 08 74 78`
+- Dirección visible: `C. 3 de Abril, 40003 Segovia`
+- Horario visible: `Abierto las 24 horas`
+- Opciones de reserva visibles:
+  - Sitio oficial: `https://voyagerballoons.eu/shop`, 120 euros, 3h
+  - Tripadvisor
+  - Viator
+
+### Riesgos detectados
+
+1. Dirección pública visible, aunque no hay atención presencial.
+2. Teléfono visible como `605 08 74 78`, cuando ese número se definió como WhatsApp; para llamadas debería figurar `921 801 005`.
+3. Web visible sin `www`, aunque la web final trabaja en `https://www.voyagerballoons.eu/`.
+4. Enlace de reserva oficial apunta a `/shop` en el dominio principal, en vez de `https://shop.voyagerballoons.eu/`.
+5. Fotos desactualizadas para una actividad muy visual.
+6. Reseñas nuevas pendientes de leer/responder.
+7. Horario `24 horas` puede crear expectativas operativas si no hay atención telefónica real 24/7.
 
 ### Qué revisar
 
@@ -234,6 +380,23 @@ Fuentes:
      - consejos de ropa.
      - qué hacer en Segovia después del vuelo.
 
+### Acciones recomendadas en Business Profile
+
+1. Convertir la ficha a negocio de área de servicio si no hay atención presencial, ocultando la dirección exacta.
+2. Cambiar teléfono principal a `+34 921 801 005`.
+3. Añadir WhatsApp/mensajería con `+34 605 087 478` si Google lo permite.
+4. Actualizar web a `https://www.voyagerballoons.eu/` o a `https://www.voyagerballoons.eu/vuelo-en-globo-segovia`.
+5. Actualizar enlace de reservas a `https://shop.voyagerballoons.eu/`.
+6. Subir fotos nuevas cada semana durante 30 días.
+7. Responder las 18 reseñas recientes con texto específico y natural.
+8. Usar el enlace de "Pedir una reseña" en el email postvuelo.
+9. Publicar posts semanales orientados a:
+   - vuelo en globo en Segovia,
+   - regalo para pareja/familia,
+   - escapada desde Madrid,
+   - actividad de amanecer,
+   - qué hacer en Segovia.
+
 Referencia oficial: Google pide información precisa y actualizada en Business Profile.  
 Fuente: https://support.google.com/business/answer/3038177
 
@@ -246,6 +409,7 @@ Fuente: https://support.google.com/business/answer/3038177
 3. Revisar canonical seleccionado por Google.
 4. Corregir robots/sitemap de `shop.voyagerballoons.eu`.
 5. Revisar feed y diagnósticos de Merchant Center.
+6. Añadir el TXT DNS para verificar la propiedad de dominio.
 
 ### Esta semana
 
@@ -253,22 +417,26 @@ Fuente: https://support.google.com/business/answer/3038177
 2. Configurar Google Business Profile sin dirección pública si no hay atención presencial.
 3. Añadir enlace de reseña de Google al proceso post-vuelo.
 4. Alinear WordPress/WooCommerce con `shop.voyagerballoons.eu`.
+5. Corregir teléfono, web y enlace de reservas en Business Profile.
+6. Completar datos de atención al cliente en Merchant.
 
 ### 30 días
 
 1. Conseguir reseñas reales en Google y plataformas.
 2. Publicar fotos reales en Business Profile.
-3. Monitorizar queries en Search Console.
-4. Crear report mensual: clicks, impresiones, CTR, posición media, reservas orgánicas.
+3. Responder todas las reseñas nuevas.
+4. Conseguir que Merchant reciba al menos los productos/experiencias principales desde WooCommerce.
+5. Revisar Search Console semanalmente: rendimiento, consultas, páginas indexadas y sitemaps.
+6. Monitorizar queries en Search Console.
+7. Crear report mensual: clicks, impresiones, CTR, posición media, reservas orgánicas.
 
-## Acceso necesario para auditoría privada
+## Accesos pendientes
 
-Para completar la auditoría dentro de Google necesito que abras o me des acceso a:
+Ya se ha podido revisar Search Console, Merchant Center y Business Profile con la cuenta actual. Para completar las correcciones que dependen de plataformas externas faltan estos accesos:
 
-- Google Search Console.
-- Google Merchant Center.
-- Google Business Profile.
-- Google Ads si hay campañas activas.
-- Site Kit en WordPress si está conectado.
+- Panel DNS/NS1 para añadir el TXT de verificación de dominio.
+- WordPress/WooCommerce de `shop.voyagerballoons.eu` para corregir sitemap, robots, canonical y feed de productos.
+- Google Ads si se quiere optimizar campañas, extensiones y conversiones.
+- Site Kit en WordPress si está conectado a Analytics/Search Console.
 
-Con eso puedo revisar diagnósticos reales, feeds, index coverage, errores de Merchant, consultas, páginas con impresiones, rich results y problemas de propiedad.
+Con eso se pueden cerrar las correcciones de propiedad completa, feed de Merchant, medición de conversiones y consistencia entre ficha, tienda y web principal.
