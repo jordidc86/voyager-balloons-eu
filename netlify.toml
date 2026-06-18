@@ -8,6 +8,48 @@
   force = true
 
 [[redirects]]
+  from = "/refund-policy/"
+  to = "/legales#cancelacion"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tag/segovia/"
+  to = "/blog"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tag/segovia/page/2/"
+  to = "/blog"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/segovia-desde-el-aire-paseo-en-globo/"
+  to = "/vuelo-en-globo-segovia"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/a-que-altura-vuela-un-globo-curiosidades-que-te-sorprenderan/"
+  to = "/articulos/como-se-dirige-globo"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/producto/oferta-vuelo-en-globo-en-segovia/"
+  to = "/vuelo-en-globo-segovia"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/etiqueta-producto/madrid/"
+  to = "/vuelo-en-globo-segovia-desde-madrid"
+  status = 301
+  force = true
+
+[[redirects]]
   from = "/blog.html"
   to = "/blog"
   status = 301
