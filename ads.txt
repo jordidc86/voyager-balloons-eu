@@ -1,0 +1,2 @@
+# Voyager Balloons EU does not sell programmatic advertising inventory.
+# This file is published to make that status explicit for crawlers and audit tools.

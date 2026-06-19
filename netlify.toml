@@ -120,3 +120,8 @@
   to = "https://shop.voyagerballoons.eu/:splat"
   status = 301
   force = true
+
+[[redirects]]
+  from = "/*"
+  to = "/404.html"
+  status = 404
