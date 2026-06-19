@@ -120,42 +120,33 @@ Método usado:
 
 Importante: no borrar este archivo, porque Google puede volver a comprobar la verificación.
 
-### Propiedad de dominio pendiente
+### Propiedad de dominio verificada
 
-Google también ofreció verificación DNS para la propiedad de dominio `voyagerballoons.eu`. Esta es la mejor opción porque cubriría:
+Estado actualizado el 2026-06-19: la propiedad de dominio `voyagerballoons.eu` ya está verificada por DNS en Search Console. Esta propiedad cubre:
 
 - `www.voyagerballoons.eu`
 - `shop.voyagerballoons.eu`
 - URLs con y sin `www`
 
-TXT a añadir en DNS:
-
-```txt
-google-site-verification=0goY5168v8tX2270vhLT5m_iWZTrT5Z03pOBFfcK5hY
-```
-
-Nameservers detectados:
-
-- `dns1.p09.nsone.net`
-- `dns2.p09.nsone.net`
-- `dns3.p09.nsone.net`
-- `dns4.p09.nsone.net`
+No eliminar el TXT DNS de verificación.
 
 ### Sitemap principal enviado
 
 Enviado en Search Console:
 
 - `https://www.voyagerballoons.eu/sitemap.xml`
+- `https://shop.voyagerballoons.eu/wp-sitemap.xml`
 
-Estado inicial mostrado por Google:
+Estado inicial mostrado por Google en algunas vistas:
 
 - `No se ha podido obtener`
 - URLs descubiertas: `0`
 
 Comprobación externa:
 
-- El sitemap público responde `200 OK`.
+- Ambos sitemaps públicos responden `200 OK`.
 - El contenido XML es válido y accesible.
+- Search Console mostró confirmación verde de envío correcto al añadirlos.
 
 Interpretación: al ser una propiedad recién verificada, puede ser un estado temporal de procesamiento. Revisar en 24-48 horas. Si sigue igual, volver a enviarlo y comprobar el informe de sitemaps.
 
@@ -163,15 +154,27 @@ Interpretación: al ser una propiedad recién verificada, puede ser un estado te
 
 Se ha solicitado indexación en URL Inspection para:
 
+- `https://www.voyagerballoons.eu/`
+- `https://www.voyagerballoons.eu/blog`
 - `https://www.voyagerballoons.eu/vuelo-en-globo-segovia`
 - `https://www.voyagerballoons.eu/vuelo-en-globo-segovia-desde-madrid`
 - `https://www.voyagerballoons.eu/actividades-segovia`
 - `https://www.voyagerballoons.eu/seguridad-pilotos`
+- `https://www.voyagerballoons.eu/articulos/vuelo-globo-segovia`
+- `https://www.voyagerballoons.eu/articulos/primer-vuelo-globo`
+- `https://www.voyagerballoons.eu/articulos/regalar-vuelo-globo`
+- `https://www.voyagerballoons.eu/articulos/como-se-dirige-globo`
 
 Estado previo observado:
 
 - `La URL no está en Google`
 - `Google no reconoce esta URL`
+
+Estado el 2026-06-19:
+
+- La home `https://www.voyagerballoons.eu/` aparece como `La URL está en Google`.
+- La cuota diaria de solicitud manual de indexación se agotó al revisar la tienda.
+- Hay una tarea programada para retomar el 2026-06-20 a las 09:00.
 
 Siguiente revisión:
 
@@ -505,8 +508,11 @@ Sitemap: https://voyagerballoons.eu/sitemap.xml
 Interpretación:
 
 - La tienda tiene un sitemap nativo correcto en `wp-sitemap.xml`.
-- El sitemap/robots antiguo parece generado por cache/plugin o archivo heredado.
+- El sitemap/robots antiguo no es solo caché: tras limpiar caché de WordPress.com respondió `MISS` y mantuvo `Last-Modified` de marzo de 2026.
+- Por tanto, parece un archivo físico heredado en la raíz del hosting WordPress.com.
 - No conviene poner el sitio completo en noindex porque rompería la tienda.
+- WPCode Lite muestra editor de archivos, pero la edición de `robots.txt` es función Pro.
+- El hosting tiene SFTP activo, pero WordPress.com exige resetear la contraseña para verla. No se ha tocado esa credencial.
 
 Acción recomendada:
 
@@ -517,8 +523,31 @@ Sitemap: https://shop.voyagerballoons.eu/wp-sitemap.xml
 ```
 
 2. Eliminar o regenerar el sitemap antiguo `https://shop.voyagerballoons.eu/sitemap.xml`.
-3. Si no se puede editar el archivo/plugin que genera robots, añadir una regla/snippet controlado en WordPress o corregir el plugin que aparece como `Vortex Optimization`.
-4. Verificar la propiedad `https://shop.voyagerballoons.eu/` o la propiedad de dominio en Search Console y enviar `wp-sitemap.xml`.
+3. Corregir por SFTP/SSH los archivos físicos heredados en la raíz de WordPress.com:
+   - `robots.txt`
+   - `sitemap.xml`
+4. Si no se quiere resetear SFTP, valorar WPCode Pro o activar/configurar Rank Math, pero solo tras copia y prueba porque afecta SEO global.
+5. La propiedad de dominio ya está verificada y `wp-sitemap.xml` ya se ha enviado.
+
+### Correcciones aplicadas en la tienda
+
+Aplicado el 2026-06-19 en WooCommerce:
+
+- Producto principal actualizado:
+  - Antes: `Vuelo en globo al amanecer en segovia`
+  - Ahora: `Vuelo en globo al amanecer en Segovia`
+- Eliminadas referencias a `picnic`, `pícnic` y desayuno en la ficha pública.
+- Descripción corta actual:
+
+```txt
+De 45 a 60 minutos de vuelo y brindis con cava al acabar la experiencia.
+```
+
+- La página pública del producto ya no contiene `picnic`, `pícnic` ni `desayuno`.
+- El schema `Product` del producto principal ya refleja la descripción con brindis de cava.
+- Se creó el snippet WPCode `SEO canonical tags tienda` para intentar añadir canonical tags en WordPress.
+  - Verificado: el producto principal emite canonical correcto.
+  - Pendiente: home/categoría de tienda no reciben canonical con WPCode Lite; resolver con Rank Math bien configurado o corrección a nivel hosting/tema.
 
 ### Merchant Center
 
@@ -570,12 +599,12 @@ Oportunidades detectadas:
 
 ### Urgente
 
-1. En Search Console, enviar sitemap principal.
-2. Solicitar indexación de las 4 páginas estratégicas.
+1. Revisar el 2026-06-20 si Search Console ya procesó los sitemaps enviados.
+2. Retomar solicitud de indexación manual cuando se renueve la cuota diaria.
 3. Revisar canonical seleccionado por Google.
 4. Corregir robots/sitemap de `shop.voyagerballoons.eu`.
 5. Revisar feed y diagnósticos de Merchant Center.
-6. Añadir el TXT DNS para verificar la propiedad de dominio.
+6. Corregir canonical de home/categorías de tienda con Rank Math, tema o SFTP/SSH.
 
 ### Esta semana
 
@@ -598,11 +627,11 @@ Oportunidades detectadas:
 
 ## Accesos pendientes
 
-Ya se ha podido revisar Search Console, Merchant Center y Business Profile con la cuenta actual. Para completar las correcciones que dependen de plataformas externas faltan estos accesos:
+Ya se ha podido revisar Search Console, Business Profile y WordPress/WooCommerce con la cuenta actual. Para completar las correcciones que dependen de plataformas externas faltan estos accesos o acciones:
 
-- Panel DNS/NS1 para añadir el TXT de verificación de dominio.
-- WordPress/WooCommerce de `shop.voyagerballoons.eu` para corregir sitemap, robots, canonical y feed de productos.
+- SFTP/SSH de WordPress.com para corregir los archivos físicos `robots.txt` y `sitemap.xml` de `shop.voyagerballoons.eu`.
+- Verificación de identidad/passkey en Merchant Center para revisar feed, productos y políticas.
 - Google Ads si se quiere optimizar campañas, extensiones y conversiones.
 - Site Kit en WordPress si está conectado a Analytics/Search Console.
 
-Con eso se pueden cerrar las correcciones de propiedad completa, feed de Merchant, medición de conversiones y consistencia entre ficha, tienda y web principal.
+Con eso se pueden cerrar las correcciones de robots/sitemap físico, feed de Merchant, medición de conversiones y consistencia entre ficha, tienda y web principal.
