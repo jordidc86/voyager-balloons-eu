@@ -21,16 +21,9 @@
 <link rel="icon" href="/favicon.ico" sizes="any">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-
-    <!-- Preconnect to Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    
-    <!-- Optimized Font Loading (font-display: swap) -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
-
     <!-- CSS -->
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="preload" href="css/style.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="css/style.css"></noscript>
     
     <script type="application/ld+json">
     {
@@ -430,7 +423,7 @@
                 <article class="blog-card fade-in slide-up delay-1">
                     <div class="blog-card-image">
                         <!-- Placeholder until real photos are uploaded -->
-                        <img src="assets/img/segovia-alcazar-card-800.webp" srcset="assets/img/segovia-alcazar-card-400.webp 400w, assets/img/segovia-alcazar-card-800.webp 800w" sizes="(max-width: 768px) 100vw, 33vw" width="800" height="450" alt="Vista del Alcázar de Segovia desde globo aerostático">
+                        <img src="assets/img/segovia-alcazar-card-800.webp" srcset="assets/img/segovia-alcazar-card-400.webp 400w, assets/img/segovia-alcazar-card-600.webp 600w, assets/img/segovia-alcazar-card-800.webp 800w" sizes="(max-width: 480px) 55vw, (max-width: 768px) 100vw, 33vw" width="800" height="450" alt="Vista del Alcázar de Segovia desde globo aerostático">
                         <div class="blog-tag">Inspiración</div>
                     </div>
                     <div class="blog-card-content">
@@ -443,7 +436,7 @@
                 <!-- Article Card 2 -->
                 <article class="blog-card fade-in slide-up delay-2">
                     <div class="blog-card-image">
-                        <img src="assets/img/passengers-view-card-800.webp" srcset="assets/img/passengers-view-card-400.webp 400w, assets/img/passengers-view-card-800.webp 800w" sizes="(max-width: 768px) 100vw, 33vw" width="800" height="450" alt="Pasajeros disfrutando del vuelo en globo">
+                        <img src="assets/img/passengers-view-card-800.webp" srcset="assets/img/passengers-view-card-400.webp 400w, assets/img/passengers-view-card-600.webp 600w, assets/img/passengers-view-card-800.webp 800w" sizes="(max-width: 480px) 55vw, (max-width: 768px) 100vw, 33vw" width="800" height="450" alt="Pasajeros disfrutando del vuelo en globo">
                         <div class="blog-tag">Guías Prácticas</div>
                     </div>
                     <div class="blog-card-content">
@@ -456,7 +449,7 @@
                 <!-- Article Card 3 -->
                 <article class="blog-card fade-in slide-up delay-3">
                     <div class="blog-card-image">
-                        <img src="assets/img/balloon-takeoff-card-800.webp" srcset="assets/img/balloon-takeoff-card-400.webp 400w, assets/img/balloon-takeoff-card-800.webp 800w" sizes="(max-width: 768px) 100vw, 33vw" width="800" height="450" alt="Globo preparándose para volar">
+                        <img src="assets/img/balloon-takeoff-card-800.webp" srcset="assets/img/balloon-takeoff-card-400.webp 400w, assets/img/balloon-takeoff-card-600.webp 600w, assets/img/balloon-takeoff-card-800.webp 800w" sizes="(max-width: 480px) 55vw, (max-width: 768px) 100vw, 33vw" width="800" height="450" alt="Globo preparándose para volar">
                         <div class="blog-tag">Regalos</div>
                     </div>
                     <div class="blog-card-content">
