@@ -67,37 +67,39 @@ Google muestra URLs antiguas de WordPress o de la etapa anterior:
 Estado anterior: muchas terminaban en 404 tras pasar a `www`.  
 Acción aplicada: redirects 301 en Netlify hacia páginas equivalentes.
 
-### 3. `shop.voyagerballoons.eu/robots.txt` apunta al sitemap equivocado
+### 3. `shop.voyagerballoons.eu/robots.txt` corregido
 
-El robots de la tienda devuelve:
+Estado anterior: el robots de la tienda devolvía:
 
 ```txt
 Sitemap: https://voyagerballoons.eu/sitemap.xml
 ```
 
-Esto es incorrecto para la tienda. Debería apuntar a un sitemap propio de `shop.voyagerballoons.eu`, por ejemplo:
+Estado actualizado el 2026-06-19: corregido por SFTP en la raíz de WordPress.com. Ahora devuelve `200 OK` y apunta al sitemap nativo de la tienda:
 
 ```txt
-Sitemap: https://shop.voyagerballoons.eu/sitemap.xml
+Sitemap: https://shop.voyagerballoons.eu/wp-sitemap.xml
 ```
 
-O, mejor, el sitemap real generado por WordPress/WooCommerce si existe.
+Backup previo guardado temporalmente en `/tmp/voyager-wp-root-backup/robots.txt.before`.
 
-### 4. `shop.voyagerballoons.eu/sitemap.xml` contiene URLs del dominio principal antiguo
+### 4. `shop.voyagerballoons.eu/sitemap.xml` corregido
 
-El sitemap de la tienda lista URLs como:
+Estado anterior: el sitemap físico de la tienda listaba URLs del dominio principal antiguo, por ejemplo:
 
 - `https://voyagerballoons.eu/`
 - `https://voyagerballoons.eu/shop/`
 - `https://voyagerballoons.eu/blog/`
 
-Esto es una señal mala para Google y Merchant porque mezcla tienda WordPress con dominio principal Netlify.
+Esto era una señal mala para Google y Merchant porque mezclaba tienda WordPress con dominio principal Netlify.
 
-Acción recomendada en WordPress:
+Estado actualizado el 2026-06-19: corregido por SFTP en la raíz de WordPress.com. Ahora `https://shop.voyagerballoons.eu/sitemap.xml` devuelve un sitemap index mínimo que apunta al sitemap real de WordPress:
 
-- Regenerar sitemap con el dominio `shop.voyagerballoons.eu`.
-- Excluir posts/páginas que no sean productos o contenido útil de tienda.
-- Asegurar canonical de productos a `shop.voyagerballoons.eu`.
+```xml
+<loc>https://shop.voyagerballoons.eu/wp-sitemap.xml</loc>
+```
+
+Backup previo guardado temporalmente en `/tmp/voyager-wp-root-backup/sitemap.xml.before`.
 
 ### 5. WordPress staging redirige a la tienda
 
@@ -275,7 +277,7 @@ La tienda está en WordPress/WooCommerce y existe producto de vuelo desde 120 eu
 
 ### Riesgos actuales
 
-- Sitemap/robots de tienda apuntan a dominio incorrecto.
+- Sitemap/robots de tienda apuntaban a dominio incorrecto. Corregido el 2026-06-19 por SFTP.
 - Posible mezcla de producto en `shop` con páginas antiguas en dominio principal.
 - Merchant puede estar leyendo URLs incorrectas si el feed se generó antes del cambio de dominio.
 - Falta confirmar si el feed usa:
@@ -455,7 +457,7 @@ Propiedad trabajada:
 
 - `https://www.voyagerballoons.eu/`
 
-La propiedad de dominio `voyagerballoons.eu` sigue sin acceso porque falta la verificación DNS. Al intentar abrirla aparece que la cuenta actual no puede acceder a esa propiedad.
+La propiedad de dominio `voyagerballoons.eu` ya está verificada por DNS. Cubre tanto `www.voyagerballoons.eu` como `shop.voyagerballoons.eu`.
 
 Sitemap:
 
@@ -485,7 +487,7 @@ Acción pendiente:
 
 - Revisar en 24-72 horas si el sitemap pasa de `No se ha podido obtener` a procesado.
 - Revisar si las URLs anteriores pasan de `Google no reconoce esta URL` a `URL en Google`.
-- Añadir el TXT DNS de la propiedad de dominio para cubrir también `shop.voyagerballoons.eu`.
+- No retirar el TXT DNS de verificación de la propiedad de dominio.
 
 ### WordPress / tienda
 
@@ -495,39 +497,40 @@ Comprobaciones realizadas:
 - En WordPress, `WordPress Address (URL)` y `Site Address (URL)` están en `https://shop.voyagerballoons.eu`.
 - `https://shop.voyagerballoons.eu/wp-sitemap.xml` existe, responde `200 OK` y lista URLs correctas de `shop.voyagerballoons.eu`.
 
-Problema pendiente:
+Problema corregido el 2026-06-19:
 
-- `https://shop.voyagerballoons.eu/robots.txt` sigue apuntando a:
+- `https://shop.voyagerballoons.eu/robots.txt` estaba apuntando a:
 
 ```txt
 Sitemap: https://voyagerballoons.eu/sitemap.xml
 ```
 
-- `https://shop.voyagerballoons.eu/sitemap.xml` sigue listando URLs antiguas de `https://voyagerballoons.eu/...`.
+- `https://shop.voyagerballoons.eu/sitemap.xml` listaba URLs antiguas de `https://voyagerballoons.eu/...`.
 
 Interpretación:
 
 - La tienda tiene un sitemap nativo correcto en `wp-sitemap.xml`.
 - El sitemap/robots antiguo no es solo caché: tras limpiar caché de WordPress.com respondió `MISS` y mantuvo `Last-Modified` de marzo de 2026.
-- Por tanto, parece un archivo físico heredado en la raíz del hosting WordPress.com.
+- Se confirmó que eran archivos físicos heredados en la raíz del hosting WordPress.com.
 - No conviene poner el sitio completo en noindex porque rompería la tienda.
 - WPCode Lite muestra editor de archivos, pero la edición de `robots.txt` es función Pro.
-- El hosting tiene SFTP activo, pero WordPress.com exige resetear la contraseña para verla. No se ha tocado esa credencial.
+- Se accedió por SFTP tras el reset autorizado por el propietario.
 
-Acción recomendada:
+Acción aplicada:
 
-1. Cambiar el robots de la tienda para que apunte a:
+1. Backup de archivos antiguos en `/tmp/voyager-wp-root-backup/`.
+2. `robots.txt` actualizado para apuntar a:
 
 ```txt
 Sitemap: https://shop.voyagerballoons.eu/wp-sitemap.xml
 ```
 
-2. Eliminar o regenerar el sitemap antiguo `https://shop.voyagerballoons.eu/sitemap.xml`.
-3. Corregir por SFTP/SSH los archivos físicos heredados en la raíz de WordPress.com:
-   - `robots.txt`
-   - `sitemap.xml`
-4. Si no se quiere resetear SFTP, valorar WPCode Pro o activar/configurar Rank Math, pero solo tras copia y prueba porque afecta SEO global.
-5. La propiedad de dominio ya está verificada y `wp-sitemap.xml` ya se ha enviado.
+3. `sitemap.xml` actualizado como sitemap index que apunta a `https://shop.voyagerballoons.eu/wp-sitemap.xml`.
+4. Verificación externa:
+   - `https://shop.voyagerballoons.eu/robots.txt` responde `200 OK`.
+   - `https://shop.voyagerballoons.eu/sitemap.xml` responde `200 OK`.
+   - `https://shop.voyagerballoons.eu/wp-sitemap.xml` responde `200 OK`.
+5. La propiedad de dominio ya está verificada y `wp-sitemap.xml` ya se ha enviado en Search Console.
 
 ### Correcciones aplicadas en la tienda
 
@@ -602,18 +605,16 @@ Oportunidades detectadas:
 1. Revisar el 2026-06-20 si Search Console ya procesó los sitemaps enviados.
 2. Retomar solicitud de indexación manual cuando se renueve la cuota diaria.
 3. Revisar canonical seleccionado por Google.
-4. Corregir robots/sitemap de `shop.voyagerballoons.eu`.
-5. Revisar feed y diagnósticos de Merchant Center.
-6. Corregir canonical de home/categorías de tienda con Rank Math, tema o SFTP/SSH.
+4. Revisar feed y diagnósticos de Merchant Center.
+5. Corregir canonical de home/categorías de tienda con Rank Math, tema o SFTP/SSH.
 
 ### Esta semana
 
 1. Revisar y limpiar URLs antiguas en Search Console.
 2. Configurar Google Business Profile sin dirección pública si no hay atención presencial.
 3. Añadir enlace de reseña de Google al proceso post-vuelo.
-4. Alinear WordPress/WooCommerce con `shop.voyagerballoons.eu`.
-5. Corregir teléfono, web y enlace de reservas en Business Profile.
-6. Completar datos de atención al cliente en Merchant.
+4. Completar datos de atención al cliente en Merchant.
+5. Revisar que Google Business Profile aprueba teléfono, web, dirección oculta y enlace de reservas.
 
 ### 30 días
 
@@ -629,9 +630,8 @@ Oportunidades detectadas:
 
 Ya se ha podido revisar Search Console, Business Profile y WordPress/WooCommerce con la cuenta actual. Para completar las correcciones que dependen de plataformas externas faltan estos accesos o acciones:
 
-- SFTP/SSH de WordPress.com para corregir los archivos físicos `robots.txt` y `sitemap.xml` de `shop.voyagerballoons.eu`.
 - Verificación de identidad/passkey en Merchant Center para revisar feed, productos y políticas.
 - Google Ads si se quiere optimizar campañas, extensiones y conversiones.
 - Site Kit en WordPress si está conectado a Analytics/Search Console.
 
-Con eso se pueden cerrar las correcciones de robots/sitemap físico, feed de Merchant, medición de conversiones y consistencia entre ficha, tienda y web principal.
+Con eso se pueden cerrar feed de Merchant, medición de conversiones y consistencia completa entre ficha, tienda y web principal.
