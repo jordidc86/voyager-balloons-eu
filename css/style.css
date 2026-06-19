@@ -295,6 +295,11 @@ ul {
     color: var(--color-text-dark);
 }
 
+.navbar.legal-navbar .logo,
+.navbar.legal-navbar .nav-links a:not(.btn) {
+    color: var(--color-primary);
+}
+
 /* ==========================================================================
    Hero Section
    ========================================================================== */
@@ -701,6 +706,16 @@ ul {
     color: var(--color-primary);
 }
 
+.footer-social-links {
+    margin-top: 1rem;
+    display: flex;
+    gap: 1rem;
+}
+
+.social-link {
+    color: var(--color-primary);
+}
+
 .footer-contact p {
     margin-bottom: 0.75rem;
 }
@@ -823,9 +838,16 @@ ul {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Add slight delays based on inline CSS variable --delay */
-[style*="--delay"] {
-    transition-delay: calc(var(--delay) * 150ms);
+.delay-1 { transition-delay: 150ms; }
+.delay-2 { transition-delay: 300ms; }
+.delay-3 { transition-delay: 450ms; }
+.delay-4 { transition-delay: 600ms; }
+.delay-5 { transition-delay: 750ms; }
+
+.private-total-note {
+    font-size: 0.6em;
+    opacity: 0.8;
+    font-weight: normal;
 }
 
 /* ==========================================================================

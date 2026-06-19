@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Google tag: Ads attribution + cross-domain checkout tracking -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=GT-55NTF5CN"></script>
-    <script src="/js/google-ads-tracking.js"></script>
-    <title>Vuelos en Globo en Segovia | Voyager Balloons EU</title>
+    <script src="/js/google-ads-tracking.js" defer></script>
+    <title>Vuelos en Globo Segovia al Amanecer | Voyager Balloons</title>
     <meta name="description" content="Vuela en globo sobre Segovia al amanecer. Reserva vuelos privados, billetes regalo y experiencias con cava con Voyager Balloons.">
     <link rel="canonical" href="https://www.voyagerballoons.eu/">
     <meta name="robots" content="index, follow">
@@ -32,13 +32,6 @@
     <!-- CSS -->
     <link rel="stylesheet" href="css/style.css">
     
-    <!-- Critical CSS for instant rendering of above-the-fold content -->
-    <style>
-        body { margin: 0; padding: 0; font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #2C3539; }
-        .hero { height: 100vh; width: 100%; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
-        .hero-content { position: relative; z-index: 2; text-align: center; padding: 0 20px; }
-        h1 { font-family: 'Montserrat', sans-serif; font-size: 3rem; margin-bottom: 1rem; color: #ffffff; text-shadow: 0 4px 12px rgba(0,0,0,0.5); }
-    </style>
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -61,8 +54,7 @@
           "image": "https://www.voyagerballoons.eu/assets/img/segovia-alcazar.webp",
           "description": "Vuelos en globo aerostático sobre Segovia para visitantes de Madrid, viajeros en pareja, familias y regalos experiencia.",
           "telephone": "+34921801005",
-          "email": "info@voyagerballoons.eu",
-          "priceRange": "€€",
+                    "priceRange": "€€",
           "areaServed": [
             {
               "@type": "City",
@@ -202,19 +194,19 @@
     <!-- Navbar (Glassmorphism) -->
     <nav class="navbar" id="navbar">
         <div class="nav-container container">
-            <a href="index.html" class="logo">Voyager<span>Balloons</span></a>
+            <a href="/" class="logo">Voyager<span>Balloons</span></a>
             <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" aria-label="Abrir menú">
                 <span></span>
                 <span></span>
                 <span></span>
             </button>
             <div class="nav-links" id="primary-navigation">
-                <a href="vuelo-en-globo-segovia.html">Vuelo Segovia</a>
-                <a href="vuelo-en-globo-segovia-desde-madrid.html">Desde Madrid</a>
-                <a href="actividades-segovia.html">Qué hacer en Segovia</a>
+                <a href="/vuelo-en-globo-segovia">Vuelo Segovia</a>
+                <a href="/vuelo-en-globo-segovia-desde-madrid">Desde Madrid</a>
+                <a href="/actividades-segovia">Qué hacer en Segovia</a>
                 <a href="#packages">Paquetes</a>
                 <a href="#faq">FAQs</a>
-                <a href="blog.html">Blog</a>
+                <a href="/blog">Blog</a>
 
                 <a href="https://shop.voyagerballoons.eu/" class="btn btn-primary nav-btn">Reservar Ahora</a>
             </div>
@@ -253,17 +245,17 @@
             </div>
             
             <div class="grid-3-col">
-                <div class="feature-card glass-panel fade-in slide-up" style="--delay: 1">
+                <div class="feature-card glass-panel fade-in slide-up delay-1">
                     <div class="icon-wrapper">🏰</div>
                     <h3>Vistas al Alcázar</h3>
                     <p>Contempla el castillo que inspiró los cuentos de hadas desde una perspectiva que pocos tienen el privilegio de ver.</p>
                 </div>
-                <div class="feature-card glass-panel fade-in slide-up" style="--delay: 2">
+                <div class="feature-card glass-panel fade-in slide-up delay-2">
                     <div class="icon-wrapper">🏛️</div>
                     <h3>El Acueducto a vista de pájaro</h3>
                     <p>Sobrevuela esta maravilla de la ingeniería romana con las primeras luces del amanecer bañando sus piedras.</p>
                 </div>
-                <div class="feature-card glass-panel fade-in slide-up" style="--delay: 3">
+                <div class="feature-card glass-panel fade-in slide-up delay-3">
                     <div class="icon-wrapper">🥂</div>
                     <h3>Brindis con Cava</h3>
                     <p>Al aterrizar, celebramos la vida con el tradicional brindis aeronáutico con cava.</p>
@@ -280,8 +272,8 @@
                 <p>Si vienes desde Madrid o buscas un regalo experiencia, un vuelo en globo al amanecer combina Alcázar, Acueducto, paisaje castellano y una emoción tranquila que encaja en una escapada completa.</p>
             </div>
             <div class="text-center fade-in slide-up">
-                <a href="vuelo-en-globo-segovia.html" class="btn btn-primary btn-large">Ver vuelo en globo en Segovia</a>
-                <a href="actividades-segovia.html" class="btn btn-outline btn-large">Ver guía de actividades</a>
+                <a href="/vuelo-en-globo-segovia" class="btn btn-primary btn-large">Ver vuelo en globo en Segovia</a>
+                <a href="/actividades-segovia" class="btn btn-outline btn-large">Ver guía de actividades</a>
             </div>
         </div>
     </section>
@@ -296,7 +288,7 @@
             
             <div class="pricing-grid">
                 <!-- Tier 1: Classic -->
-                <div class="price-card fade-in slide-up" style="--delay: 1">
+                <div class="price-card fade-in slide-up delay-1">
                     <div class="card-content-wrapper">
                         <div class="card-header">
                             <h3>Classic Adventure</h3>
@@ -319,12 +311,12 @@
                 </div>
 
                 <!-- Tier 2: Luxury -->
-                <div class="price-card fade-in slide-up" style="--delay: 2">
+                <div class="price-card fade-in slide-up delay-2">
                     <div class="card-content-wrapper">
                         <div class="card-header">
                             <h3>Private Suite</h3>
                             <p class="card-desc">Una experiencia privada adaptada a lo que necesites.</p>
-                            <div class="price">Desde 1200€ <span><br><small style="font-size: 0.6em; opacity: 0.8; font-weight: normal;">Precio total por globo privado</small></span></div>
+                            <div class="price">Desde 1200€ <span><br><small class="private-total-note">Precio total por globo privado</small></span></div>
                         </div>
                         <ul class="features-list">
                             <li>✓ Vuelo privado con piloto</li>
@@ -435,48 +427,48 @@
             
             <div class="blog-grid">
                 <!-- Article Card 1 -->
-                <article class="blog-card fade-in slide-up" style="--delay: 1">
+                <article class="blog-card fade-in slide-up delay-1">
                     <div class="blog-card-image">
                         <!-- Placeholder until real photos are uploaded -->
                         <img src="assets/img/segovia-alcazar-card-800.webp" srcset="assets/img/segovia-alcazar-card-400.webp 400w, assets/img/segovia-alcazar-card-800.webp 800w" sizes="(max-width: 768px) 100vw, 33vw" width="800" height="450" alt="Vista del Alcázar de Segovia desde globo aerostático">
                         <div class="blog-tag">Inspiración</div>
                     </div>
                     <div class="blog-card-content">
-                        <h3><a href="articulos/vuelo-globo-segovia.html">¿Por qué Segovia es el mejor lugar de España para volar en globo?</a></h3>
+                        <h3><a href="/articulos/vuelo-globo-segovia">¿Por qué Segovia es el mejor lugar de España para volar en globo?</a></h3>
                         <p>Descubre las razones que hacen de la ciudad del Acueducto un destino top mundial para la aerostación.</p>
-                        <a href="articulos/vuelo-globo-segovia.html" class="read-more">Leer sobre volar en Segovia <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+                        <a href="/articulos/vuelo-globo-segovia" class="read-more">Leer sobre volar en Segovia <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
                     </div>
                 </article>
 
                 <!-- Article Card 2 -->
-                <article class="blog-card fade-in slide-up" style="--delay: 2">
+                <article class="blog-card fade-in slide-up delay-2">
                     <div class="blog-card-image">
                         <img src="assets/img/passengers-view-card-800.webp" srcset="assets/img/passengers-view-card-400.webp 400w, assets/img/passengers-view-card-800.webp 800w" sizes="(max-width: 768px) 100vw, 33vw" width="800" height="450" alt="Pasajeros disfrutando del vuelo en globo">
                         <div class="blog-tag">Guías Prácticas</div>
                     </div>
                     <div class="blog-card-content">
-                        <h3><a href="articulos/primer-vuelo-globo.html">Guía de supervivencia para tu primer vuelo en globo</a></h3>
+                        <h3><a href="/articulos/primer-vuelo-globo">Guía de supervivencia para tu primer vuelo en globo</a></h3>
                         <p>Todo lo que necesitas saber antes de despegar: desde qué ropa llevar hasta cómo evitar mareos.</p>
-                        <a href="articulos/primer-vuelo-globo.html" class="read-more">Leer guía primer vuelo <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+                        <a href="/articulos/primer-vuelo-globo" class="read-more">Leer guía primer vuelo <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
                     </div>
                 </article>
 
                 <!-- Article Card 3 -->
-                <article class="blog-card fade-in slide-up" style="--delay: 3">
+                <article class="blog-card fade-in slide-up delay-3">
                     <div class="blog-card-image">
                         <img src="assets/img/balloon-takeoff-card-800.webp" srcset="assets/img/balloon-takeoff-card-400.webp 400w, assets/img/balloon-takeoff-card-800.webp 800w" sizes="(max-width: 768px) 100vw, 33vw" width="800" height="450" alt="Globo preparándose para volar">
                         <div class="blog-tag">Regalos</div>
                     </div>
                     <div class="blog-card-content">
-                        <h3><a href="articulos/regalar-vuelo-globo.html">Regalar un vuelo en globo: El regalo más original</a></h3>
+                        <h3><a href="/articulos/regalar-vuelo-globo">Regalar un vuelo en globo: El regalo más original</a></h3>
                         <p>Por qué una experiencia en el cielo supera a cualquier regalo material para cumpleaños o aniversarios.</p>
-                        <a href="articulos/regalar-vuelo-globo.html" class="read-more">Leer ideas para regalar <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+                        <a href="/articulos/regalar-vuelo-globo" class="read-more">Leer ideas para regalar <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
                     </div>
                 </article>
             </div>
             
             <div class="text-center mt-12">
-                <a href="blog.html" class="btn btn-outline btn-large">Ver todos los artículos</a>
+                <a href="/blog" class="btn btn-outline btn-large">Ver todos los artículos</a>
             </div>
         </div>
     </section>
@@ -544,26 +536,26 @@
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-brand">
-                    <a href="index.html" class="logo">Voyager<span>Balloons</span></a>
+                    <a href="/" class="logo">Voyager<span>Balloons</span></a>
                     <p>Más de 25 años volando y creando experiencias inolvidables en globo.</p>
                 </div>
                 <div class="footer-links">
                     <h3>Experiencias</h3>
                     <ul>
-                        <li><a href="vuelo-en-globo-segovia.html">Vuelo en globo Segovia</a></li>
-                        <li><a href="vuelo-en-globo-segovia-desde-madrid.html">Desde Madrid</a></li>
-                        <li><a href="seguridad-pilotos.html">Seguridad y pilotos</a></li>
+                        <li><a href="/vuelo-en-globo-segovia">Vuelo en globo Segovia</a></li>
+                        <li><a href="/vuelo-en-globo-segovia-desde-madrid">Desde Madrid</a></li>
+                        <li><a href="/seguridad-pilotos">Seguridad y pilotos</a></li>
                         <li><a href="https://wa.me/34605087478?text=Hola%2C%20quiero%20descargar%20las%20fotos%20de%20mi%20vuelo" target="_blank" rel="noopener noreferrer">Descargar Fotos</a></li>
                         <li><a href="https://wa.me/34605087478?text=Hola%2C%20quiero%20solicitar%20mi%20certificado%20de%20vuelo" target="_blank" rel="noopener noreferrer">Certificado de Vuelo</a></li>
                     </ul>
-                    <div class="social-links" style="margin-top: 1rem; display: flex; gap: 1rem;">
-                        <a href="https://instagram.com/voyagerballoons" target="_blank" rel="noopener noreferrer" aria-label="Instagram" style="color: var(--color-primary);"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg></a>
-                        <a href="https://facebook.com/voyagerballoons" target="_blank" rel="noopener noreferrer" aria-label="Facebook" style="color: var(--color-primary);"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg></a>
+                    <div class="social-links footer-social-links">
+                        <a href="https://instagram.com/voyagerballoons" target="_blank" rel="noopener noreferrer" aria-label="Instagram" class="social-link"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg></a>
+                        <a href="https://facebook.com/voyagerballoons" target="_blank" rel="noopener noreferrer" aria-label="Facebook" class="social-link"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg></a>
                     </div>
                 </div>
                 <div class="footer-contact">
                     <h3>Contacto</h3>
-                    <p>📧 info@voyagerballoons.eu</p>
+                    <p>📧 info [arroba] voyagerballoons.eu</p>
                     <p>📞 Llamadas: +34 921 801 005</p>
                     <p>💬 WhatsApp: +34 605 087 478</p>
                 </div>
@@ -571,10 +563,10 @@
             <div class="footer-bottom">
                 <p>&copy; 2026 Voyager Balloons EU. Todos los derechos reservados.</p>
                 <div class="legal-links">
-                    <a href="legales.html#aviso-legal">Aviso Legal</a>
-                    <a href="legales.html#privacidad">Política de Privacidad</a>
-                    <a href="legales.html#cookies">Política de Cookies</a>
-                    <a href="legales.html#cancelacion">Devoluciones y Cancelación</a>
+                    <a href="/legales#aviso-legal">Aviso Legal</a>
+                    <a href="/legales#privacidad">Política de Privacidad</a>
+                    <a href="/legales#cookies">Política de Cookies</a>
+                    <a href="/legales#cancelacion">Devoluciones y Cancelación</a>
                 </div>
             </div>
         </div>

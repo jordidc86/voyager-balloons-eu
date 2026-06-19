@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Google tag: Ads attribution + cross-domain checkout tracking -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=GT-55NTF5CN"></script>
-    <script src="/js/google-ads-tracking.js"></script>
+    <script src="/js/google-ads-tracking.js" defer></script>
     <title>Páginas Legales | Voyager Balloons EU</title>
     <meta name="description" content="Términos y condiciones, política de privacidad y otros documentos legales de Voyager Balloons EU.">
     <meta name="robots" content="noindex, follow">
@@ -35,17 +35,17 @@
 </head>
 <body>
     <!-- Navbar (Glassmorphism) -->
-    <nav class="navbar scrolled" id="navbar" style="background: rgba(255, 255, 255, 0.95); box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+    <nav class="navbar scrolled legal-navbar" id="navbar">
         <div class="nav-container container">
-            <a href="index.html" class="logo" style="color: var(--color-primary);">Voyager<span>Balloons</span></a>
+            <a href="/" class="logo">Voyager<span>Balloons</span></a>
             <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" aria-label="Abrir menú">
                 <span></span>
                 <span></span>
                 <span></span>
             </button>
             <div class="nav-links" id="primary-navigation">
-                <a href="index.html#experience" style="color: var(--color-primary);">La Experiencia</a>
-                <a href="index.html#packages" style="color: var(--color-primary);">Paquetes</a>
+                <a href="/#experience">La Experiencia</a>
+                <a href="/#packages">Paquetes</a>
 
                 <a href="https://shop.voyagerballoons.eu/" class="btn btn-primary nav-btn">Reservar Ahora</a>
             </div>
@@ -66,7 +66,7 @@
             <p>Conforme al Reglamento (UE) 2016/679 General de Protección de Datos (RGPD) y la Ley Orgánica 3/2018 (LOPDGDD), Voyager Balloons EU le informa que los datos personales que nos proporcione a través de los formularios o por contacto directo serán tratados con la finalidad de gestionar su reserva de vuelo, atender consultas, y cumplir con obligaciones legales aplicables a la actividad aeronáutica.</p>
             <p><strong>Base legitimadora:</strong> Consentimiento del interesado y ejecución de un contrato de prestación de servicios.</p>
             <p><strong>Conservación:</strong> Los datos se conservarán durante el tiempo necesario para la prestación del servicio y para cumplir con las responsabilidades legales derivadas (incluyendo normativa aeronáutica y fiscal).</p>
-            <p><strong>Derechos:</strong> Usted puede ejercer sus derechos de acceso, rectificación, supresión, oposición, limitación y portabilidad enviando un correo a info@voyagerballoons.eu adjuntando copia de su DNI o documento equivalente.</p>
+            <p><strong>Derechos:</strong> Usted puede ejercer sus derechos de acceso, rectificación, supresión, oposición, limitación y portabilidad enviando un correo a info [arroba] voyagerballoons.eu adjuntando copia de su DNI o documento equivalente.</p>
         </section>
 
         <section id="cookies">
@@ -112,7 +112,7 @@
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-brand">
-                    <a href="index.html" class="logo">Voyager<span>Balloons</span></a>
+                    <a href="/" class="logo">Voyager<span>Balloons</span></a>
                     <p>Más de 25 años volando y creando experiencias inolvidables en globo.</p>
                 </div>
                 <div class="footer-links">
@@ -120,14 +120,14 @@
                         <li><a href="https://wa.me/34605087478?text=Hola%2C%20quiero%20descargar%20las%20fotos%20de%20mi%20vuelo" target="_blank" rel="noopener noreferrer">Descargar Fotos</a></li>
                         <li><a href="https://wa.me/34605087478?text=Hola%2C%20quiero%20solicitar%20mi%20certificado%20de%20vuelo" target="_blank" rel="noopener noreferrer">Certificado de Vuelo</a></li>
                     </ul>
-                    <div class="social-links" style="margin-top: 1rem; display: flex; gap: 1rem;">
-                        <a href="https://instagram.com/voyagerballoons" target="_blank" rel="noopener noreferrer" aria-label="Instagram" style="color: var(--color-primary);"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg></a>
-                        <a href="https://facebook.com/voyagerballoons" target="_blank" rel="noopener noreferrer" aria-label="Facebook" style="color: var(--color-primary);"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg></a>
+                    <div class="social-links footer-social-links">
+                        <a href="https://instagram.com/voyagerballoons" target="_blank" rel="noopener noreferrer" aria-label="Instagram" class="social-link"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg></a>
+                        <a href="https://facebook.com/voyagerballoons" target="_blank" rel="noopener noreferrer" aria-label="Facebook" class="social-link"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg></a>
                     </div>
                 </div>
                 <div class="footer-contact">
                     <h3>Contacto</h3>
-                    <p>📧 info@voyagerballoons.eu</p>
+                    <p>📧 info [arroba] voyagerballoons.eu</p>
                     <p>📞 Llamadas: +34 921 801 005</p>
                     <p>💬 WhatsApp: +34 605 087 478</p>
                 </div>
@@ -135,10 +135,10 @@
             <div class="footer-bottom">
                 <p>&copy; 2026 Voyager Balloons EU. Todos los derechos reservados.</p>
                 <div class="legal-links">
-                    <a href="legales.html#aviso-legal">Aviso Legal</a>
-                    <a href="legales.html#privacidad">Política de Privacidad</a>
-                    <a href="legales.html#cookies">Política de Cookies</a>
-                    <a href="legales.html#cancelacion">Devoluciones y Cancelación</a>
+                    <a href="/legales#aviso-legal">Aviso Legal</a>
+                    <a href="/legales#privacidad">Política de Privacidad</a>
+                    <a href="/legales#cookies">Política de Cookies</a>
+                    <a href="/legales#cancelacion">Devoluciones y Cancelación</a>
                 </div>
             </div>
         </div>
