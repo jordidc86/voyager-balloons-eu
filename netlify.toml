@@ -44,6 +44,12 @@
   force = true
 
 [[redirects]]
+  from = "/producto/*"
+  to = "https://shop.voyagerballoons.eu/producto/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
   from = "/etiqueta-producto/madrid/"
   to = "/vuelo-en-globo-segovia-desde-madrid"
   status = 301
