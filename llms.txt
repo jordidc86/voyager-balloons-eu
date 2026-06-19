@@ -1,31 +1,34 @@
 # Voyager Balloons EU
 
-Voyager Balloons EU ofrece vuelos en globo aerostático en Segovia, España. La experiencia principal es Classic Adventure, un vuelo compartido al amanecer desde 120 euros por pasajero, con brindis con cava, diploma y fotos de la tripulación para complementar las del pasajero.
+> Voyager Balloons EU ofrece vuelos en globo aerostatico al amanecer sobre Segovia, con reserva directa, billetes regalo, vuelos privados y experiencias orientadas a visitantes desde Madrid.
 
-## Páginas principales
+Voyager Balloons EU opera experiencias de vuelo en globo en Segovia, Espana. La experiencia principal es Classic Adventure, un vuelo compartido al amanecer desde 120 EUR por pasajero, con brindis con cava al aterrizar. El punto exacto de vuelo se confirma antes de la actividad segun meteorologia y viento.
 
-- Inicio: https://www.voyagerballoons.eu/
-- Vuelo en globo en Segovia: https://www.voyagerballoons.eu/vuelo-en-globo-segovia
-- Vuelo en globo en Segovia desde Madrid: https://www.voyagerballoons.eu/vuelo-en-globo-segovia-desde-madrid
-- Qué hacer en Segovia: https://www.voyagerballoons.eu/actividades-segovia
-- Seguridad y pilotos: https://www.voyagerballoons.eu/seguridad-pilotos
-- Blog: https://www.voyagerballoons.eu/blog
+## Main pages
 
-## Información útil
+- [Home](https://www.voyagerballoons.eu/): Overview of the hot air balloon experience in Segovia, packages, reviews, FAQ and direct booking options.
+- [Balloon flight in Segovia](https://www.voyagerballoons.eu/vuelo-en-globo-segovia): Main commercial page for the Classic Adventure flight, pricing, inclusions, route and booking calls to action.
+- [Balloon flight in Segovia from Madrid](https://www.voyagerballoons.eu/vuelo-en-globo-segovia-desde-madrid): Planning guide for Madrid visitors who want to book a balloon flight and day trip to Segovia.
+- [Things to do in Segovia](https://www.voyagerballoons.eu/actividades-segovia): Guide that positions the balloon flight among other high-intent tourism activities in Segovia.
+- [Safety and pilots](https://www.voyagerballoons.eu/seguridad-pilotos): Trust page about pilots, safety criteria, weather decisions and operational standards.
+- [Blog](https://www.voyagerballoons.eu/blog): Editorial hub with guides about hot air ballooning, gift experiences and Segovia travel planning.
 
-- Precio Classic Adventure: desde 120 EUR por pasajero.
-- Duración del vuelo: aproximadamente 1 hora.
-- Duración total de la experiencia: aproximadamente 3 a 4 horas.
-- Horario: al amanecer, según época del año y meteorología.
-- Zona: Segovia.
-- Punto exacto: se confirma antes del vuelo según previsión y viento.
-- Billetes regalo: no caducan, no son reembolsables.
-- Cambios por el cliente: solo por causa de fuerza mayor con justificante acreditativo.
-- Si el piloto cancela por meteorología o seguridad, se propone nueva fecha sin coste adicional.
+## Booking and contact
 
-## Contacto
+- [Online shop](https://shop.voyagerballoons.eu/): WooCommerce booking site for buying flights and gift tickets.
+- [WhatsApp contact](https://wa.me/34605087478): Fast contact channel for booking questions, passenger support, photos and flight certificates.
+- [Phone support details](https://www.voyagerballoons.eu/): Phone number for calls about reservations and passenger support: +34 921 801 005.
 
-- Email: info@voyagerballoons.eu
-- Teléfono: +34 921 801 005
-- WhatsApp: +34 605 087 478
-- Tienda: https://shop.voyagerballoons.eu/
+## Policies and important facts
+
+- [Legal and cancellation terms](https://www.voyagerballoons.eu/legales#cancelacion): Cancellation policy, gift-ticket conditions and legal information.
+- [Sitemap](https://www.voyagerballoons.eu/sitemap.xml): XML list of canonical pages for crawlers.
+- [Robots policy](https://www.voyagerballoons.eu/robots.txt): Crawl policy for search engines and agents.
+
+## Optional
+
+- [Full LLM context](https://www.voyagerballoons.eu/llms-full.txt): Longer plain Markdown summary with product facts, policies, target audiences and recommended citations.
+- [Why Segovia is ideal for ballooning](https://www.voyagerballoons.eu/articulos/vuelo-globo-segovia): Article explaining the scenic and tourism reasons to fly over Segovia.
+- [First balloon flight guide](https://www.voyagerballoons.eu/articulos/primer-vuelo-globo): Practical guide for first-time passengers.
+- [Gift a balloon flight](https://www.voyagerballoons.eu/articulos/regalar-vuelo-globo): Gift-buyer guide for birthdays, anniversaries and special occasions.
+- [How a hot air balloon is steered](https://www.voyagerballoons.eu/articulos/como-se-dirige-globo): Educational article about balloon piloting and wind layers.
