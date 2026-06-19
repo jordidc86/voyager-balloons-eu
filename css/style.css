@@ -5,6 +5,7 @@
     /* Colors */
     --color-primary: #D4AF37; /* Sunrise Gold */
     --color-primary-hover: #b5952f;
+    --color-primary-accessible: #6f570e;
     --color-bg-light: #FAF9F6; /* Cream/Off-white */
     --color-bg-alt: #F0EBE1; /* Slightly darker cream */
     --color-bg-dark: #2C3539;
@@ -145,7 +146,7 @@ ul {
 
 .btn-primary {
     background-color: var(--color-primary);
-    color: #fff;
+    color: var(--color-text-dark);
     font-weight: 600;
 }
 
@@ -157,13 +158,13 @@ ul {
 
 .btn-outline {
     background: transparent;
-    border: 1px solid var(--color-primary);
-    color: var(--color-primary);
+    border: 1px solid var(--color-primary-accessible);
+    color: var(--color-primary-accessible);
 }
 
 .btn-outline:hover {
     background: var(--color-primary);
-    color: #fff;
+    color: var(--color-text-dark);
 }
 
 /* ==========================================================================
@@ -959,7 +960,7 @@ ul {
     top: 1rem;
     left: 1rem;
     background: var(--color-primary);
-    color: #fff;
+    color: var(--color-text-dark);
     padding: 0.25rem 0.75rem;
     border-radius: 20px;
     font-size: 0.75rem;
@@ -1002,7 +1003,7 @@ ul {
 .read-more {
     display: inline-flex;
     align-items: center;
-    color: var(--color-primary);
+    color: var(--color-primary-accessible);
     text-decoration: none;
     font-weight: 600;
     font-size: 0.9rem;
@@ -1060,7 +1061,7 @@ ul {
 }
 
 .source-link {
-    color: var(--color-primary);
+    color: var(--color-primary-accessible);
     font-weight: 700;
     margin-top: auto;
 }
