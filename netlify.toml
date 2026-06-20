@@ -74,6 +74,18 @@
   force = true
 
 [[redirects]]
+  from = "/paseo-en-globo-segovia.html"
+  to = "/paseo-en-globo-segovia"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/regalar-vuelo-en-globo-segovia.html"
+  to = "/regalar-vuelo-en-globo-segovia"
+  status = 301
+  force = true
+
+[[redirects]]
   from = "/vuelo-en-globo-segovia-desde-madrid.html"
   to = "/vuelo-en-globo-segovia-desde-madrid"
   status = 301

@@ -8,6 +8,8 @@ Voyager Balloons EU opera experiencias de vuelo en globo en Segovia, Espana. La 
 
 - [Home](https://www.voyagerballoons.eu/): Overview of the hot air balloon experience in Segovia, packages, reviews, FAQ and direct booking options.
 - [Balloon flight in Segovia](https://www.voyagerballoons.eu/vuelo-en-globo-segovia): Main commercial page for the Classic Adventure flight, pricing, inclusions, route and booking calls to action.
+- [Balloon ride in Segovia](https://www.voyagerballoons.eu/paseo-en-globo-segovia): Transactional landing for users searching "paseo en globo Segovia", with price, inclusions and direct booking.
+- [Gift a balloon flight in Segovia](https://www.voyagerballoons.eu/regalar-vuelo-en-globo-segovia): Gift-buyer landing for birthdays, anniversaries and experience gifts, including gift-ticket conditions.
 - [Balloon flight in Segovia from Madrid](https://www.voyagerballoons.eu/vuelo-en-globo-segovia-desde-madrid): Planning guide for Madrid visitors who want to book a balloon flight and day trip to Segovia.
 - [Things to do in Segovia](https://www.voyagerballoons.eu/actividades-segovia): Guide that positions the balloon flight among other high-intent tourism activities in Segovia.
 - [Safety and pilots](https://www.voyagerballoons.eu/seguridad-pilotos): Trust page about pilots, safety criteria, weather decisions and operational standards.
