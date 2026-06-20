@@ -14,6 +14,60 @@
   force = true
 
 [[redirects]]
+  from = "/about/"
+  to = "/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/nosotros/"
+  to = "/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/contacto/"
+  to = "/#contacto"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/contact/"
+  to = "/#contacto"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/home/"
+  to = "/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/en/home/"
+  to = "/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/fr/"
+  to = "/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/it/"
+  to = "/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/pt/"
+  to = "/"
+  status = 301
+  force = true
+
+[[redirects]]
   from = "/tag/segovia/"
   to = "/blog"
   status = 301
@@ -38,6 +92,24 @@
   force = true
 
 [[redirects]]
+  from = "/guia-completa-para-volar-en-globo-aerostatico-en-segovia/"
+  to = "/articulos/primer-vuelo-globo"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/que-hacer-cerca-de-madrid-experiencia-segovia-5/"
+  to = "/actividades-segovia"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/que-hacer-cerca-de-madrid-vuelo-en-globo-segovia"
+  to = "/vuelo-en-globo-segovia-desde-madrid"
+  status = 301
+  force = true
+
+[[redirects]]
   from = "/producto/oferta-vuelo-en-globo-en-segovia/"
   to = "/vuelo-en-globo-segovia"
   status = 301
@@ -50,8 +122,105 @@
   force = true
 
 [[redirects]]
+  from = "/categoria-producto/vuelos/"
+  to = "/vuelo-en-globo-segovia"
+  status = 301
+  force = true
+
+[[redirects]]
   from = "/etiqueta-producto/madrid/"
   to = "/vuelo-en-globo-segovia-desde-madrid"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/flights/"
+  to = "/vuelo-en-globo-segovia"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/en/flights/trip-search-result/"
+  query = {view_mode = "grid"}
+  to = "/vuelo-en-globo-segovia"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/blog-2/"
+  to = "/blog"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/author/equipo-voyager-balloons-eu/page/3/"
+  to = "/blog"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/en/my-account/"
+  to = "https://shop.voyagerballoons.eu/my-account/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/en/about/"
+  to = "/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/en/tag/vuelo-en-globo-segovia/"
+  to = "/vuelo-en-globo-segovia"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/en/tag/segovia/"
+  to = "/vuelo-en-globo-segovia"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/en/tag/volar-en-globo/"
+  to = "/vuelo-en-globo-segovia"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/en/etiqueta-producto/madrid/"
+  to = "/vuelo-en-globo-segovia-desde-madrid"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/en/etiqueta-producto/segovia/"
+  to = "/vuelo-en-globo-segovia"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/en/categoria-producto/vuelos/"
+  to = "/vuelo-en-globo-segovia"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/en/category/informacion/"
+  to = "/blog"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/en/category/uncategorized/"
+  to = "/blog"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/wp-*.php"
+  to = "/"
   status = 301
   force = true
 
