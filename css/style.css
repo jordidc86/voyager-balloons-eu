@@ -1074,6 +1074,36 @@ ul {
     text-align: center;
 }
 
+.direct-booking-section {
+    background: #fff;
+}
+
+.direct-booking-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+}
+
+.direct-booking-card {
+    background: var(--color-bg-light);
+    border: 1px solid rgba(44, 53, 57, 0.08);
+    border-radius: 12px;
+    padding: 1.4rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.direct-booking-card strong {
+    display: block;
+    color: var(--color-text-dark);
+    font-family: var(--font-heading);
+    font-size: 1.08rem;
+    margin-bottom: 0.45rem;
+}
+
+.direct-booking-card p {
+    color: var(--color-text-muted);
+}
+
 .trust-strip-inline {
     display: flex;
     flex-wrap: wrap;

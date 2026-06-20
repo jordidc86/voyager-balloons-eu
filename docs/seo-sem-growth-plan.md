@@ -37,7 +37,9 @@ Las paginas deben responder de forma directa a preguntas que un asistente pueda 
 
 ## SEM
 
-Cuando el tracking este completo, separar campanas por intencion:
+SEM se gestiona en otro hilo. En este proyecto la prioridad es aumentar reservas directas organicas en la web oficial y reducir dependencia de marketplaces.
+
+Cuando se retome SEM, separar campanas por intencion:
 
 - Search exacta: vuelo en globo Segovia, paseo en globo Segovia.
 - Search regalo: regalar vuelo en globo, experiencia regalo pareja, regalo aniversario.
@@ -47,7 +49,7 @@ Cuando el tracking este completo, separar campanas por intencion:
 
 ## Datos necesarios
 
-- Enlace publico exacto de Google Business Profile.
+- Enlace publico exacto de Google Business Profile: recibido como ficha de Voyager Balloons EU - Paseos en Globo.
 - Numero real de resenas y puntuacion si se quiere usar en copy o schema propio.
 - Confirmacion de precios definitivos por producto.
 - Lista de plataformas activas: Smartbox, Aladinia, GetYourGuide, Viator, Tripadvisor, etc.
