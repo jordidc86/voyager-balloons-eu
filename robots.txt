@@ -2,3 +2,4 @@ User-agent: *
 Allow: /
 
 Sitemap: https://www.voyagerballoons.eu/sitemap.xml
+Sitemap: https://www.voyagerballoons.eu/sitemap_index.xml
