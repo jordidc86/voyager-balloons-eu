@@ -4,7 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "backlinks:score": "node scripts/backlink-outreach.js score",
+    "backlinks:draft": "node scripts/backlink-outreach.js draft --limit 20 --min-score 50",
+    "backlinks:audit": "node scripts/backlink-outreach.js audit",
+    "backlinks:scan": "node scripts/backlink-outreach.js scan",
+    "backlinks:send:smtp": "node scripts/send-backlink-outreach-smtp.js",
+    "test": "npm run backlinks:score"
   },
   "repository": {
     "type": "git",

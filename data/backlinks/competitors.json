@@ -1,0 +1,32 @@
+[
+  {
+    "name": "Siempre en las Nubes",
+    "domain": "siempreenlasnubes.com",
+    "seedUrl": "https://www.siempreenlasnubes.com/rutas-para-volar-en-globo/globo-rutas-segovia/",
+    "notes": "Competidor directo con landing especifica de Segovia."
+  },
+  {
+    "name": "Globos Boreal",
+    "domain": "globosboreal.com",
+    "seedUrl": "https://globosboreal.com/product/paseo-en-globo-segovia",
+    "notes": "Competidor directo con producto transaccional y autoridad historica."
+  },
+  {
+    "name": "Aerodifusion",
+    "domain": "aerodifusion.es",
+    "seedUrl": "https://aerodifusion.es/destinos-vuelo-en-globo/vuelo-en-globo-segovia/",
+    "notes": "Competidor directo con fuerte autoridad historica."
+  },
+  {
+    "name": "Aerotours",
+    "domain": "aerotours.com",
+    "seedUrl": "https://aerotours.com/es/",
+    "notes": "Competidor de marca amplia con Segovia, Madrid y regalos."
+  },
+  {
+    "name": "Turismo de Segovia",
+    "domain": "turismodesegovia.com",
+    "seedUrl": "https://turismodesegovia.com/es/turismo-deportivo-y-activo/vuela-en-globo",
+    "notes": "Fuente institucional de autoridad y oportunidad de cita local."
+  }
+]

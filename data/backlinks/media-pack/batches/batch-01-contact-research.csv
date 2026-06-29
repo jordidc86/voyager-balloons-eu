@@ -1,0 +1,14 @@
+domain,contact_channel,contact_value,source_url,confidence,notes
+madridsecreto.co,email,madrid@secretmedianetwork.com,https://madridsecreto.co/quienes-somos/,high,Contacto editorial publico para recomendaciones/noticias/invitaciones.
+traveler.es,contact_page,https://www.traveler.es/info/quienes-somos,medium,Pagina corporativa de Condé Nast Traveler España; requiere buscar ruta editorial/comercial adecuada.
+traveler.es,linkedin,https://es.linkedin.com/in/david-moralejo-ortega-a8253824,medium,Director Condé Nast Traveler; mejor no usar email no verificado.
+guiarepsol.com,press_contact_page,https://www.guiarepsol.com/es/sala-de-prensa/contacto-de-prensa/,medium,Contacto de prensa; puede no ser el canal editorial ideal pero es oficial.
+viajes.nationalgeographic.com.es,instagram,https://www.instagram.com/viajesng/,medium,Canal social oficial; buscar contacto RBA/editorial antes de enviar.
+lonelyplanet.com,business_suggestions,https://support.lonelyplanet.com/hc/en-us/articles/218158197-Can-I-contact-a-Lonely-Planet-writer-directly,high,Lonely Planet indica usar Business Suggestions; no dan contacto directo de escritores.
+roughguides.com,email,mail@roughguides.com,https://shop.roughguides.com/faq,medium,Email publicado para correcciones; usar con asunto editorial cuidadoso.
+fodors.com,email,editors@fodors.com,https://www.fodors.com/community/europe/how-do-i-contact-the-editors-759549/,medium,Email citado historicamente para publicaciones; validar antes de enviar.
+planetware.com,email,staff@planetware.com,https://www.planetware.com/about/,high,Email publico de contacto editorial/general.
+europeanbestdestinations.com,contact_needed,,https://www.europeanbestdestinations.com/destinations/segovia/,low,Falta localizar contacto editorial fiable.
+theculturetrip.com,contact_needed,,https://theculturetrip.com/europe/spain/articles/the-best-day-trips-from-madrid,low,Falta localizar contacto editorial fiable.
+getyourguide.es,partner_portal_needed,,https://www.getyourguide.es/segovia-l1694/,medium,Mas comercial que backlink; revisar alta de proveedor.
+viator.com,partner_portal_needed,,https://www.viator.com/Segovia/d26564-ttd,medium,Mas comercial que backlink; revisar alta de proveedor.

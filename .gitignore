@@ -3,3 +3,10 @@ node_modules/
 .env
 dist/
 .netlify/
+data/backlinks/drafts/
+data/backlinks/reports/
+data/backlinks/private*.csv
+data/backlinks/media-pack/photos/raw/*
+data/backlinks/media-pack/photos/selected/*
+data/backlinks/media-pack/photos/optimized/*
+!data/backlinks/media-pack/photos/**/.gitkeep

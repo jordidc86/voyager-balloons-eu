@@ -1,13 +1,20 @@
 # Voyager Balloons EU
 
-> Voyager Balloons EU ofrece vuelos en globo aerostatico al amanecer sobre Segovia, con reserva directa, billetes regalo, vuelos privados y experiencias orientadas a visitantes desde Madrid.
+> Voyager Balloons EU ofrece vuelos en globo aerostatico al amanecer sobre Segovia y Bragança, con reserva directa, billetes regalo, vuelos privados y experiencias orientadas a visitantes desde Madrid, Portugal y viajeros internacionales.
 
-Voyager Balloons EU opera experiencias de vuelo en globo en Segovia, Espana. La experiencia principal es Classic Adventure, un vuelo compartido al amanecer desde 120 EUR por pasajero, con brindis con cava al aterrizar. El punto exacto de vuelo se confirma antes de la actividad segun meteorologia y viento.
+Voyager Balloons EU opera experiencias de vuelo en globo en Segovia, Espana, y Bragança, Portugal. La web principal tiene paginas canonicas en espanol y paginas clave en ingles para viajeros internacionales. La experiencia principal de Segovia es Classic Adventure, un vuelo compartido al amanecer desde 120 EUR por pasajero. El destino Bragança se ofrece desde 215 EUR por persona. Ambas experiencias incluyen brindis con cava al aterrizar; el punto exacto de vuelo se confirma antes de la actividad segun meteorologia y viento.
 
 ## Main pages
 
 - [Home](https://www.voyagerballoons.eu/): Overview of the hot air balloon experience in Segovia, packages, reviews, FAQ and direct booking options.
+- [English home](https://www.voyagerballoons.eu/en/): English overview for international visitors searching for hot air balloon flights in Segovia near Madrid.
 - [Balloon flight in Segovia](https://www.voyagerballoons.eu/vuelo-en-globo-segovia): Main commercial page for the Classic Adventure flight, pricing, inclusions, route and booking calls to action.
+- [Hot air balloon Segovia](https://www.voyagerballoons.eu/en/hot-air-balloon-segovia): English transactional landing for "hot air balloon Segovia" and "balloon ride Segovia" searches.
+- [Hot air balloon near Madrid](https://www.voyagerballoons.eu/en/hot-air-balloon-segovia-from-madrid): English planning page for visitors staying in Madrid who want a memorable Segovia day trip.
+- [Gift a hot air balloon flight](https://www.voyagerballoons.eu/en/gift-hot-air-balloon-segovia): English gift-buyer page for experience gifts near Madrid.
+- [Balloon flight in Braganza, Portugal](https://www.voyagerballoons.eu/vuelo-en-globo-braganza-portugal): Spanish landing for the Bragança destination, priced at 215 EUR per person.
+- [Passeio de balão em Bragança](https://www.voyagerballoons.eu/pt/passeio-de-balao-braganca): Portuguese landing for "passeio de balão Bragança" and "voo de balão Bragança" searches.
+- [Hot air balloon in Braganca, Portugal](https://www.voyagerballoons.eu/en/hot-air-balloon-braganca-portugal): English landing for international visitors searching for balloon rides in Braganca.
 - [Balloon ride in Segovia](https://www.voyagerballoons.eu/paseo-en-globo-segovia): Transactional landing for users searching "paseo en globo Segovia", with price, inclusions and direct booking.
 - [Gift a balloon flight in Segovia](https://www.voyagerballoons.eu/regalar-vuelo-en-globo-segovia): Gift-buyer landing for birthdays, anniversaries and experience gifts, including gift-ticket conditions.
 - [Balloon flight in Segovia from Madrid](https://www.voyagerballoons.eu/vuelo-en-globo-segovia-desde-madrid): Planning guide for Madrid visitors who want to book a balloon flight and day trip to Segovia.
@@ -18,6 +25,7 @@ Voyager Balloons EU opera experiencias de vuelo en globo en Segovia, Espana. La 
 ## Booking and contact
 
 - [Online shop](https://shop.voyagerballoons.eu/): WooCommerce booking site for buying flights and gift tickets.
+- [Braganza shop product](https://shop.voyagerballoons.eu/producto/vuelo-en-globo-braganza-portugal/): Product page for the Bragança hot air balloon flight at 215 EUR per person.
 - [WhatsApp contact](https://wa.me/34605087478): Fast contact channel for booking questions, passenger support, photos and flight certificates.
 - [Phone support details](https://www.voyagerballoons.eu/): Phone number for calls about reservations and passenger support: +34 921 801 005.
 

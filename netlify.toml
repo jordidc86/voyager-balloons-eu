@@ -45,7 +45,7 @@
 
 [[redirects]]
   from = "/en/home/"
-  to = "/"
+  to = "/en/"
   status = 301
   force = true
 
@@ -142,7 +142,7 @@
 [[redirects]]
   from = "/en/flights/trip-search-result/"
   query = {view_mode = "grid"}
-  to = "/vuelo-en-globo-segovia"
+  to = "/en/hot-air-balloon-segovia"
   status = 301
   force = true
 
@@ -166,55 +166,55 @@
 
 [[redirects]]
   from = "/en/about/"
-  to = "/"
+  to = "/en/"
   status = 301
   force = true
 
 [[redirects]]
   from = "/en/tag/vuelo-en-globo-segovia/"
-  to = "/vuelo-en-globo-segovia"
+  to = "/en/hot-air-balloon-segovia"
   status = 301
   force = true
 
 [[redirects]]
   from = "/en/tag/segovia/"
-  to = "/vuelo-en-globo-segovia"
+  to = "/en/hot-air-balloon-segovia"
   status = 301
   force = true
 
 [[redirects]]
   from = "/en/tag/volar-en-globo/"
-  to = "/vuelo-en-globo-segovia"
+  to = "/en/hot-air-balloon-segovia"
   status = 301
   force = true
 
 [[redirects]]
   from = "/en/etiqueta-producto/madrid/"
-  to = "/vuelo-en-globo-segovia-desde-madrid"
+  to = "/en/hot-air-balloon-segovia-from-madrid"
   status = 301
   force = true
 
 [[redirects]]
   from = "/en/etiqueta-producto/segovia/"
-  to = "/vuelo-en-globo-segovia"
+  to = "/en/hot-air-balloon-segovia"
   status = 301
   force = true
 
 [[redirects]]
   from = "/en/categoria-producto/vuelos/"
-  to = "/vuelo-en-globo-segovia"
+  to = "/en/hot-air-balloon-segovia"
   status = 301
   force = true
 
 [[redirects]]
   from = "/en/category/informacion/"
-  to = "/blog"
+  to = "/en/"
   status = 301
   force = true
 
 [[redirects]]
   from = "/en/category/uncategorized/"
-  to = "/blog"
+  to = "/en/"
   status = 301
   force = true
 

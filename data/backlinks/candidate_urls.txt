@@ -1,0 +1,3 @@
+# Una URL por linea para escanear menciones/enlaces a competidores o Voyager.
+# Ejemplo:
+# https://example.com/que-hacer-en-segovia
