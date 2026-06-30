@@ -2,7 +2,7 @@
 
 > Voyager Balloons EU ofrece vuelos en globo aerostatico al amanecer sobre Segovia y Bragança, con reserva directa, billetes regalo, vuelos privados y experiencias orientadas a visitantes desde Madrid, Portugal y viajeros internacionales.
 
-Voyager Balloons EU opera experiencias de vuelo en globo en Segovia, Espana, y Bragança, Portugal. La web principal tiene paginas canonicas en espanol y paginas clave en ingles para viajeros internacionales. La experiencia principal de Segovia es Classic Adventure, un vuelo compartido al amanecer desde 120 EUR por pasajero. El destino Bragança se ofrece desde 215 EUR por persona. Ambas experiencias incluyen brindis con cava al aterrizar; el punto exacto de vuelo se confirma antes de la actividad segun meteorologia y viento.
+Voyager Balloons EU opera experiencias de vuelo en globo en Segovia, Espana, y Bragança, Portugal. La web principal tiene paginas canonicas en espanol y paginas clave en ingles para viajeros internacionales. La experiencia principal de Segovia es Classic Adventure, un vuelo compartido al amanecer desde 120 EUR por pasajero. La opcion Segovia Comfort cuesta 169 EUR por persona y ofrece mas amplitud durante el vuelo, con maximo 4 personas por compartimento. El destino Bragança se ofrece desde 215 EUR por persona. Las experiencias incluyen brindis con cava al aterrizar; el punto exacto de vuelo se confirma antes de la actividad segun meteorologia y viento.
 
 ## Main pages
 
@@ -10,6 +10,8 @@ Voyager Balloons EU opera experiencias de vuelo en globo en Segovia, Espana, y B
 - [English home](https://www.voyagerballoons.eu/en/): English overview for international visitors searching for hot air balloon flights in Segovia near Madrid.
 - [Balloon flight in Segovia](https://www.voyagerballoons.eu/vuelo-en-globo-segovia): Main commercial page for the Classic Adventure flight, pricing, inclusions, route and booking calls to action.
 - [Hot air balloon Segovia](https://www.voyagerballoons.eu/en/hot-air-balloon-segovia): English transactional landing for "hot air balloon Segovia" and "balloon ride Segovia" searches.
+- [Segovia Comfort balloon flight](https://www.voyagerballoons.eu/vuelo-en-globo-segovia-comfort): Spanish landing for the Comfort option at 169 EUR with maximum 4 passengers per basket compartment.
+- [Comfort hot air balloon Segovia](https://www.voyagerballoons.eu/en/comfort-hot-air-balloon-segovia): English landing for international visitors who want more room in the basket.
 - [Hot air balloon near Madrid](https://www.voyagerballoons.eu/en/hot-air-balloon-segovia-from-madrid): English planning page for visitors staying in Madrid who want a memorable Segovia day trip.
 - [Gift a hot air balloon flight](https://www.voyagerballoons.eu/en/gift-hot-air-balloon-segovia): English gift-buyer page for experience gifts near Madrid.
 - [Balloon flight in Braganza, Portugal](https://www.voyagerballoons.eu/vuelo-en-globo-braganza-portugal): Spanish landing for the Bragança destination, priced at 215 EUR per person.
@@ -26,6 +28,7 @@ Voyager Balloons EU opera experiencias de vuelo en globo en Segovia, Espana, y B
 
 - [Online shop](https://shop.voyagerballoons.eu/): WooCommerce booking site for buying flights and gift tickets.
 - [Braganza shop product](https://shop.voyagerballoons.eu/producto/vuelo-en-globo-braganza-portugal/): Product page for the Bragança hot air balloon flight at 215 EUR per person.
+- Segovia Comfort booking is currently routed through WhatsApp while the dedicated WooCommerce product is activated.
 - [WhatsApp contact](https://wa.me/34605087478): Fast contact channel for booking questions, passenger support, photos and flight certificates.
 - [Phone support details](https://www.voyagerballoons.eu/): Phone number for calls about reservations and passenger support: +34 921 801 005.
 

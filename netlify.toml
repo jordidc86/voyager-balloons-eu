@@ -116,6 +116,24 @@
   force = true
 
 [[redirects]]
+  from = "/comfort/"
+  to = "/vuelo-en-globo-segovia-comfort"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/vuelo-comfort/"
+  to = "/vuelo-en-globo-segovia-comfort"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/en/comfort/"
+  to = "/en/comfort-hot-air-balloon-segovia"
+  status = 301
+  force = true
+
+[[redirects]]
   from = "/producto/*"
   to = "https://shop.voyagerballoons.eu/producto/:splat"
   status = 301

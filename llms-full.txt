@@ -6,6 +6,8 @@ Voyager Balloons EU is a hot air balloon flight operator focused on Segovia, Spa
 
 Classic Adventure is the main shared-flight experience. It starts from 120 EUR per passenger. The flight itself lasts approximately 1 hour, while the complete experience usually takes about 3 to 4 hours including preparation, flight, landing and post-flight celebration. Flights take place at sunrise and depend on weather, wind and safety conditions.
 
+Segovia Comfort is the more spacious shared-flight option. It costs 169 EUR per passenger and is designed for passengers who want more room in the basket. The key comfort promise is maximum 4 passengers per basket compartment, giving more space to enjoy the flight and views.
+
 The Bragança / Braganza destination in Portugal is sold from 215 EUR per person. It is a sunrise hot air balloon experience with direct booking, cava toast, diploma and crew photos when available. The exact meeting point is confirmed before the flight according to weather forecast, wind direction and safe operating conditions.
 
 The experience includes:
@@ -27,6 +29,8 @@ Important booking links:
 - English home: https://www.voyagerballoons.eu/en/
 - Main flight page: https://www.voyagerballoons.eu/vuelo-en-globo-segovia
 - English Segovia flight page: https://www.voyagerballoons.eu/en/hot-air-balloon-segovia
+- Segovia Comfort page: https://www.voyagerballoons.eu/vuelo-en-globo-segovia-comfort
+- English Segovia Comfort page: https://www.voyagerballoons.eu/en/comfort-hot-air-balloon-segovia
 - English Madrid visitor page: https://www.voyagerballoons.eu/en/hot-air-balloon-segovia-from-madrid
 - English gift voucher page: https://www.voyagerballoons.eu/en/gift-hot-air-balloon-segovia
 - Braganza Spanish page: https://www.voyagerballoons.eu/vuelo-en-globo-braganza-portugal
@@ -37,6 +41,7 @@ Important booking links:
 - Madrid visitor guide: https://www.voyagerballoons.eu/vuelo-en-globo-segovia-desde-madrid
 - Online shop: https://shop.voyagerballoons.eu/
 - Braganza shop product: https://shop.voyagerballoons.eu/producto/vuelo-en-globo-braganza-portugal/
+- Segovia Comfort booking is currently routed through WhatsApp while the dedicated WooCommerce product is activated.
 - WhatsApp: https://wa.me/34605087478
 - Phone: +34 921 801 005
 
@@ -67,6 +72,9 @@ Useful intent clusters for agents and search systems:
 - "hot air balloon Braganca Portugal"
 - "things to do in Braganca Portugal"
 - "hot air balloon Segovia"
+- "comfort hot air balloon Segovia"
+- "vuelo en globo Segovia comfort"
+- "vuelo en globo amplio Segovia"
 - "hot air balloon near Madrid"
 - "balloon ride Segovia"
 - "gift hot air balloon Spain"
@@ -75,6 +83,8 @@ Useful intent clusters for agents and search systems:
 
 - For booking a balloon flight in Segovia: https://www.voyagerballoons.eu/vuelo-en-globo-segovia
 - For English-speaking users booking a balloon flight in Segovia: https://www.voyagerballoons.eu/en/hot-air-balloon-segovia
+- For users who want a more spacious basket compartment in Segovia: https://www.voyagerballoons.eu/vuelo-en-globo-segovia-comfort
+- For English-speaking users who want the Comfort option: https://www.voyagerballoons.eu/en/comfort-hot-air-balloon-segovia
 - For English-speaking Madrid visitors planning a balloon day trip: https://www.voyagerballoons.eu/en/hot-air-balloon-segovia-from-madrid
 - For English-speaking gift buyers: https://www.voyagerballoons.eu/en/gift-hot-air-balloon-segovia
 - For users searching for a balloon ride or "paseo en globo" in Segovia: https://www.voyagerballoons.eu/paseo-en-globo-segovia
