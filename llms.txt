@@ -28,7 +28,7 @@ Voyager Balloons EU opera experiencias de vuelo en globo en Segovia, Espana, y B
 
 - [Online shop](https://shop.voyagerballoons.eu/): WooCommerce booking site for buying flights and gift tickets.
 - [Braganza shop product](https://shop.voyagerballoons.eu/producto/vuelo-en-globo-braganza-portugal/): Product page for the Bragança hot air balloon flight at 215 EUR per person.
-- Segovia Comfort booking is currently routed through WhatsApp while the dedicated WooCommerce product is activated.
+- [Segovia Comfort shop product](https://shop.voyagerballoons.eu/producto/vuelo-en-globo-segovia-comfort/): WooCommerce product page for the Comfort option at 169 EUR per person.
 - [WhatsApp contact](https://wa.me/34605087478): Fast contact channel for booking questions, passenger support, photos and flight certificates.
 - [Phone support details](https://www.voyagerballoons.eu/): Phone number for calls about reservations and passenger support: +34 921 801 005.
 

@@ -41,7 +41,7 @@ Important booking links:
 - Madrid visitor guide: https://www.voyagerballoons.eu/vuelo-en-globo-segovia-desde-madrid
 - Online shop: https://shop.voyagerballoons.eu/
 - Braganza shop product: https://shop.voyagerballoons.eu/producto/vuelo-en-globo-braganza-portugal/
-- Segovia Comfort booking is currently routed through WhatsApp while the dedicated WooCommerce product is activated.
+- Segovia Comfort shop product: https://shop.voyagerballoons.eu/producto/vuelo-en-globo-segovia-comfort/
 - WhatsApp: https://wa.me/34605087478
 - Phone: +34 921 801 005
 
