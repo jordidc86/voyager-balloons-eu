@@ -335,6 +335,19 @@ ul {
     font-weight: 600;
 }
 
+.quick-summary .eyebrow,
+.answer-panel .eyebrow,
+.comfort-panel .eyebrow,
+.price-panel .eyebrow,
+.section-header .eyebrow,
+.summary-item strong,
+.include-item strong,
+.step-item strong,
+.destination-card strong,
+.en-card strong {
+    color: var(--color-primary-accessible) !important;
+}
+
 .hero-subtitle {
     font-size: 1.25rem;
     color: #ffffff; /* changed to white for contrast against dark overlay */
@@ -1219,6 +1232,19 @@ ul {
 
     .cookie-visible .booking-section {
         padding-bottom: 20rem;
+    }
+
+    .whatsapp-float {
+        right: 0.9rem;
+        bottom: 0.9rem;
+        width: 52px;
+        height: 52px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.16);
+    }
+
+    .whatsapp-float svg {
+        width: 28px;
+        height: 28px;
     }
 
     .cookie-actions,
