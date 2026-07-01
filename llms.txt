@@ -17,6 +17,9 @@ Voyager Balloons EU opera experiencias de vuelo en globo en Segovia, Espana, y B
 - [Balloon flight in Braganza, Portugal](https://www.voyagerballoons.eu/vuelo-en-globo-braganza-portugal): Spanish landing for the Bragança destination, priced at 215 EUR per person.
 - [Passeio de balão em Bragança](https://www.voyagerballoons.eu/pt/passeio-de-balao-braganca): Portuguese landing for "passeio de balão Bragança" and "voo de balão Bragança" searches.
 - [Hot air balloon in Braganca, Portugal](https://www.voyagerballoons.eu/en/hot-air-balloon-braganca-portugal): English landing for international visitors searching for balloon rides in Braganca.
+- [Things to do in Braganza, Portugal](https://www.voyagerballoons.eu/articulos/que-hacer-en-braganza-portugal): Spanish travel guide that connects Braganza tourism searches with the balloon flight.
+- [O que fazer em Bragança](https://www.voyagerballoons.eu/pt/o-que-fazer-em-braganca): Portuguese travel guide for Bragança visitor intent.
+- [Things to do in Braganca Portugal](https://www.voyagerballoons.eu/en/things-to-do-in-braganca-portugal): English travel guide for international Braganca planning searches.
 - [Balloon ride in Segovia](https://www.voyagerballoons.eu/paseo-en-globo-segovia): Transactional landing for users searching "paseo en globo Segovia", with price, inclusions and direct booking.
 - [Gift a balloon flight in Segovia](https://www.voyagerballoons.eu/regalar-vuelo-en-globo-segovia): Gift-buyer landing for birthdays, anniversaries and experience gifts, including gift-ticket conditions.
 - [Balloon flight in Segovia from Madrid](https://www.voyagerballoons.eu/vuelo-en-globo-segovia-desde-madrid): Planning guide for Madrid visitors who want to book a balloon flight and day trip to Segovia.
@@ -45,3 +48,4 @@ Voyager Balloons EU opera experiencias de vuelo en globo en Segovia, Espana, y B
 - [First balloon flight guide](https://www.voyagerballoons.eu/articulos/primer-vuelo-globo): Practical guide for first-time passengers.
 - [Gift a balloon flight](https://www.voyagerballoons.eu/articulos/regalar-vuelo-globo): Gift-buyer guide for birthdays, anniversaries and special occasions.
 - [How a hot air balloon is steered](https://www.voyagerballoons.eu/articulos/como-se-dirige-globo): Educational article about balloon piloting and wind layers.
+- [Braganza travel guide](https://www.voyagerballoons.eu/articulos/que-hacer-en-braganza-portugal): Guide for visitors comparing things to do in Braganza, Portugal.

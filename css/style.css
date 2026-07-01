@@ -779,6 +779,13 @@ ul {
 }
 
 /* ==========================================================================
+   Mobile Booking Bar
+   ========================================================================== */
+.mobile-booking-bar {
+    display: none;
+}
+
+/* ==========================================================================
    Cookie Consent
    ========================================================================== */
 .cookie-banner {
@@ -1245,6 +1252,47 @@ ul {
     .whatsapp-float svg {
         width: 28px;
         height: 28px;
+    }
+
+    .with-mobile-cta {
+        padding-bottom: calc(86px + env(safe-area-inset-bottom));
+    }
+
+    .with-mobile-cta .whatsapp-float {
+        display: none;
+    }
+
+    .mobile-booking-bar {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1100;
+        display: grid;
+        grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+        gap: 0.65rem;
+        padding: 0.75rem 0.85rem calc(0.75rem + env(safe-area-inset-bottom));
+        background: rgba(250, 249, 246, 0.97);
+        border-top: 1px solid rgba(44, 53, 57, 0.14);
+        box-shadow: 0 -12px 30px rgba(44, 53, 57, 0.18);
+        backdrop-filter: blur(14px);
+    }
+
+    .mobile-booking-bar a {
+        min-height: 46px;
+        padding: 0.72rem 0.7rem;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        line-height: 1.15;
+        text-align: center;
+        white-space: normal;
+    }
+
+    .mobile-booking-bar .btn-outline {
+        background: #fff;
+        border-color: rgba(37, 211, 102, 0.85);
+        color: #156f39;
+        font-weight: 600;
     }
 
     .cookie-actions,
