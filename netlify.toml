@@ -309,6 +309,24 @@
   force = true
 
 [[redirects]]
+  from = "/articulos/que-hacer-en-braganza-portugal.html"
+  to = "/articulos/que-hacer-en-braganza-portugal"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/pt/o-que-fazer-em-braganca.html"
+  to = "/pt/o-que-fazer-em-braganca"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/en/things-to-do-in-braganca-portugal.html"
+  to = "/en/things-to-do-in-braganca-portugal"
+  status = 301
+  force = true
+
+[[redirects]]
   from = "/shop"
   to = "https://shop.voyagerballoons.eu/"
   status = 301
