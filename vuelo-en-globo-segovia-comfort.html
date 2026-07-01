@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script async src="https://www.googletagmanager.com/gtag/js?id=GT-55NTF5CN"></script>
     <script src="/js/google-ads-tracking.js" defer></script>
     <title>Vuelo en Globo Comfort Segovia | Máximo 4 | 169€</title>
     <meta name="description" content="Reserva el vuelo en globo Comfort en Segovia por 169€. Más amplitud durante el vuelo: máximo 4 personas por compartimento, al amanecer y con brindis con cava.">
@@ -21,6 +20,7 @@
     <link rel="icon" href="/favicon.ico" sizes="any">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="preload" href="/assets/img/passengers-view.avif" as="image" type="image/avif" fetchpriority="high">
     <link rel="preload" href="/css/style.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="/css/style.css"></noscript>
     <style>
@@ -44,7 +44,7 @@
         .nav-toggle{display:none;width:44px;height:44px;border:1px solid rgba(255,255,255,.35);border-radius:8px;background:rgba(255,255,255,.08);align-items:center;justify-content:center;flex-direction:column;gap:5px}
         .nav-toggle span{display:block;width:20px;height:2px;background:#fff;border-radius:2px}
         @media(max-width:768px){.navbar{padding:1rem 0}.nav-toggle{display:flex}#primary-navigation{display:none}.navbar.nav-open #primary-navigation{display:flex}.nav-links{position:absolute;top:calc(100% + .75rem);left:20px;right:20px;flex-direction:column;align-items:stretch;gap:0;padding:.75rem;background:rgba(250,249,246,.98);border:1px solid rgba(44,53,57,.1);border-radius:8px;box-shadow:0 14px 35px rgba(44,53,57,.12);white-space:normal}.nav-links a:not(.btn){color:var(--color-text-dark);padding:.9rem .75rem;font-size:1rem}.nav-links .btn{margin-top:.5rem;width:100%}}
-        .sales-hero{min-height:82vh;display:flex;align-items:center;position:relative;overflow:hidden;background:linear-gradient(rgba(11,15,25,.68),rgba(11,15,25,.38)),url('/assets/img/passengers-view.webp') center/cover no-repeat;color:#fff}
+        .sales-hero{min-height:82vh;display:flex;align-items:center;position:relative;overflow:hidden;background-image:linear-gradient(rgba(11,15,25,.68),rgba(11,15,25,.38)),image-set(url('/assets/img/passengers-view.avif') type('image/avif'),url('/assets/img/passengers-view.webp') type('image/webp'));background-position:center;background-size:cover;background-repeat:no-repeat;color:#fff}
         .sales-hero .container{position:relative;z-index:1;padding-top:6rem;padding-bottom:4rem}
         .sales-hero h1{max-width:920px;font-size:3.45rem;color:#fff;margin-bottom:1.25rem;text-shadow:0 4px 18px rgba(0,0,0,.42)}
         .sales-hero p{max-width:740px;font-size:1.2rem;color:rgba(255,255,255,.92);margin-bottom:2rem}

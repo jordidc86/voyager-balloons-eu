@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Google tag: Ads attribution + cross-domain checkout tracking -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=GT-55NTF5CN"></script>
     <script src="/js/google-ads-tracking.js" defer></script>
     <title>Vuelo en Globo Segovia | Reserva desde 120€</title>
     <meta name="description" content="Reserva tu vuelo en globo en Segovia desde 120€. Sobrevuela el Alcázar, el Acueducto y la ciudad histórica al amanecer con brindis con cava.">
@@ -22,7 +21,7 @@
     <link rel="icon" href="/favicon.ico" sizes="any">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-    <link rel="preload" href="/assets/img/balloon-takeoff.webp" as="image" fetchpriority="high">
+    <link rel="preload" href="/assets/img/balloon-takeoff.avif" as="image" type="image/avif" fetchpriority="high">
     <link rel="preload" href="css/style.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="css/style.css"></noscript>
     <style>
@@ -52,7 +51,10 @@
             align-items: center;
             position: relative;
             overflow: hidden;
-            background: linear-gradient(rgba(11, 15, 25, 0.68), rgba(11, 15, 25, 0.42)), url('assets/img/balloon-takeoff.webp') center/cover no-repeat;
+            background-image: linear-gradient(rgba(11, 15, 25, 0.68), rgba(11, 15, 25, 0.42)), image-set(url('/assets/img/balloon-takeoff.avif') type('image/avif'), url('/assets/img/balloon-takeoff.webp') type('image/webp'));
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
             color: #fff;
         }
 
