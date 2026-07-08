@@ -1218,6 +1218,9 @@ ul {
         margin-top: 0.5rem !important;
         width: 100% !important;
     }
+}
+
+@media (max-width: 768px) {
     
     .section {
         padding: 4rem 1rem;
