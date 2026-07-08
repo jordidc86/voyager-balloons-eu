@@ -279,8 +279,20 @@
   force = true
 
 [[redirects]]
+  from = "/regalar-vuelo-en-globo.html"
+  to = "/regalar-vuelo-en-globo"
+  status = 301
+  force = true
+
+[[redirects]]
   from = "/vuelo-en-globo-segovia-desde-madrid.html"
   to = "/vuelo-en-globo-segovia-desde-madrid"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/vuelo-en-globo-madrid.html"
+  to = "/vuelo-en-globo-madrid"
   status = 301
   force = true
 
