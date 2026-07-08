@@ -158,6 +158,12 @@
   force = true
 
 [[redirects]]
+  from = "/zonas-de-vuelo/"
+  to = "/vuelo-en-globo-segovia"
+  status = 301
+  force = true
+
+[[redirects]]
   from = "/en/flights/trip-search-result/"
   query = {view_mode = "grid"}
   to = "/en/hot-air-balloon-segovia"
