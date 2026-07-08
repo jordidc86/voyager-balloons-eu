@@ -1171,52 +1171,52 @@ ul {
     }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1100px) {
     .navbar {
         padding: 1rem 0;
     }
 
     .nav-toggle {
-        display: flex;
+        display: flex !important;
     }
 
     .nav-links {
-        position: absolute;
-        top: calc(100% + 0.75rem);
-        left: 20px;
-        right: 20px;
-        display: none;
-        flex-direction: column;
-        align-items: stretch;
-        gap: 0;
-        padding: 0.75rem;
-        background: rgba(250, 249, 246, 0.98);
-        border: 1px solid rgba(44, 53, 57, 0.1);
-        border-radius: 8px;
-        box-shadow: var(--shadow-md);
-        opacity: 0;
-        pointer-events: none;
-        transform: translateY(-8px);
-        transition: opacity 0.25s ease, transform 0.25s ease;
-        white-space: normal;
+        position: absolute !important;
+        top: calc(100% + 0.75rem) !important;
+        left: 20px !important;
+        right: 20px !important;
+        display: none !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 0 !important;
+        padding: 0.75rem !important;
+        background: rgba(250, 249, 246, 0.98) !important;
+        border: 1px solid rgba(44, 53, 57, 0.1) !important;
+        border-radius: 8px !important;
+        box-shadow: var(--shadow-md) !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        transform: translateY(-8px) !important;
+        transition: opacity 0.25s ease, transform 0.25s ease !important;
+        white-space: normal !important;
     }
 
     .navbar.nav-open .nav-links {
-        display: flex;
-        opacity: 1;
-        pointer-events: auto;
-        transform: translateY(0);
+        display: flex !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        transform: translateY(0) !important;
     }
 
     .nav-links a:not(.btn) {
-        color: var(--color-text-dark);
-        padding: 0.9rem 0.75rem;
-        font-size: 1rem;
+        color: var(--color-text-dark) !important;
+        padding: 0.9rem 0.75rem !important;
+        font-size: 1rem !important;
     }
 
     .nav-links .btn {
-        margin-top: 0.5rem;
-        width: 100%;
+        margin-top: 0.5rem !important;
+        width: 100% !important;
     }
     
     .section {
