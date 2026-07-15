@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import concurrent.futures
 import json
 import re
 import sys
@@ -214,7 +215,42 @@ def audit_html(response: requests.Response) -> tuple[dict[str, Any], list[dict[s
     }, links)
 
 
-def crawl(max_pages: int, timeout: float) -> dict[str, Any]:
+def check_external_url(url: str, timeout: float) -> dict[str, Any]:
+    started = time.perf_counter()
+    try:
+        response = requests.get(
+            url,
+            timeout=timeout,
+            allow_redirects=True,
+            stream=True,
+            headers={"User-Agent": "Mozilla/5.0 (compatible; VoyagerBalloonsTechnicalAudit/1.0)"},
+        )
+        result = {
+            "url": url,
+            "status": response.status_code,
+            "final_url": normalize_url(response.url),
+            "elapsed_s": round(time.perf_counter() - started, 3),
+            "error": None,
+        }
+        response.close()
+        return result
+    except Exception as exc:
+        return {
+            "url": url,
+            "status": None,
+            "final_url": None,
+            "elapsed_s": round(time.perf_counter() - started, 3),
+            "error": str(exc),
+        }
+
+
+def audit_external_links(urls: list[str], timeout: float) -> list[dict[str, Any]]:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
+        futures = [executor.submit(check_external_url, url, timeout) for url in urls]
+        return sorted((future.result() for future in futures), key=lambda item: item["url"])
+
+
+def crawl(max_pages: int, timeout: float, check_external: bool = True) -> dict[str, Any]:
     session = requests.Session()
     session.headers.update({
         "User-Agent": "VoyagerBalloonsTechnicalAudit/1.0 (+https://www.voyagerballoons.eu/)"
@@ -299,6 +335,13 @@ def crawl(max_pages: int, timeout: float) -> dict[str, Any]:
         "schema_json_errors": [page["url"] for page in html_pages if page.get("schema_errors")],
         "slow_over_2s": [page["url"] for page in html_pages if page.get("elapsed_s", 0) > 2],
     }
+    external_targets = sorted({edge["target"] for edge in edges if not is_internal(edge["target"])})
+    external_links = audit_external_links(external_targets, timeout) if check_external else []
+    external_broken = [item for item in external_links if item.get("status") in {404, 410}]
+    external_unavailable = [
+        item for item in external_links
+        if item.get("error") or (item.get("status") is not None and item["status"] >= 500)
+    ]
 
     return {
         "generated_at": datetime.now(timezone.utc).isoformat(),
@@ -310,6 +353,10 @@ def crawl(max_pages: int, timeout: float) -> dict[str, Any]:
         "edge_count": len(edges),
         "internal_edge_count": sum(1 for edge in edges if is_internal(edge["target"])),
         "external_edge_count": sum(1 for edge in edges if not is_internal(edge["target"])),
+        "external_target_count": len(external_targets),
+        "external_links": external_links,
+        "external_broken": external_broken,
+        "external_unavailable": external_unavailable,
         "broken": broken,
         "redirects": redirects,
         "issues": issues,
@@ -322,9 +369,10 @@ def main() -> int:
     parser.add_argument("--output", default="/tmp/voyager-technical-crawl.json")
     parser.add_argument("--max-pages", type=int, default=500)
     parser.add_argument("--timeout", type=float, default=20)
+    parser.add_argument("--skip-external", action="store_true")
     args = parser.parse_args()
 
-    report = crawl(args.max_pages, args.timeout)
+    report = crawl(args.max_pages, args.timeout, check_external=not args.skip_external)
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -336,6 +384,9 @@ def main() -> int:
         "internal_edges": report["internal_edge_count"],
         "broken_targets": len(report["broken"]),
         "redirect_targets": len(report["redirects"]),
+        "external_targets": report["external_target_count"],
+        "external_broken": len(report["external_broken"]),
+        "external_unavailable": len(report["external_unavailable"]),
         "status_counts": report["status_counts"],
     }
     print(json.dumps(summary, ensure_ascii=False, indent=2))
