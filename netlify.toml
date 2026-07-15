@@ -110,6 +110,12 @@
   force = true
 
 [[redirects]]
+  from = "/la-experiencia-de-volar-en-globo/"
+  to = "/vuelo-en-globo-segovia"
+  status = 301
+  force = true
+
+[[redirects]]
   from = "/producto/oferta-vuelo-en-globo-en-segovia/"
   to = "/vuelo-en-globo-segovia"
   status = 301
