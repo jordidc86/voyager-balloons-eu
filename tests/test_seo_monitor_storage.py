@@ -3,8 +3,9 @@ from __future__ import annotations
 import tempfile
 import unittest
 from pathlib import Path
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
+from seo_monitor.models import JobRun
 from seo_monitor.storage import Store, normalize_database_url
 from seo_monitor.types import AlertSpec, CheckResult
 
@@ -96,6 +97,18 @@ class StoreTests(unittest.TestCase):
 
         self.assertEqual(len(self.store.open_alerts()), 1)
         self.assertEqual(self.store.open_alerts()[0].dedupe_key, "rank:test")
+
+    def test_stale_running_job_is_failed_and_can_be_retried(self) -> None:
+        run_id = self.store.start_job("pagespeed")
+        with self.store.sessions.begin() as session:
+            session.get(JobRun, run_id).started_at = datetime.now(timezone.utc) - timedelta(hours=3)
+
+        recovered = self.store.fail_stale_runs(datetime.now(timezone.utc) - timedelta(hours=2))
+        latest = self.store.latest_run("pagespeed")
+
+        self.assertEqual(recovered, 1)
+        self.assertEqual(latest.status, "failed")
+        self.assertIn("interrumpida", latest.error)
 
     def test_local_and_ai_observations_are_persisted(self) -> None:
         local_run = self.store.start_job("local_visibility")

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from .config import Settings, load_config
 from .notifications import ping_heartbeat
@@ -28,6 +28,9 @@ def _due(last_run, interval_seconds: int) -> bool:
 
 
 def run_due_once(settings: Settings, store: Store) -> dict[str, int]:
+    stale_runs = store.fail_stale_runs(datetime.now(timezone.utc) - timedelta(hours=2))
+    if stale_runs:
+        LOGGER.warning("recovered %s stale job run(s)", stale_runs)
     config = load_config(settings)
     schedules = config["schedules_seconds"]
     completed = 0
@@ -65,7 +68,7 @@ def run_due_once(settings: Settings, store: Store) -> dict[str, int]:
             LOGGER.exception("heartbeat ping failed")
     else:
         LOGGER.warning("heartbeat omitted because the cycle had %s failure(s)", failed)
-    return {"completed": completed, "failed": failed, "not_due": skipped_due}
+    return {"completed": completed, "failed": failed, "not_due": skipped_due, "stale_recovered": stale_runs}
 
 
 def run_forever(settings: Settings, store: Store) -> None:

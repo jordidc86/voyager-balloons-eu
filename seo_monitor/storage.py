@@ -60,6 +60,21 @@ class Store:
                 run.finished_at = utcnow()
                 run.error = error
 
+    def fail_stale_runs(self, stale_before: datetime) -> int:
+        now = utcnow()
+        with self.sessions.begin() as session:
+            runs = session.scalars(
+                select(JobRun).where(
+                    JobRun.status == "running",
+                    JobRun.started_at < stale_before,
+                )
+            ).all()
+            for run in runs:
+                run.status = "failed"
+                run.finished_at = now
+                run.error = "Ejecución interrumpida: superó el tiempo máximo sin finalizar."
+            return len(runs)
+
     def save_result(self, run_id: int, result: CheckResult) -> list[Alert]:
         now = utcnow()
         seen_keys = {item.dedupe_key for item in result.alerts}

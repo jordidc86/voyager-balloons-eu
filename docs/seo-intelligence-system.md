@@ -13,6 +13,7 @@ Mantener una vigilancia continua y accionable de la web, tienda, posicionamiento
 5. Detección y almacenamiento son automáticos. Los cambios comerciales/editoriales requieren aprobación; las reparaciones técnicas seguras pueden automatizarse después de validarlas.
 6. Las consultas de pago tienen un presupuesto mensual máximo y su coste real queda registrado por ejecución.
 7. Una señal de vida externa debe avisar si el worker deja de ejecutarse; un sistema de vigilancia no puede depender solo de vigilarse a sí mismo.
+8. Una ejecución que permanezca dos horas en estado `running` se recupera como fallida y vuelve a ser elegible para reintento; ninguna fuente debe quedar congelada tras una caída del proceso.
 
 ## Cobertura actual
 
