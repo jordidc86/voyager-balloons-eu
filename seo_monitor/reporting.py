@@ -165,6 +165,7 @@ def render_markdown(store: Store) -> str:
         ga4_funnel_line = (
             f"- Embudo GA4 post-reparación: en calentamiento "
             f"({ga4_commerce.get('complete_days', 0)} días completos; se evaluará al alcanzar "
+            f"{ga4_commerce.get('minimum_complete_days', 'sin datos')} días y "
             f"{ga4_commerce.get('minimum_shop_sessions', 'sin datos')} sesiones de tienda)."
         )
     lines.extend([

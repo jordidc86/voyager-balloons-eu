@@ -51,6 +51,7 @@ class ReportingTests(unittest.TestCase):
             "current": {"sessions": 64, "keyEvents": 7, "totalRevenue": 845},
             "commerce_diagnostics": {
                 "complete_days": 0,
+                "minimum_complete_days": 2,
                 "minimum_shop_sessions": 50,
                 "evaluation_ready": False,
             },
@@ -69,6 +70,7 @@ class ReportingTests(unittest.TestCase):
         self.assertIn("80 clics, 4000 impresiones, CTR 2.0%", report)
         self.assertIn("64 sesiones, 7 eventos clave, 845 € atribuidos", report)
         self.assertIn("Embudo GA4 post-reparación: en calentamiento", report)
+        self.assertIn("se evaluará al alcanzar 2 días y 50 sesiones", report)
         self.assertIn("Histórico tienda (28 días): 2 compras y 480 €", report)
         self.assertIn("Atribución tienda (28 días): 1131 sesiones", report)
         self.assertIn("Consulta `vuelo en globo segovia`", report)

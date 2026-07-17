@@ -11,7 +11,7 @@ from seo_monitor.checks.local_visibility import _absence_streak, _drop_assessmen
 from seo_monitor.config import Settings, load_config
 from seo_monitor.storage import Store
 from seo_monitor.checks import ai_visibility, backlink_gap, indexing, keyword_demand, local_visibility, rank
-from seo_monitor.checks.pagespeed import _field_scope, _performance_opportunities
+from seo_monitor.checks.pagespeed import _failed_category_audits, _field_scope, _performance_opportunities
 from seo_monitor.google_auth import authorized_session
 
 
@@ -104,6 +104,33 @@ class VisibilityTests(unittest.TestCase):
 
         self.assertEqual(opportunities[0]["audit"], "render-blocking-insight")
         self.assertEqual(opportunities[0]["savings_ms"], 1220)
+
+    def test_pagespeed_does_not_sum_overlapping_render_delays(self) -> None:
+        opportunities = _performance_opportunities({
+            "render-blocking-insight": {
+                "score": 0,
+                "details": {"items": [{"wastedMs": 1220}, {"wastedMs": 980}]},
+            },
+        })
+
+        self.assertEqual(opportunities[0]["savings_ms"], 1220)
+
+    def test_failed_seo_audits_capture_actionable_nodes(self) -> None:
+        failures = _failed_category_audits(
+            {"seo": {"auditRefs": [{"id": "crawlable-anchors"}]}},
+            {"crawlable-anchors": {
+                "score": 0,
+                "title": "Links are not crawlable",
+                "details": {"items": [{"node": {
+                    "selector": "a.ast-qty-placeholder",
+                    "snippet": '<a href="javascript:void(0)">',
+                }}]},
+            }},
+            "seo",
+        )
+
+        self.assertEqual(failures[0]["id"], "crawlable-anchors")
+        self.assertEqual(failures[0]["nodes"][0]["selector"], "a.ast-qty-placeholder")
 
     @patch("seo_monitor.checks.keyword_demand.requests.post")
     def test_keyword_overview_accepts_null_items(self, post) -> None:

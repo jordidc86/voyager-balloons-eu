@@ -29,7 +29,7 @@ Mantener una vigilancia continua y accionable de la web, tienda, posicionamiento
 | `ai_visibility` | semanal | 7 preguntas comerciales en ChatGPT, Gemini y Perplexity; menciones, citas y fuentes competidoras |
 | `technical` | semanal | 151 URLs, enlaces, sitemaps, metadatos, canonical, H1 y JSON-LD |
 | `tracking` | diaria | Etiquetas Google, atribución cross-domain y eventos WooCommerce `add_to_cart`/`begin_checkout`/`purchase` |
-| `pagespeed` | semanal | Rendimiento, accesibilidad, SEO, LCP y CLS en móvil/escritorio |
+| `pagespeed` | semanal | Rendimiento, accesibilidad, SEO, LCP y CLS en móvil/escritorio; conserva los tests SEO concretos y los selectores afectados |
 | `competitors` | semanal | Títulos, H1, precios y cambios de páginas de 7 competidores/canales |
 | `backlinks` | mensual | Enlaces/menciones ganados y relaciones contactadas del sistema de outreach |
 | `backlink_gap` | mensual | Dominios relevantes que enlazan a varios competidores directos pero no a Voyager |
@@ -152,7 +152,7 @@ Proyecto Railway `zealous-creativity`, entorno `production`:
 - Validación productiva repetida: 14/14 URLs, 5/5 compras, 151 páginas, 2.937 enlaces internos, 0 enlaces rotos y 0 errores de schema.
 - Medición validada en navegador: el salto web → producto Comfort queda decorado con `_gl`; las dos propiedades comparten `GT-55NTF5CN`/`AW-11564692382` y WooCommerce declara `add_to_cart` y `purchase`.
 - Control diario de integridad Analytics: valida etiquetas, linker, eventos declarados y que WP Rocket no retrase el listener WooCommerce de Site Kit.
-- Tests locales: 71/71 correctos antes del siguiente despliegue.
+- Tests locales: 74/74 correctos antes del siguiente despliegue.
 - Protección operativa añadida: techo de 8 USD/mes, 1 USD por ejecución y aviso a 0,75 USD para DataForSEO; las consultas secundarias se difieren automáticamente para evitar gasto repetido.
 - Google, GA4, PageSpeed, SMTP, Railway, PostgreSQL y DataForSEO están desplegados y verificados con datos reales.
 - Primera inteligencia de demanda: 10 keywords con datos y 9 oportunidades fuera del top 10 por 0,0252 USD en la ejecución del 17 de julio.
@@ -163,3 +163,4 @@ Proyecto Railway `zealous-creativity`, entorno `production`:
 - Los tres avisos urgentes iniciales de Maps y de `segovia balloon ride` se cerraron tras recalibrar el ruido: Maps requiere tres ausencias consecutivas y se trata como P2; una caída orgánica solo escala a P1 cuando la referencia histórica y una segunda observación degradada la confirman.
 - La propiedad recibe tráfico de `localhost`/`127.0.0.1`; el script propio ya no carga en esos hosts y el monitor mantiene la contaminación histórica como aviso separado hasta que salga de la ventana de 28 días.
 - Descubrimiento real de Search Console validado: 20 candidatas comerciales detectadas en 28 días, 6 activadas como inventario dinámico y 2 oportunidades de CTR, sin incorporar búsquedas branded, marcas competidoras ni URLs técnicas.
+- PageSpeed completo revalidado: 20/20 pruebas correctas a nivel de proveedor. CrUX confirma que el principal problema real de la tienda es TTFB (p75 3,13 s), con INP y CLS correctos; la ficha Bragança obtiene SEO 92 por controles de cantidad de Astra implementados como enlaces no rastreables.

@@ -259,6 +259,9 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
         evaluation_ready=funnel_days_ready,
     )
     diagnostics["complete_days"] = funnel_complete_days
+    diagnostics["minimum_complete_days"] = int(
+        config.get("thresholds", {}).get("ga4_funnel_minimum_complete_days", 2)
+    )
 
     for period, values in (("current_7d", current), ("previous_7d", previous)):
         for name, value in values.items():

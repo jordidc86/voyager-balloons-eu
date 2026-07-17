@@ -45,7 +45,11 @@ def _performance_opportunities(audits: dict) -> list[dict]:
         savings_ms = float(details.get("overallSavingsMs") or 0)
         savings_bytes = float(details.get("overallSavingsBytes") or 0)
         if isinstance(items, list):
-            savings_ms = max(savings_ms, sum(float(item.get("wastedMs") or 0) for item in items if isinstance(item, dict)))
+            # Resource delays can overlap; summing them overstates the critical-path saving.
+            savings_ms = max(
+                [savings_ms]
+                + [float(item.get("wastedMs") or 0) for item in items if isinstance(item, dict)]
+            )
             savings_bytes = max(savings_bytes, sum(float(item.get("wastedBytes") or 0) for item in items if isinstance(item, dict)))
         opportunities.append({
             "audit": audit_id,
@@ -59,6 +63,30 @@ def _performance_opportunities(audits: dict) -> list[dict]:
         key=lambda item: (item["savings_ms"], item["savings_kib"]),
         reverse=True,
     )
+
+
+def _failed_category_audits(categories: dict, audits: dict, category: str) -> list[dict]:
+    failures = []
+    for reference in categories.get(category, {}).get("auditRefs", []):
+        audit = audits.get(reference.get("id"), {})
+        score = audit.get("score")
+        if score is None or score >= 1:
+            continue
+        items = (audit.get("details") or {}).get("items") or []
+        failures.append({
+            "id": reference.get("id"),
+            "title": audit.get("title"),
+            "display_value": audit.get("displayValue"),
+            "nodes": [
+                {
+                    "selector": (item.get("node") or {}).get("selector"),
+                    "snippet": (item.get("node") or {}).get("snippet"),
+                }
+                for item in items[:8]
+                if isinstance(item, dict) and item.get("node")
+            ],
+        })
+    return failures
 
 
 def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckResult:
@@ -109,6 +137,7 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
             lcp_ms = float(audits.get("largest-contentful-paint", {}).get("numericValue", 0))
             cls = float(audits.get("cumulative-layout-shift", {}).get("numericValue", 0))
             performance_opportunities = _performance_opportunities(audits)
+            failed_seo_audits = _failed_category_audits(categories, audits, "seo")
             dimensions = {"url": page["url"], "strategy": strategy}
             for name, score in scores.items():
                 result.add_metric(f"score_{name}", score, source="pagespeed", dimensions=dimensions)
@@ -157,6 +186,20 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
                         "cls": cls,
                         "performance_opportunities": performance_opportunities,
                     },
+                ))
+            if strategy == "mobile" and scores.get("seo", 100) < 100:
+                result.alerts.append(AlertSpec(
+                    dedupe_key=f"pagespeed:seo:{page['url']}",
+                    severity="P2",
+                    category="pagespeed",
+                    title=f"Auditoría SEO incompleta en {page['name']}",
+                    message=(
+                        f"Lighthouse SEO {scores.get('seo', 0)}/100; "
+                        f"fallan {len(failed_seo_audits)} comprobaciones identificables."
+                    ),
+                    action="Corregir primero los elementos concretos indicados y repetir Lighthouse en móvil.",
+                    evidence_url=f"https://pagespeed.web.dev/analysis?url={page['url']}",
+                    metadata={"scores": scores, "failed_audits": failed_seo_audits},
                 ))
             if field.get("overall_category") == "SLOW" and field_key not in field_alerts_seen:
                 is_origin = field_scope == "origin"
