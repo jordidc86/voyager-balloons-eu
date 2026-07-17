@@ -21,6 +21,7 @@ class TrackingTests(unittest.TestCase):
         script = f'GT-55NTF5CN AW-11564692382 {linker}'
         shop = (
             f'GT-55NTF5CN AW-11564692382 {linker} eventsToTrack add_to_cart purchase '
+            'voyager_begin_checkout siteKit.gtagEvent("begin_checkout", {}) '
             '<script id="googlesitekit-events-provider-woocommerce-js" src="provider.js"></script>'
         )
         findings = _audit(main, script, shop, self.config)
@@ -32,6 +33,7 @@ class TrackingTests(unittest.TestCase):
         script = f'GT-55NTF5CN AW-11564692382 {linker}'
         shop = (
             f'GT-55NTF5CN AW-11564692382 {linker} eventsToTrack add_to_cart '
+            'voyager_begin_checkout siteKit.gtagEvent("begin_checkout", {}) '
             '<script id="googlesitekit-events-provider-woocommerce-js" src="provider.js"></script>'
         )
         findings = _audit(main, script, shop, self.config)
@@ -44,12 +46,25 @@ class TrackingTests(unittest.TestCase):
         script = f'GT-55NTF5CN AW-11564692382 {linker}'
         shop = (
             f'GT-55NTF5CN AW-11564692382 {linker} eventsToTrack add_to_cart purchase '
+            'voyager_begin_checkout siteKit.gtagEvent("begin_checkout", {}) '
             '<script type="rocketlazyloadscript" id="googlesitekit-events-provider-woocommerce-js" '
             'data-rocket-src="provider.js"></script>'
         )
         findings = _audit(main, script, shop, self.config)
         listener_check = next(item for item in findings if item["key"] == "woocommerce-listener-immediate")
         self.assertFalse(listener_check["ok"])
+
+    def test_missing_begin_checkout_snippet_fails(self) -> None:
+        main = f'{self.config["main_script_url"]} shop.voyagerballoons.eu'
+        linker = "voyagerballoons.eu shop.voyagerballoons.eu accept_incoming decorate_forms"
+        script = f'GT-55NTF5CN AW-11564692382 {linker}'
+        shop = (
+            f'GT-55NTF5CN AW-11564692382 {linker} eventsToTrack add_to_cart purchase '
+            '<script id="googlesitekit-events-provider-woocommerce-js" src="provider.js"></script>'
+        )
+        findings = _audit(main, script, shop, self.config)
+        checkout_check = next(item for item in findings if item["key"] == "woocommerce-begin-checkout")
+        self.assertFalse(checkout_check["ok"])
 
 
 if __name__ == "__main__":

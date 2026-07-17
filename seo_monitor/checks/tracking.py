@@ -86,6 +86,15 @@ def _audit(main_html: str, tracking_js: str, shop_html: str, tracking_config: di
             "message": "WP Rocket vuelve a retrasar el listener de Site Kit que registra los productos añadidos al carrito.",
         },
         {
+            "key": "woocommerce-begin-checkout",
+            "ok": all(
+                token in shop_html
+                for token in ("voyager_begin_checkout", 'gtagEvent("begin_checkout"')
+            ),
+            "severity": "P1",
+            "message": "La tienda ya no contiene la medición propia del inicio del checkout.",
+        },
+        {
             "key": "shop-links",
             "ok": shop_domain in main_html,
             "severity": "P0",

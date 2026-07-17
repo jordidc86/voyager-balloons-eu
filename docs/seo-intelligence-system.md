@@ -28,7 +28,7 @@ Mantener una vigilancia continua y accionable de la web, tienda, posicionamiento
 | `local_visibility` | semanal | Posición móvil del Perfil de Empresa en 5 consultas/ubicaciones de Segovia, Madrid y Bragança |
 | `ai_visibility` | semanal | 7 preguntas comerciales en ChatGPT, Gemini y Perplexity; menciones, citas y fuentes competidoras |
 | `technical` | semanal | 151 URLs, enlaces, sitemaps, metadatos, canonical, H1 y JSON-LD |
-| `tracking` | diaria | Etiquetas Google, atribución cross-domain y eventos WooCommerce `add_to_cart`/`purchase` |
+| `tracking` | diaria | Etiquetas Google, atribución cross-domain y eventos WooCommerce `add_to_cart`/`begin_checkout`/`purchase` |
 | `pagespeed` | semanal | Rendimiento, accesibilidad, SEO, LCP y CLS en móvil/escritorio |
 | `competitors` | semanal | Títulos, H1, precios y cambios de páginas de 7 competidores/canales |
 | `backlinks` | mensual | Enlaces/menciones ganados y relaciones contactadas del sistema de outreach |
@@ -151,12 +151,13 @@ Proyecto Railway `zealous-creativity`, entorno `production`:
 - Validación productiva repetida: 14/14 URLs, 5/5 compras, 151 páginas, 2.937 enlaces internos, 0 enlaces rotos y 0 errores de schema.
 - Medición validada en navegador: el salto web → producto Comfort queda decorado con `_gl`; las dos propiedades comparten `GT-55NTF5CN`/`AW-11564692382` y WooCommerce declara `add_to_cart` y `purchase`.
 - Control diario de integridad Analytics: valida etiquetas, linker, eventos declarados y que WP Rocket no retrase el listener WooCommerce de Site Kit.
-- Tests locales: 64/64 correctos; el contenedor está desplegado en Railway.
+- Tests locales: 65/65 correctos; el contenedor está desplegado en Railway.
 - Protección operativa añadida: techo de 8 USD/mes, 1 USD por ejecución y aviso a 0,75 USD para DataForSEO; las consultas secundarias se difieren automáticamente para evitar gasto repetido.
 - Google, GA4, PageSpeed, SMTP, Railway, PostgreSQL y DataForSEO están desplegados y verificados con datos reales.
 - Primera inteligencia de demanda: 10 keywords con datos y 9 oportunidades fuera del top 10 por 0,0252 USD en la ejecución del 17 de julio.
 - Calibración de ruido: una variación aislada de ranking ya no escala a P1; Maps requiere tres observaciones; el estado indeterminado de Search Console es P2; carrito se valida por producto y URL; CrUX de tienda se deduplica por origen.
 - El informe y las alertas urgentes incluyen score 0–100, impacto sobre reservas, horizonte, esfuerzo, destino, potencial basado en evidencia y acción recomendada.
 - Auditoría GA4 de 28 días: `purchase` registra 2 compras y 480 €, y el canal se conserva al entrar en la tienda. Se corrigió la causa probable del `add_to_cart` ausente excluyendo solo el listener WooCommerce de Site Kit del retraso de WP Rocket; el monitor comprobará diariamente que siga cargando de inmediato.
-- `begin_checkout` no forma parte del contrato actual de Site Kit y queda como mejora P2 independiente, sin presentarlo como una rotura de la compra.
+- `begin_checkout` se emite mediante un snippet JavaScript seguro en el checkout, después de que Site Kit esté disponible y respetando el consentimiento. La integridad publicada pasa 9/9 comprobaciones; la alerta histórica del embudo se mantendrá hasta que GA4 procese un nuevo evento consentido real.
+- Los tres avisos urgentes iniciales de Maps y de `segovia balloon ride` se cerraron tras recalibrar el ruido: Maps requiere tres ausencias consecutivas y se trata como P2; una caída orgánica solo escala a P1 cuando la referencia histórica y una segunda observación degradada la confirman.
 - La propiedad recibe tráfico de `localhost`/`127.0.0.1`; el script propio ya no carga en esos hosts y el monitor mantiene la contaminación histórica como aviso separado hasta que salga de la ventana de 28 días.
