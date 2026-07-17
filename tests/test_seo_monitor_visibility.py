@@ -131,6 +131,36 @@ class VisibilityTests(unittest.TestCase):
         self.assertEqual(payload["location_code"], 9051350)
         self.assertNotIn("location_name", payload)
 
+    @patch("seo_monitor.checks.rank.time.sleep")
+    @patch("seo_monitor.checks.rank.requests.post")
+    def test_rank_search_retries_transient_provider_errors(self, post, sleep) -> None:
+        failed = Mock()
+        failed.json.return_value = {
+            "tasks": [{"status_code": 50000, "status_message": "Internal SE Server Error.", "cost": 0}],
+        }
+        succeeded = Mock()
+        succeeded.json.return_value = {
+            "tasks": [{
+                "status_code": 20000,
+                "cost": 0.002,
+                "result": [{"items": [], "check_url": "https://example.test/serp"}],
+            }],
+        }
+        post.side_effect = [failed, succeeded]
+        settings = replace(Settings.from_env(), dataforseo_login="login", dataforseo_password="password")
+
+        _, cost = rank._search(settings, {
+            "keyword": "vuelo en globo comfort segovia",
+            "location_name": "Madrid Spain",
+            "location_code": "1005493",
+            "language_code": "es",
+            "device": "mobile",
+        }, 20)
+
+        self.assertEqual(post.call_count, 2)
+        sleep.assert_called_once_with(1)
+        self.assertEqual(cost, 0.002)
+
 
 if __name__ == "__main__":
     unittest.main()

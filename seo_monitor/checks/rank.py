@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
+import time
 from urllib.parse import urlsplit
 
 import requests
@@ -33,22 +34,40 @@ def _search(settings: Settings, row: dict[str, str], depth: int) -> tuple[dict, 
         payload["location_name"] = row["location_name"]
     if row["device"] == "mobile":
         payload["os"] = "android"
-    response = requests.post(
-        ENDPOINT,
-        auth=(settings.dataforseo_login or "", settings.dataforseo_password or ""),
-        json=[payload],
-        timeout=90,
-    )
-    response.raise_for_status()
-    data = response.json()
-    task = data.get("tasks", [{}])[0]
-    if task.get("status_code") != 20000:
-        raise RuntimeError(task.get("status_message") or "DataForSEO no devolvió una tarea válida")
-    result = task.get("result", [{}])[0]
-    return (
-        {"request": payload, "items": result.get("items", []), "check_url": result.get("check_url")},
-        float(task.get("cost") or 0),
-    )
+    total_cost = 0.0
+    for attempt in range(3):
+        try:
+            response = requests.post(
+                ENDPOINT,
+                auth=(settings.dataforseo_login or "", settings.dataforseo_password or ""),
+                json=[payload],
+                timeout=90,
+            )
+            response.raise_for_status()
+        except requests.RequestException as exc:
+            status_code = exc.response.status_code if exc.response is not None else None
+            if attempt < 2 and (status_code is None or status_code >= 500):
+                time.sleep(2 ** attempt)
+                continue
+            raise
+
+        data = response.json()
+        task = data.get("tasks", [{}])[0]
+        total_cost += float(task.get("cost") or 0)
+        if task.get("status_code") == 20000:
+            result = task.get("result", [{}])[0]
+            return (
+                {"request": payload, "items": result.get("items", []), "check_url": result.get("check_url")},
+                total_cost,
+            )
+
+        message = task.get("status_message") or "DataForSEO no devolvió una tarea válida"
+        if attempt < 2 and (int(task.get("status_code") or 0) >= 50000 or "internal" in message.lower()):
+            time.sleep(2 ** attempt)
+            continue
+        raise RuntimeError(message)
+
+    raise RuntimeError("DataForSEO agotó los reintentos")
 
 
 def _is_due(previous, interval_days: int, now: datetime | None = None) -> bool:
