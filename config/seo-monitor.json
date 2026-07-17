@@ -17,13 +17,13 @@
     {"name": "Comfort Segovia", "url": "https://www.voyagerballoons.eu/vuelo-en-globo-segovia-comfort", "canonical": "https://www.voyagerballoons.eu/vuelo-en-globo-segovia-comfort", "required_text": ["169"], "severity": "P0"},
     {"name": "Regalo Segovia", "url": "https://www.voyagerballoons.eu/regalar-vuelo-en-globo-segovia", "canonical": "https://www.voyagerballoons.eu/regalar-vuelo-en-globo-segovia", "severity": "P1"},
     {"name": "Madrid", "url": "https://www.voyagerballoons.eu/vuelo-en-globo-segovia-desde-madrid", "canonical": "https://www.voyagerballoons.eu/vuelo-en-globo-segovia-desde-madrid", "severity": "P1"},
-    {"name": "Braganza ES", "url": "https://www.voyagerballoons.eu/vuelo-en-globo-braganza-portugal", "canonical": "https://www.voyagerballoons.eu/vuelo-en-globo-braganza-portugal", "required_text": ["215"], "severity": "P0"},
-    {"name": "Braganca PT", "url": "https://www.voyagerballoons.eu/pt/passeio-de-balao-braganca", "canonical": "https://www.voyagerballoons.eu/pt/passeio-de-balao-braganca", "required_text": ["215"], "severity": "P0"},
+    {"name": "Braganza ES", "url": "https://www.voyagerballoons.eu/vuelo-en-globo-braganza-portugal", "canonical": "https://www.voyagerballoons.eu/vuelo-en-globo-braganza-portugal", "required_text": ["195"], "severity": "P0"},
+    {"name": "Braganca PT", "url": "https://www.voyagerballoons.eu/pt/passeio-de-balao-braganca", "canonical": "https://www.voyagerballoons.eu/pt/passeio-de-balao-braganca", "required_text": ["195"], "severity": "P0"},
     {"name": "Segovia EN", "url": "https://www.voyagerballoons.eu/en/hot-air-balloon-segovia", "canonical": "https://www.voyagerballoons.eu/en/hot-air-balloon-segovia", "severity": "P1"},
-    {"name": "Braganca EN", "url": "https://www.voyagerballoons.eu/en/hot-air-balloon-braganca-portugal", "canonical": "https://www.voyagerballoons.eu/en/hot-air-balloon-braganca-portugal", "required_text": ["215"], "severity": "P0"},
+    {"name": "Braganca EN", "url": "https://www.voyagerballoons.eu/en/hot-air-balloon-braganca-portugal", "canonical": "https://www.voyagerballoons.eu/en/hot-air-balloon-braganca-portugal", "required_text": ["195"], "severity": "P0"},
     {"name": "Shop home", "url": "https://shop.voyagerballoons.eu/", "severity": "P0"},
     {"name": "Producto Comfort", "url": "https://shop.voyagerballoons.eu/producto/vuelo-en-globo-segovia-comfort/", "required_text": ["169"], "severity": "P0"},
-    {"name": "Producto Braganca", "url": "https://shop.voyagerballoons.eu/producto/vuelo-en-globo-braganza-portugal/", "required_text": ["215"], "severity": "P0"},
+    {"name": "Producto Braganca", "url": "https://shop.voyagerballoons.eu/producto/vuelo-en-globo-braganza-portugal/", "required_text": ["195"], "severity": "P0"},
     {"name": "Carrito", "url": "https://shop.voyagerballoons.eu/cart/", "allow_noindex": true, "severity": "P0"},
     {"name": "Checkout", "url": "https://shop.voyagerballoons.eu/checkout/", "allowed_final_urls": ["https://shop.voyagerballoons.eu/checkout/", "https://shop.voyagerballoons.eu/cart/"], "allow_noindex": true, "severity": "P0"}
   ],
@@ -74,7 +74,7 @@
     {"name": "Oferta Segovia", "url": "https://shop.voyagerballoons.eu/producto/oferta-vuelo-en-globo-en-segovia/", "expected_text": "OFERTA", "expected_price": "170"},
     {"name": "Privado Segovia", "url": "https://shop.voyagerballoons.eu/producto/vuelo-en-globo-privado-en-segovia/", "expected_text": "privado", "expected_price": "1.200"},
     {"name": "Comfort Segovia", "url": "https://shop.voyagerballoons.eu/producto/vuelo-en-globo-segovia-comfort/", "expected_text": "Comfort", "expected_price": "169"},
-    {"name": "Braganca", "url": "https://shop.voyagerballoons.eu/producto/vuelo-en-globo-braganza-portugal/", "expected_text": "Braganza", "expected_price": "215"}
+    {"name": "Braganca", "url": "https://shop.voyagerballoons.eu/producto/vuelo-en-globo-braganza-portugal/", "expected_text": "Braganza", "expected_price": "195"}
   ],
   "thresholds": {
     "health_timeout_seconds": 25,
