@@ -9,6 +9,7 @@ CATEGORY_BONUS = {
     "commerce": 12,
     "tracking": 10,
     "health": 10,
+    "deployment": 9,
     "ga4": 8,
     "gsc": 8,
     "technical": 7,
@@ -63,7 +64,7 @@ def _destination(text: str) -> str:
 
 
 def _effort(category: str) -> str:
-    if category in {"gsc", "indexing", "health", "tracking"}:
+    if category in {"gsc", "indexing", "health", "deployment", "tracking"}:
         return "bajo"
     if category in {"commerce", "rank", "keyword_demand", "technical", "ga4"}:
         return "medio"
@@ -71,7 +72,7 @@ def _effort(category: str) -> str:
 
 
 def _impact(category: str, text: str) -> str:
-    if category in {"commerce", "health", "tracking"} or any(
+    if category in {"commerce", "health", "deployment", "tracking"} or any(
         word in text for word in ("carrito", "checkout", "compra", "pago")
     ):
         return "protección de ingresos"
@@ -101,7 +102,7 @@ def _upside(category: str, metadata: dict) -> tuple[str, int]:
 
     if category == "commerce":
         return "riesgo directo de abandono o pérdida de una compra", 7
-    if category in {"health", "tracking"}:
+    if category in {"health", "deployment", "tracking"}:
         return "protege la disponibilidad o la atribución de reservas", 5
     if category == "indexing":
         return "permite que una landing estratégica pueda competir en Google", 4

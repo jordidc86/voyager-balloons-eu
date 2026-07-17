@@ -10,6 +10,7 @@ from .checks import (
     backlinks,
     commerce,
     competitors,
+    deployment,
     ga4,
     gsc,
     http_health,
@@ -37,6 +38,7 @@ PAID_JOBS = {"rank", "local_visibility", "ai_visibility", "backlink_gap", "keywo
 
 JOBS: dict[str, Check] = {
     "health": http_health.run,
+    "deployment": deployment.run,
     "commerce": commerce.run,
     "technical": technical.run,
     "tracking": tracking.run,

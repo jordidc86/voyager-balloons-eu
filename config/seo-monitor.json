@@ -12,6 +12,40 @@
     "google_ads_id": "AW-11564692382",
     "funnel_tracking_start_date": "2026-07-17"
   },
+  "deployment": {
+    "probes": [
+      {
+        "name": "Home inglesa",
+        "url": "https://www.voyagerballoons.eu/en/",
+        "source_file": "en/index.html",
+        "severity": "P1"
+      },
+      {
+        "name": "Sitemap principal",
+        "url": "https://www.voyagerballoons.eu/sitemap.xml",
+        "source_file": "sitemap.xml",
+        "severity": "P1"
+      },
+      {
+        "name": "Índice de sitemaps",
+        "url": "https://www.voyagerballoons.eu/sitemap_index.xml",
+        "source_file": "sitemap_index.xml",
+        "severity": "P1"
+      },
+      {
+        "name": "Contexto resumido para IA",
+        "url": "https://www.voyagerballoons.eu/llms.txt",
+        "source_file": "llms.txt",
+        "severity": "P2"
+      },
+      {
+        "name": "Contexto completo para IA",
+        "url": "https://www.voyagerballoons.eu/llms-full.txt",
+        "source_file": "llms-full.txt",
+        "severity": "P2"
+      }
+    ]
+  },
   "strategic_pages": [
     {"name": "Home ES", "url": "https://www.voyagerballoons.eu/", "canonical": "https://www.voyagerballoons.eu/", "severity": "P0"},
     {"name": "Landing Segovia", "url": "https://www.voyagerballoons.eu/vuelo-en-globo-segovia", "canonical": "https://www.voyagerballoons.eu/vuelo-en-globo-segovia", "severity": "P0"},
@@ -123,6 +157,7 @@
   },
   "schedules_seconds": {
     "health": 21600,
+    "deployment": 900,
     "commerce": 21600,
     "gsc": 86400,
     "indexing": 604800,

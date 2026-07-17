@@ -3,6 +3,7 @@ from __future__ import annotations
 import unittest
 
 from seo_monitor.config import Settings, load_config, load_keywords
+from seo_monitor.config import ROOT
 from seo_monitor.runner import JOBS
 
 
@@ -27,6 +28,10 @@ class ConfigTests(unittest.TestCase):
         self.assertEqual({row["language_code"] for row in keywords}, {"es", "en", "pt"})
         self.assertTrue(all(row["priority"] in {"P0", "P1", "P2", "P3"} for row in keywords))
         self.assertEqual(set(config["schedules_seconds"]), set(JOBS) | {"digest"})
+        deployment_probes = config["deployment"]["probes"]
+        self.assertGreaterEqual(len(deployment_probes), 5)
+        self.assertTrue(all(item["url"].startswith("https://") for item in deployment_probes))
+        self.assertTrue(all((ROOT / item["source_file"]).is_file() for item in deployment_probes))
 
 
 if __name__ == "__main__":

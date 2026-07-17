@@ -10,6 +10,7 @@ from .types import SEVERITY_ORDER
 
 JOB_LABELS = {
     "health": "Disponibilidad web",
+    "deployment": "Frescura de despliegue",
     "commerce": "Flujos de compra",
     "gsc": "Search Console",
     "indexing": "Indexación estratégica",
