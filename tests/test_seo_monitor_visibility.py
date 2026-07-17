@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from dataclasses import replace
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from seo_monitor.checks.ai_visibility import _extract_response
 from seo_monitor.checks.local_visibility import _rating
@@ -101,6 +101,35 @@ class VisibilityTests(unittest.TestCase):
         self.assertEqual(search.call_args.args[2], config["thresholds"]["rank_critical_depth"])
         self.assertEqual(result.summary["keywords_checked"], 1)
         self.assertEqual(result.summary["found_top_10"], 1)
+
+    @patch("seo_monitor.checks.rank.requests.post")
+    def test_rank_search_prefers_stable_location_code(self, post) -> None:
+        response = Mock()
+        response.json.return_value = {
+            "tasks": [{
+                "status_code": 20000,
+                "cost": 0.002,
+                "result": [{"items": [], "check_url": "https://example.test/serp"}],
+            }],
+        }
+        post.return_value = response
+        settings = replace(
+            Settings.from_env(),
+            dataforseo_login="login",
+            dataforseo_password="password",
+        )
+
+        rank._search(settings, {
+            "keyword": "paseo en globo braganza",
+            "location_name": "Braganca Portugal",
+            "location_code": "9051350",
+            "language_code": "es",
+            "device": "mobile",
+        }, 20)
+
+        payload = post.call_args.kwargs["json"][0]
+        self.assertEqual(payload["location_code"], 9051350)
+        self.assertNotIn("location_name", payload)
 
 
 if __name__ == "__main__":

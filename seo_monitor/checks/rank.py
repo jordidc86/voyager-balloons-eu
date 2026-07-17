@@ -23,11 +23,14 @@ def _domain(url: str | None) -> str | None:
 def _search(settings: Settings, row: dict[str, str], depth: int) -> tuple[dict, float]:
     payload = {
         "keyword": row["keyword"],
-        "location_name": row["location_name"],
         "language_code": row["language_code"],
         "device": row["device"],
         "depth": depth,
     }
+    if row.get("location_code"):
+        payload["location_code"] = int(row["location_code"])
+    else:
+        payload["location_name"] = row["location_name"]
     if row["device"] == "mobile":
         payload["os"] = "android"
     response = requests.post(

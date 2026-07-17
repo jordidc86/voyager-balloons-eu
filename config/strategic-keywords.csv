@@ -1,30 +1,30 @@
-keyword,language_code,location_name,device,cluster,target_url,priority
-vuelo en globo segovia,es,Segovia Castile and Leon Spain,mobile,segovia,https://www.voyagerballoons.eu/vuelo-en-globo-segovia,P0
-volar en globo segovia,es,Segovia Castile and Leon Spain,mobile,segovia,https://www.voyagerballoons.eu/vuelo-en-globo-segovia,P0
-paseo en globo segovia,es,Segovia Castile and Leon Spain,mobile,segovia,https://www.voyagerballoons.eu/paseo-en-globo-segovia,P0
-globos aerostaticos segovia,es,Segovia Castile and Leon Spain,mobile,segovia,https://www.voyagerballoons.eu/globos-aerostaticos-segovia,P1
-precio vuelo en globo segovia,es,Madrid Spain,mobile,segovia,https://www.voyagerballoons.eu/vuelo-en-globo-segovia,P0
-vuelo en globo segovia desde madrid,es,Madrid Spain,mobile,madrid,https://www.voyagerballoons.eu/vuelo-en-globo-segovia-desde-madrid,P0
-excursion globo segovia desde madrid,es,Madrid Spain,mobile,madrid,https://www.voyagerballoons.eu/vuelo-en-globo-segovia-desde-madrid,P1
-que hacer en segovia,es,Madrid Spain,mobile,activities,https://www.voyagerballoons.eu/actividades-segovia,P1
-actividades en segovia,es,Madrid Spain,mobile,activities,https://www.voyagerballoons.eu/actividades-segovia,P1
-planes en segovia,es,Madrid Spain,mobile,activities,https://www.voyagerballoons.eu/actividades-segovia,P2
-regalar vuelo en globo segovia,es,Madrid Spain,mobile,gift,https://www.voyagerballoons.eu/regalar-vuelo-en-globo-segovia,P0
-regalo experiencia segovia,es,Madrid Spain,mobile,gift,https://www.voyagerballoons.eu/regalar-vuelo-en-globo-segovia,P1
-regalo vuelo en globo,es,Madrid Spain,mobile,gift,https://www.voyagerballoons.eu/regalar-vuelo-en-globo,P1
-vuelo en globo para parejas segovia,es,Madrid Spain,mobile,comfort,https://www.voyagerballoons.eu/vuelo-en-globo-segovia-comfort,P1
-vuelo en globo comfort segovia,es,Madrid Spain,mobile,comfort,https://www.voyagerballoons.eu/vuelo-en-globo-segovia-comfort,P0
-vuelo en globo braganza,es,Spain,mobile,braganca,https://www.voyagerballoons.eu/vuelo-en-globo-braganza-portugal,P0
-vuelo en globo braganca portugal,es,Spain,mobile,braganca,https://www.voyagerballoons.eu/vuelo-en-globo-braganza-portugal,P0
-passeio de balao braganca,pt,Braganca Portugal,mobile,braganca,https://www.voyagerballoons.eu/pt/passeio-de-balao-braganca,P0
-voo de balao braganca,pt,Braganca Portugal,mobile,braganca,https://www.voyagerballoons.eu/pt/passeio-de-balao-braganca,P0
-balao de ar quente braganca,pt,Portugal,mobile,braganca,https://www.voyagerballoons.eu/pt/passeio-de-balao-braganca,P1
-o que fazer em braganca,pt,Portugal,mobile,braganca_activities,https://www.voyagerballoons.eu/pt/o-que-fazer-em-braganca,P1
-hot air balloon segovia,en,Madrid Spain,mobile,segovia_en,https://www.voyagerballoons.eu/en/hot-air-balloon-segovia,P0
-segovia balloon ride,en,Madrid Spain,mobile,segovia_en,https://www.voyagerballoons.eu/en/hot-air-balloon-segovia,P0
-hot air balloon madrid day trip,en,Madrid Spain,mobile,madrid_en,https://www.voyagerballoons.eu/en/hot-air-balloon-segovia-from-madrid,P1
-things to do in segovia,en,Madrid Spain,mobile,activities_en,https://www.voyagerballoons.eu/en/,P1
-hot air balloon gift spain,en,Madrid Spain,mobile,gift_en,https://www.voyagerballoons.eu/en/gift-hot-air-balloon-segovia,P1
-hot air balloon braganca portugal,en,Portugal,mobile,braganca_en,https://www.voyagerballoons.eu/en/hot-air-balloon-braganca-portugal,P0
-balloon ride braganca,en,Portugal,mobile,braganca_en,https://www.voyagerballoons.eu/en/hot-air-balloon-braganca-portugal,P0
-things to do in braganca portugal,en,Portugal,mobile,braganca_activities_en,https://www.voyagerballoons.eu/en/things-to-do-in-braganca-portugal,P1
+keyword,language_code,location_name,location_code,device,cluster,target_url,priority
+vuelo en globo segovia,es,Segovia Castile and Leon Spain,1005528,mobile,segovia,https://www.voyagerballoons.eu/vuelo-en-globo-segovia,P0
+volar en globo segovia,es,Segovia Castile and Leon Spain,1005528,mobile,segovia,https://www.voyagerballoons.eu/vuelo-en-globo-segovia,P0
+paseo en globo segovia,es,Segovia Castile and Leon Spain,1005528,mobile,segovia,https://www.voyagerballoons.eu/paseo-en-globo-segovia,P0
+globos aerostaticos segovia,es,Segovia Castile and Leon Spain,1005528,mobile,segovia,https://www.voyagerballoons.eu/globos-aerostaticos-segovia,P1
+precio vuelo en globo segovia,es,Madrid Spain,1005493,mobile,segovia,https://www.voyagerballoons.eu/vuelo-en-globo-segovia,P0
+vuelo en globo segovia desde madrid,es,Madrid Spain,1005493,mobile,madrid,https://www.voyagerballoons.eu/vuelo-en-globo-segovia-desde-madrid,P0
+excursion globo segovia desde madrid,es,Madrid Spain,1005493,mobile,madrid,https://www.voyagerballoons.eu/vuelo-en-globo-segovia-desde-madrid,P1
+que hacer en segovia,es,Madrid Spain,1005493,mobile,activities,https://www.voyagerballoons.eu/actividades-segovia,P1
+actividades en segovia,es,Madrid Spain,1005493,mobile,activities,https://www.voyagerballoons.eu/actividades-segovia,P1
+planes en segovia,es,Madrid Spain,1005493,mobile,activities,https://www.voyagerballoons.eu/actividades-segovia,P2
+regalar vuelo en globo segovia,es,Madrid Spain,1005493,mobile,gift,https://www.voyagerballoons.eu/regalar-vuelo-en-globo-segovia,P0
+regalo experiencia segovia,es,Madrid Spain,1005493,mobile,gift,https://www.voyagerballoons.eu/regalar-vuelo-en-globo-segovia,P1
+regalo vuelo en globo,es,Madrid Spain,1005493,mobile,gift,https://www.voyagerballoons.eu/regalar-vuelo-en-globo,P1
+vuelo en globo para parejas segovia,es,Madrid Spain,1005493,mobile,comfort,https://www.voyagerballoons.eu/vuelo-en-globo-segovia-comfort,P1
+vuelo en globo comfort segovia,es,Madrid Spain,1005493,mobile,comfort,https://www.voyagerballoons.eu/vuelo-en-globo-segovia-comfort,P0
+vuelo en globo braganza,es,Spain,2724,mobile,braganca,https://www.voyagerballoons.eu/vuelo-en-globo-braganza-portugal,P0
+vuelo en globo braganca portugal,es,Spain,2724,mobile,braganca,https://www.voyagerballoons.eu/vuelo-en-globo-braganza-portugal,P0
+passeio de balao braganca,pt,Braganca Portugal,9051350,mobile,braganca,https://www.voyagerballoons.eu/pt/passeio-de-balao-braganca,P0
+voo de balao braganca,pt,Braganca Portugal,9051350,mobile,braganca,https://www.voyagerballoons.eu/pt/passeio-de-balao-braganca,P0
+balao de ar quente braganca,pt,Portugal,2620,mobile,braganca,https://www.voyagerballoons.eu/pt/passeio-de-balao-braganca,P1
+o que fazer em braganca,pt,Portugal,2620,mobile,braganca_activities,https://www.voyagerballoons.eu/pt/o-que-fazer-em-braganca,P1
+hot air balloon segovia,en,Madrid Spain,1005493,mobile,segovia_en,https://www.voyagerballoons.eu/en/hot-air-balloon-segovia,P0
+segovia balloon ride,en,Madrid Spain,1005493,mobile,segovia_en,https://www.voyagerballoons.eu/en/hot-air-balloon-segovia,P0
+hot air balloon madrid day trip,en,Madrid Spain,1005493,mobile,madrid_en,https://www.voyagerballoons.eu/en/hot-air-balloon-segovia-from-madrid,P1
+things to do in segovia,en,Madrid Spain,1005493,mobile,activities_en,https://www.voyagerballoons.eu/en/,P1
+hot air balloon gift spain,en,Madrid Spain,1005493,mobile,gift_en,https://www.voyagerballoons.eu/en/gift-hot-air-balloon-segovia,P1
+hot air balloon braganca portugal,en,Portugal,2620,mobile,braganca_en,https://www.voyagerballoons.eu/en/hot-air-balloon-braganca-portugal,P0
+balloon ride braganca,en,Portugal,2620,mobile,braganca_en,https://www.voyagerballoons.eu/en/hot-air-balloon-braganca-portugal,P0
+things to do in braganca portugal,en,Portugal,2620,mobile,braganca_activities_en,https://www.voyagerballoons.eu/en/things-to-do-in-braganca-portugal,P1
