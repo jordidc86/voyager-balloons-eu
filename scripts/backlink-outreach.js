@@ -397,7 +397,7 @@ function findLink(html, targetUrl) {
   return { found: html.includes(targetUrl) || html.includes(targetDomain), rel: "", anchor: "" };
 }
 
-async function auditCommand() {
+async function auditCommand(args = []) {
   ensureDir(REPORT_DIR);
   const rows = readOpportunities().filter((row) => row.status === "won" || row.status === "sent" || row.status === "replied");
   const now = new Date().toISOString();
@@ -434,7 +434,8 @@ async function auditCommand() {
   }
 
   const headers = ["domain", "url_or_profile", "target_url", "expected_anchor", "last_checked_at", "http_status", "link_found", "rel", "anchor", "status", "notes"];
-  writeCsv(LINK_AUDIT, output, headers);
+  const outputFile = readArg(args, "--output", LINK_AUDIT);
+  writeCsv(outputFile, output, headers);
   const reportFile = path.join(REPORT_DIR, `link-audit-${todayStamp()}.csv`);
   writeCsv(reportFile, output, headers);
   console.log(`Auditoria creada: ${path.relative(ROOT, reportFile)}`);

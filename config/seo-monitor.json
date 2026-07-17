@@ -1,0 +1,112 @@
+{
+  "brand": "Voyager Balloons",
+  "primary_domain": "www.voyagerballoons.eu",
+  "target_domains": ["www.voyagerballoons.eu", "shop.voyagerballoons.eu"],
+  "tracking": {
+    "main_url": "https://www.voyagerballoons.eu/",
+    "main_script_url": "https://www.voyagerballoons.eu/js/google-ads-tracking.js",
+    "shop_url": "https://shop.voyagerballoons.eu/",
+    "main_domain": "voyagerballoons.eu",
+    "shop_domain": "shop.voyagerballoons.eu",
+    "google_tag_id": "GT-55NTF5CN",
+    "google_ads_id": "AW-11564692382"
+  },
+  "strategic_pages": [
+    {"name": "Home ES", "url": "https://www.voyagerballoons.eu/", "canonical": "https://www.voyagerballoons.eu/", "severity": "P0"},
+    {"name": "Landing Segovia", "url": "https://www.voyagerballoons.eu/vuelo-en-globo-segovia", "canonical": "https://www.voyagerballoons.eu/vuelo-en-globo-segovia", "severity": "P0"},
+    {"name": "Comfort Segovia", "url": "https://www.voyagerballoons.eu/vuelo-en-globo-segovia-comfort", "canonical": "https://www.voyagerballoons.eu/vuelo-en-globo-segovia-comfort", "required_text": ["169"], "severity": "P0"},
+    {"name": "Regalo Segovia", "url": "https://www.voyagerballoons.eu/regalar-vuelo-en-globo-segovia", "canonical": "https://www.voyagerballoons.eu/regalar-vuelo-en-globo-segovia", "severity": "P1"},
+    {"name": "Madrid", "url": "https://www.voyagerballoons.eu/vuelo-en-globo-segovia-desde-madrid", "canonical": "https://www.voyagerballoons.eu/vuelo-en-globo-segovia-desde-madrid", "severity": "P1"},
+    {"name": "Braganza ES", "url": "https://www.voyagerballoons.eu/vuelo-en-globo-braganza-portugal", "canonical": "https://www.voyagerballoons.eu/vuelo-en-globo-braganza-portugal", "required_text": ["215"], "severity": "P0"},
+    {"name": "Braganca PT", "url": "https://www.voyagerballoons.eu/pt/passeio-de-balao-braganca", "canonical": "https://www.voyagerballoons.eu/pt/passeio-de-balao-braganca", "required_text": ["215"], "severity": "P0"},
+    {"name": "Segovia EN", "url": "https://www.voyagerballoons.eu/en/hot-air-balloon-segovia", "canonical": "https://www.voyagerballoons.eu/en/hot-air-balloon-segovia", "severity": "P1"},
+    {"name": "Braganca EN", "url": "https://www.voyagerballoons.eu/en/hot-air-balloon-braganca-portugal", "canonical": "https://www.voyagerballoons.eu/en/hot-air-balloon-braganca-portugal", "required_text": ["215"], "severity": "P0"},
+    {"name": "Shop home", "url": "https://shop.voyagerballoons.eu/", "severity": "P0"},
+    {"name": "Producto Comfort", "url": "https://shop.voyagerballoons.eu/producto/vuelo-en-globo-segovia-comfort/", "required_text": ["169"], "severity": "P0"},
+    {"name": "Producto Braganca", "url": "https://shop.voyagerballoons.eu/producto/vuelo-en-globo-braganza-portugal/", "required_text": ["215"], "severity": "P0"},
+    {"name": "Carrito", "url": "https://shop.voyagerballoons.eu/cart/", "allow_noindex": true, "severity": "P0"},
+    {"name": "Checkout", "url": "https://shop.voyagerballoons.eu/checkout/", "allowed_final_urls": ["https://shop.voyagerballoons.eu/checkout/", "https://shop.voyagerballoons.eu/cart/"], "allow_noindex": true, "severity": "P0"}
+  ],
+  "competitors": [
+    {"name": "Siempre en las Nubes", "domain": "siempreenlasnubes.com", "url": "https://www.siempreenlasnubes.com/rutas-para-volar-en-globo/globo-rutas-segovia/"},
+    {"name": "Globos Boreal", "domain": "globosboreal.com", "url": "https://globosboreal.com/product/paseo-en-globo-segovia"},
+    {"name": "Aerodifusion", "domain": "aerodifusion.es", "url": "https://aerodifusion.es/destinos-vuelo-en-globo/vuelo-en-globo-segovia/"},
+    {"name": "Aerotours", "domain": "aerotours.com", "url": "https://aerotours.com/es/"},
+    {"name": "Civitatis Segovia", "domain": "civitatis.com", "url": "https://www.civitatis.com/es/segovia/paseo-globo-segovia/"},
+    {"name": "GetYourGuide Segovia", "domain": "getyourguide.com", "url": "https://www.getyourguide.com/segovia-l1694/"},
+    {"name": "Viator Segovia", "domain": "viator.com", "url": "https://www.viator.com/Segovia/d26564-ttd"}
+  ],
+  "backlink_gap_competitors": [
+    {"name": "Siempre en las Nubes", "domain": "siempreenlasnubes.com"},
+    {"name": "Globos Boreal", "domain": "globosboreal.com"},
+    {"name": "Aerodifusion", "domain": "aerodifusion.es"},
+    {"name": "Aerotours", "domain": "aerotours.com"}
+  ],
+  "local_visibility": {
+    "business_name": "Voyager Balloons EU - Paseos en Globo",
+    "cid": "3510492992662249273",
+    "checks": [
+      {"keyword": "vuelo en globo segovia", "language_code": "es", "location_label": "Segovia centro", "location_coordinate": "40.9429,-4.1088,13z", "required": true, "priority": "P0"},
+      {"keyword": "paseo en globo segovia", "language_code": "es", "location_label": "Segovia centro", "location_coordinate": "40.9429,-4.1088,13z", "required": true, "priority": "P0"},
+      {"keyword": "actividades en segovia", "language_code": "es", "location_label": "Segovia centro", "location_coordinate": "40.9429,-4.1088,13z", "required": false, "priority": "P1"},
+      {"keyword": "vuelo en globo segovia", "language_code": "es", "location_label": "Madrid centro", "location_coordinate": "40.4168,-3.7038,11z", "required": false, "priority": "P1"},
+      {"keyword": "passeio de balao braganca", "language_code": "pt", "location_label": "Braganca centro", "location_coordinate": "41.8061,-6.7567,12z", "required": false, "priority": "P1"}
+    ]
+  },
+  "ai_visibility": {
+    "providers": [
+      {"name": "chat_gpt", "model_name": "gpt-4.1-mini"},
+      {"name": "gemini", "model_name": "gemini-2.5-flash"},
+      {"name": "perplexity", "model_name": "sonar"}
+    ],
+    "prompts": [
+      {"id": "es-segovia-operadores", "prompt": "¿Qué empresas recomiendas para hacer un vuelo en globo en Segovia? Compara las mejores opciones y enlaza sus webs oficiales.", "language_code": "es", "market": "Segovia", "country": "ES", "city": "Segovia", "priority": "P0"},
+      {"id": "es-segovia-actividades", "prompt": "¿Qué actividades especiales merece la pena reservar directamente para una escapada a Segovia? Incluye experiencias al amanecer.", "language_code": "es", "market": "Segovia", "country": "ES", "city": "Segovia", "priority": "P1"},
+      {"id": "es-madrid-excursion", "prompt": "Quiero reservar desde Madrid una excursión de un día para volar en globo sobre Segovia. ¿Qué operador elegirías y por qué?", "language_code": "es", "market": "Madrid", "country": "ES", "city": "Madrid", "priority": "P0"},
+      {"id": "es-regalo", "prompt": "¿Dónde puedo comprar directamente un billete regalo fiable para volar en globo en Segovia?", "language_code": "es", "market": "Madrid", "country": "ES", "city": "Madrid", "priority": "P1"},
+      {"id": "en-segovia", "prompt": "Which company would you recommend for booking a hot air balloon flight in Segovia directly? Compare the best official options.", "language_code": "en", "market": "Madrid", "country": "ES", "city": "Madrid", "priority": "P0"},
+      {"id": "pt-braganca", "prompt": "Que empresa recomenda para reservar diretamente um passeio de balão em Bragança, Portugal? Compare as melhores opções oficiais.", "language_code": "pt", "market": "Braganca", "country": "PT", "city": "Bragança", "priority": "P0"},
+      {"id": "en-braganca", "prompt": "What is the best official company for booking a hot air balloon ride in Braganca, Portugal?", "language_code": "en", "market": "Braganca", "country": "PT", "city": "Bragança", "priority": "P1"}
+    ]
+  },
+  "commerce_products": [
+    {"name": "Classic Segovia", "url": "https://shop.voyagerballoons.eu/producto/vuelo-en-globo-al-amanecer-en-segovia/", "expected_text": "amanecer", "expected_price": "120"},
+    {"name": "Oferta Segovia", "url": "https://shop.voyagerballoons.eu/producto/oferta-vuelo-en-globo-en-segovia/", "expected_text": "OFERTA", "expected_price": "170"},
+    {"name": "Privado Segovia", "url": "https://shop.voyagerballoons.eu/producto/vuelo-en-globo-privado-en-segovia/", "expected_text": "privado", "expected_price": "1.200"},
+    {"name": "Comfort Segovia", "url": "https://shop.voyagerballoons.eu/producto/vuelo-en-globo-segovia-comfort/", "expected_text": "Comfort", "expected_price": "169"},
+    {"name": "Braganca", "url": "https://shop.voyagerballoons.eu/producto/vuelo-en-globo-braganza-portugal/", "expected_text": "Braganza", "expected_price": "215"}
+  ],
+  "thresholds": {
+    "health_timeout_seconds": 25,
+    "slow_page_ms": 2500,
+    "performance_score_warning": 80,
+    "performance_score_critical": 60,
+    "lcp_warning_ms": 2500,
+    "lcp_critical_ms": 4000,
+    "cls_warning": 0.1,
+    "organic_click_drop_percent": 30,
+    "organic_conversion_drop_percent": 30,
+    "rank_drop_positions": 3,
+    "minimum_impressions_for_alert": 50,
+    "dataforseo_monthly_budget_usd": 25,
+    "dataforseo_run_budget_usd": 5,
+    "dataforseo_run_cost_warning_usd": 5
+  },
+  "schedules_seconds": {
+    "health": 21600,
+    "commerce": 21600,
+    "gsc": 86400,
+    "indexing": 604800,
+    "ga4": 86400,
+    "rank": 86400,
+    "local_visibility": 604800,
+    "technical": 604800,
+    "tracking": 86400,
+    "pagespeed": 604800,
+    "competitors": 604800,
+    "backlinks": 2592000,
+    "backlink_gap": 2592000,
+    "ai_visibility": 604800,
+    "digest": 604800
+  }
+}

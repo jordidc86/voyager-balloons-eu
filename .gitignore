@@ -10,3 +10,9 @@ data/backlinks/media-pack/photos/raw/*
 data/backlinks/media-pack/photos/selected/*
 data/backlinks/media-pack/photos/optimized/*
 !data/backlinks/media-pack/photos/**/.gitkeep
+data/seo-monitor/
+.env.seo-monitor
+.pytest_cache/
+__pycache__/
+*.pyc
+.venv-seo-monitor/

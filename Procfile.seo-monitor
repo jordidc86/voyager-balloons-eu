@@ -1,0 +1,2 @@
+worker: python -m seo_monitor worker
+cron: python -m seo_monitor tick

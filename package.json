@@ -10,7 +10,19 @@
     "backlinks:audit": "node scripts/backlink-outreach.js audit",
     "backlinks:scan": "node scripts/backlink-outreach.js scan",
     "backlinks:send:smtp": "node scripts/send-backlink-outreach-smtp.js",
-    "test": "npm run backlinks:score"
+    "seo:monitor:doctor": "./scripts/seo-monitor.sh doctor",
+    "seo:monitor:health": "./scripts/seo-monitor.sh run health",
+    "seo:monitor:commerce": "./scripts/seo-monitor.sh run commerce",
+    "seo:monitor:technical": "./scripts/seo-monitor.sh run technical",
+    "seo:monitor:tracking": "./scripts/seo-monitor.sh run tracking",
+    "seo:monitor:indexing": "./scripts/seo-monitor.sh run indexing",
+    "seo:monitor:local": "./scripts/seo-monitor.sh run local_visibility",
+    "seo:monitor:ai": "./scripts/seo-monitor.sh run ai_visibility",
+    "seo:monitor:backlink-gap": "./scripts/seo-monitor.sh run backlink_gap",
+    "seo:monitor:tick": "./scripts/seo-monitor.sh tick",
+    "seo:monitor:report": "./scripts/seo-monitor.sh report",
+    "seo:monitor:test": "./scripts/seo-monitor.sh test",
+    "test": "npm run backlinks:score && npm run seo:monitor:test"
   },
   "repository": {
     "type": "git",
