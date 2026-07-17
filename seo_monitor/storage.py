@@ -25,12 +25,21 @@ def utcnow() -> datetime:
     return datetime.now(timezone.utc)
 
 
+def normalize_database_url(database_url: str) -> str:
+    """Use the installed psycopg v3 driver for Railway PostgreSQL URLs."""
+    if database_url.startswith("postgresql://"):
+        return database_url.replace("postgresql://", "postgresql+psycopg://", 1)
+    if database_url.startswith("postgres://"):
+        return database_url.replace("postgres://", "postgresql+psycopg://", 1)
+    return database_url
+
+
 class Store:
     def __init__(self, database_url: str):
         if database_url.startswith("sqlite:///"):
             db_path = Path(database_url.removeprefix("sqlite:///"))
             db_path.parent.mkdir(parents=True, exist_ok=True)
-        self.engine = create_engine(database_url, pool_pre_ping=True)
+        self.engine = create_engine(normalize_database_url(database_url), pool_pre_ping=True)
         self.sessions = sessionmaker(self.engine, expire_on_commit=False)
 
     def initialize(self) -> None:

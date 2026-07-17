@@ -5,11 +5,25 @@ import unittest
 from pathlib import Path
 from datetime import datetime, timezone
 
-from seo_monitor.storage import Store
+from seo_monitor.storage import Store, normalize_database_url
 from seo_monitor.types import AlertSpec, CheckResult
 
 
 class StoreTests(unittest.TestCase):
+    def test_normalizes_railway_postgres_urls_to_psycopg_v3(self):
+        self.assertEqual(
+            normalize_database_url("postgresql://user:pass@host:5432/db"),
+            "postgresql+psycopg://user:pass@host:5432/db",
+        )
+        self.assertEqual(
+            normalize_database_url("postgres://user:pass@host:5432/db"),
+            "postgresql+psycopg://user:pass@host:5432/db",
+        )
+        self.assertEqual(
+            normalize_database_url("sqlite:///tmp/monitor.db"),
+            "sqlite:///tmp/monitor.db",
+        )
+
     def setUp(self) -> None:
         self.tmp = tempfile.TemporaryDirectory()
         self.store = Store(f"sqlite:///{Path(self.tmp.name) / 'monitor.db'}")
