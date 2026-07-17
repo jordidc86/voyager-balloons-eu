@@ -14,6 +14,7 @@ from .checks import (
     gsc,
     http_health,
     indexing,
+    keyword_demand,
     local_visibility,
     pagespeed,
     rank,
@@ -30,7 +31,7 @@ from .types import AlertSpec, CheckResult
 
 Check = Callable[..., object]
 
-PAID_JOBS = {"rank", "local_visibility", "ai_visibility", "backlink_gap"}
+PAID_JOBS = {"rank", "local_visibility", "ai_visibility", "backlink_gap", "keyword_demand"}
 
 
 JOBS: dict[str, Check] = {
@@ -43,6 +44,7 @@ JOBS: dict[str, Check] = {
     "indexing": indexing.run,
     "ga4": ga4.run,
     "rank": rank.run,
+    "keyword_demand": keyword_demand.run,
     "local_visibility": local_visibility.run,
     "ai_visibility": ai_visibility.run,
     "pagespeed": pagespeed.run,
@@ -137,6 +139,7 @@ def execute(job_name: str, settings: Settings, store: Store) -> tuple[object, li
             "indexing",
             "ga4",
             "rank",
+            "keyword_demand",
             "local_visibility",
             "ai_visibility",
             "pagespeed",

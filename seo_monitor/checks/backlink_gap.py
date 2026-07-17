@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from itertools import combinations
-
 import requests
 
 from ..config import Settings
@@ -10,20 +8,19 @@ from ..storage import Store
 from ..types import AlertSpec, CheckResult
 
 
-ENDPOINT = "https://api.dataforseo.com/v3/backlinks/domain_intersection/live"
+ENDPOINT = "https://api.dataforseo.com/v3/backlinks/referring_domains/live"
 
 
-def _intersection(settings: Settings, left: dict, right: dict, primary_domain: str) -> tuple[list[dict], float]:
+def _referring_domains(settings: Settings, target: str) -> tuple[list[dict], float]:
     payload = {
-        "targets": {"1": left["domain"], "2": right["domain"]},
-        "exclude_targets": [primary_domain.removeprefix("www.")],
+        "target": target.removeprefix("www."),
         "include_subdomains": True,
         "exclude_internal_backlinks": True,
         "backlinks_status_type": "live",
-        "backlinks_filters": [["dofollow", "=", True]],
+        "backlinks_filters": ["dofollow", "=", True],
         "rank_scale": "one_hundred",
         "limit": 100,
-        "order_by": ["1.rank,desc"],
+        "order_by": ["rank,desc"],
     }
     response = requests.post(
         ENDPOINT,
@@ -48,55 +45,77 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
         return result
 
     competitors = config.get("backlink_gap_competitors", [])
-    pairs = list(combinations(competitors, 2))
+    primary_domain = config["primary_domain"].removeprefix("www.")
+    targets = [{"name": "Voyager Balloons", "domain": primary_domain}, *competitors]
     opportunities: dict[str, dict] = {}
+    referring_domains: dict[str, dict[str, dict]] = {}
     failures = []
     total_cost = 0.0
     budget_limited = False
+    thresholds = config.get("thresholds", {})
+    minimum_rank = float(thresholds.get("backlink_gap_minimum_rank", 8))
+    maximum_spam = float(thresholds.get("backlink_gap_maximum_spam_score", 30))
 
-    for left, right in pairs:
+    for target in targets:
         if not budget_available(config, total_cost):
             budget_limited = True
             break
         try:
-            items, cost = _intersection(settings, left, right, config["primary_domain"])
+            items, cost = _referring_domains(settings, target["domain"])
             total_cost += cost
         except Exception as exc:
-            failures.append({"competitors": [left["name"], right["name"]], "error": str(exc)})
+            failures.append({"target": target["name"], "error": str(exc)})
             continue
+        referring_domains[target["name"]] = {
+            str(item.get("domain") or "").lower().removeprefix("www.").strip("/"): item
+            for item in items
+            if item.get("domain")
+        }
 
-        for item in items:
-            intersection = item.get("domain_intersection", {})
-            details = [value for value in intersection.values() if isinstance(value, dict)]
-            referring_domain = next((str(value.get("target") or "") for value in details if value.get("target")), "")
-            referring_domain = referring_domain.removeprefix("www.").strip("/")
-            if not referring_domain:
+    voyager_domains = set(referring_domains.get("Voyager Balloons", {}))
+    excluded_domains = {primary_domain, *(item["domain"].removeprefix("www.") for item in competitors)}
+    for competitor in competitors:
+        for referring_domain, item in referring_domains.get(competitor["name"], {}).items():
+            if referring_domain in voyager_domains or referring_domain in excluded_domains:
                 continue
-            rank = max((float(value.get("rank") or 0) for value in details), default=0)
-            spam_score = max((float(value.get("backlinks_spam_score") or 0) for value in details), default=0)
-            if rank < 15 or spam_score > 30:
+            rank = float(item.get("rank") or 0)
+            spam_score = float(item.get("backlinks_spam_score") or 0)
+            if rank < minimum_rank or spam_score > maximum_spam:
                 continue
+            platforms = item.get("referring_links_platform_types") or {}
+            editorial_bonus = 4 if any(platforms.get(key) for key in ("news", "blogs", "organization")) else 0
             opportunity = opportunities.setdefault(referring_domain, {
                 "domain": referring_domain,
                 "rank": rank,
                 "spam_score": spam_score,
                 "competitors": set(),
-                "pair_count": 0,
+                "backlinks": 0,
+                "countries": {},
+                "editorial_bonus": editorial_bonus,
             })
             opportunity["rank"] = max(opportunity["rank"], rank)
             opportunity["spam_score"] = max(opportunity["spam_score"], spam_score)
-            opportunity["competitors"].update({left["name"], right["name"]})
-            opportunity["pair_count"] += 1
+            opportunity["competitors"].add(competitor["name"])
+            opportunity["backlinks"] += int(item.get("backlinks") or 0)
+            opportunity["editorial_bonus"] = max(opportunity["editorial_bonus"], editorial_bonus)
+            for country, count in (item.get("referring_links_countries") or {}).items():
+                opportunity["countries"][country] = opportunity["countries"].get(country, 0) + int(count or 0)
 
     ranked = []
     for opportunity in opportunities.values():
         opportunity["competitors"] = sorted(opportunity["competitors"])
         opportunity["score"] = round(
-            min(100, opportunity["rank"] + opportunity["pair_count"] * 8 - opportunity["spam_score"]),
+            min(
+                100,
+                opportunity["rank"]
+                + len(opportunity["competitors"]) * 8
+                + opportunity["editorial_bonus"]
+                - opportunity["spam_score"],
+            ),
             1,
         )
         ranked.append(opportunity)
-    ranked.sort(key=lambda item: (item["score"], item["rank"], item["pair_count"]), reverse=True)
+    ranked.sort(key=lambda item: (item["score"], item["rank"], len(item["competitors"])), reverse=True)
 
     for opportunity in ranked[:100]:
         store.add_page_snapshot(run_id, "backlink_gap", {
@@ -113,7 +132,7 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
             severity="P2",
             category="backlink_gap",
             title="Nuevas oportunidades de enlaces frente a competidores",
-            message=f"Se han identificado {len(ranked)} dominios que enlazan a varios competidores directos y no a Voyager.",
+            message=f"Se han identificado {len(ranked)} dominios relevantes que enlazan a competidores directos y no a Voyager.",
             action="Revisar los dominios mejor puntuados, descartar medios irrelevantes y preparar colaboraciones editoriales personalizadas por tandas aprobadas.",
             metadata={"opportunities": ranked[:30]},
         ))
@@ -122,15 +141,15 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
             dedupe_key="backlink_gap:provider-failures",
             severity="P1",
             category="backlink_gap",
-            title="Cruce de backlinks incompleto",
-            message=f"Fallaron {len(failures)} de {len(pairs)} cruces previstos.",
+            title="Comparación de backlinks incompleta",
+            message=f"Fallaron {len(failures)} de {len(targets)} dominios previstos.",
             action="Revisar credenciales, saldo y respuesta del proveedor antes de usar la lista de oportunidades.",
             metadata={"failures": failures},
         ))
 
     result.summary = {
         "competitors": len(competitors),
-        "pair_checks": len(pairs),
+        "targets_checked": len(referring_domains),
         "qualified_opportunities": len(ranked),
         "failures": len(failures),
         "provider_cost_usd": round(total_cost, 4),

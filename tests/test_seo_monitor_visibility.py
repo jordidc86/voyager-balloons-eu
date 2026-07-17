@@ -10,7 +10,7 @@ from seo_monitor.checks.ai_visibility import _extract_response
 from seo_monitor.checks.local_visibility import _rating
 from seo_monitor.config import Settings, load_config
 from seo_monitor.storage import Store
-from seo_monitor.checks import ai_visibility, backlink_gap, indexing, local_visibility, rank
+from seo_monitor.checks import ai_visibility, backlink_gap, indexing, keyword_demand, local_visibility, rank
 from seo_monitor.google_auth import authorized_session
 
 
@@ -97,9 +97,60 @@ class VisibilityTests(unittest.TestCase):
             gap_result = backlink_gap.run(config, store, gap_run, settings)
             self.assertEqual(gap_result.status, "skipped")
 
+            demand_run = store.start_job("keyword_demand")
+            demand_result = keyword_demand.run(config, store, demand_run, settings)
+            self.assertEqual(demand_result.status, "skipped")
+
             indexing_run = store.start_job("indexing")
             indexing_result = indexing.run(config, store, indexing_run, settings)
             self.assertEqual(indexing_result.status, "skipped")
+
+    @patch("seo_monitor.checks.backlink_gap.requests.post")
+    def test_backlink_gap_uses_referring_domains_for_each_target(self, post) -> None:
+        response = Mock()
+        response.json.return_value = {
+            "tasks": [{"status_code": 20000, "cost": 0.02, "result": [{"items": []}]}],
+        }
+        post.return_value = response
+        settings = replace(Settings.from_env(), dataforseo_login="login", dataforseo_password="password")
+
+        backlink_gap._referring_domains(settings, "www.example.com")
+
+        payload = post.call_args.kwargs["json"][0]
+        self.assertEqual(payload["target"], "example.com")
+        self.assertEqual(payload["order_by"], ["rank,desc"])
+        self.assertEqual(payload["backlinks_filters"], ["dofollow", "=", True])
+
+    @patch("seo_monitor.checks.keyword_demand._overview")
+    @patch("seo_monitor.checks.keyword_demand.load_keywords")
+    def test_keyword_demand_uses_native_market_language_and_records_opportunity(self, load_keywords, overview) -> None:
+        load_keywords.return_value = [{
+            "keyword": "hot air balloon segovia",
+            "location_name": "Madrid Spain",
+            "language_code": "en",
+            "device": "mobile",
+            "priority": "P0",
+            "target_url": "https://www.voyagerballoons.eu/en/hot-air-balloon-segovia",
+            "cluster": "segovia_en",
+        }]
+        overview.return_value = ([{
+            "keyword": "hot air balloon segovia",
+            "keyword_info": {"search_volume": 50, "cpc": 5.01, "competition": 1, "competition_level": "HIGH"},
+            "search_intent_info": {"main_intent": "commercial"},
+            "keyword_properties": {"keyword_difficulty": 0},
+        }], 0.012)
+        settings = replace(Settings.from_env(), dataforseo_login="login", dataforseo_password="password")
+        config = load_config(settings)
+        with tempfile.TemporaryDirectory() as tmp:
+            store = Store(f"sqlite:///{Path(tmp) / 'monitor.db'}")
+            store.initialize()
+            run_id = store.start_job("keyword_demand")
+            result = keyword_demand.run(config, store, run_id, settings)
+
+        self.assertEqual(overview.call_args.args[2:4], ("es", 2724))
+        self.assertEqual(result.summary["keywords_with_data"], 1)
+        self.assertEqual(result.summary["opportunities"], 1)
+        self.assertEqual(result.summary["provider_cost_usd"], 0.012)
 
     @patch("seo_monitor.checks.rank._search")
     @patch("seo_monitor.checks.rank.load_keywords")

@@ -14,6 +14,7 @@ JOB_LABELS = {
     "indexing": "Indexación estratégica",
     "ga4": "GA4 orgánico",
     "rank": "Posiciones orgánicas",
+    "keyword_demand": "Demanda de keywords",
     "local_visibility": "Google Maps",
     "ai_visibility": "Visibilidad IA",
     "technical": "Crawl técnico",
@@ -56,10 +57,17 @@ def _alert_evidence(raw: str) -> list[str]:
             f"{item.get('current_clicks')} clics ({item.get('drop_percent')}%)"
         )
     for item in metadata.get("opportunities", [])[:5]:
-        lines.append(
-            f"- Dominio `{item.get('domain')}` · score {item.get('score')} · "
-            f"autoridad {item.get('rank')} · competidores: {', '.join(item.get('competitors', []))}"
-        )
+        if item.get("domain"):
+            lines.append(
+                f"- Dominio `{item.get('domain')}` · score {item.get('score')} · "
+                f"autoridad {item.get('rank')} · competidores: {', '.join(item.get('competitors', []))}"
+            )
+        elif item.get("keyword"):
+            position = item.get("position") or "fuera del seguimiento"
+            lines.append(
+                f"- Keyword `{item.get('keyword')}` · {item.get('search_volume')} búsquedas/mes · "
+                f"CPC ${item.get('cpc')} · posición {position} · intención {item.get('intent') or 'sin clasificar'}"
+            )
     return lines
 
 
@@ -125,6 +133,7 @@ def render_markdown(store: Store) -> str:
     rank_summary = _summary_dict(latest_runs["rank"].summary_json) if latest_runs["rank"] else {}
     local_summary = _summary_dict(latest_runs["local_visibility"].summary_json) if latest_runs["local_visibility"] else {}
     ai_summary = _summary_dict(latest_runs["ai_visibility"].summary_json) if latest_runs["ai_visibility"] else {}
+    demand_summary = _summary_dict(latest_runs["keyword_demand"].summary_json) if latest_runs["keyword_demand"] else {}
     gsc_current = gsc_summary.get("current", {})
     ga4_current = ga4_summary.get("current", {})
     lines.extend([
@@ -138,7 +147,8 @@ def render_markdown(store: Store) -> str:
         "",
         f"- Search Console (7 días): {gsc_current.get('clicks', 'sin datos')} clics, {gsc_current.get('impressions', 'sin datos')} impresiones, CTR {_percent(gsc_current.get('ctr'), 100)}.",
         f"- GA4 orgánico (7 días): {ga4_current.get('sessions', 'sin datos')} sesiones, {ga4_current.get('keyEvents', 'sin datos')} eventos clave, {ga4_current.get('totalRevenue', 'sin datos')} € atribuidos.",
-        f"- Rankings: {rank_summary.get('found_top_10', 'sin datos')}/{rank_summary.get('keywords', 'sin datos')} keywords en top 10.",
+        f"- Rankings: {rank_summary.get('found_top_10', 'sin datos')}/{rank_summary.get('keywords_checked', 'sin datos')} keywords comprobadas en top 10.",
+        f"- Demanda: datos disponibles para {demand_summary.get('keywords_with_data', 'sin datos')}/{demand_summary.get('keywords_inventory', 'sin datos')} keywords; {demand_summary.get('opportunities', 'sin datos')} oportunidades fuera del top 10.",
         f"- Google Maps: {local_summary.get('found_top_3', 'sin datos')}/{local_summary.get('checks', 'sin datos')} consultas en top 3.",
         f"- IA: menciones {_percent(ai_summary.get('mention_share_percent'))}, citas {_percent(ai_summary.get('citation_share_percent'))}.",
         "",
