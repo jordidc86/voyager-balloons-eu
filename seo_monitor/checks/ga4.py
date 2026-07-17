@@ -44,32 +44,97 @@ def _dimension_report(
     metrics: list[str],
     limit: int = 1000,
 ) -> list[dict]:
-    endpoint = f"https://analyticsdata.googleapis.com/v1beta/properties/{property_id}:runReport"
-    response = session.post(endpoint, json={
-        "dateRanges": [{"startDate": start.isoformat(), "endDate": end.isoformat()}],
-        "dimensions": [{"name": dimension}],
-        "metrics": [{"name": name} for name in metrics],
-        "dimensionFilter": {
+    return _multi_dimension_report(
+        session,
+        property_id,
+        start,
+        end,
+        [dimension],
+        metrics,
+        dimension_filter={
             "filter": {
                 "fieldName": "sessionDefaultChannelGroup",
                 "stringFilter": {"matchType": "EXACT", "value": "Organic Search"},
             }
         },
+        limit=limit,
+    )
+
+
+def _multi_dimension_report(
+    session,
+    property_id: str,
+    start: date,
+    end: date,
+    dimensions: list[str],
+    metrics: list[str],
+    dimension_filter: dict | None = None,
+    limit: int = 1000,
+) -> list[dict]:
+    endpoint = f"https://analyticsdata.googleapis.com/v1beta/properties/{property_id}:runReport"
+    body = {
+        "dateRanges": [{"startDate": start.isoformat(), "endDate": end.isoformat()}],
+        "dimensions": [{"name": name} for name in dimensions],
+        "metrics": [{"name": name} for name in metrics],
         "orderBys": [{"metric": {"metricName": metrics[0]}, "desc": True}],
         "limit": limit,
-    }, timeout=45)
+    }
+    if dimension_filter:
+        body["dimensionFilter"] = dimension_filter
+    response = session.post(endpoint, json=body, timeout=45)
     response.raise_for_status()
     data = response.json()
+    dimension_headers = [item["name"] for item in data.get("dimensionHeaders", [])] or dimensions
     metric_headers = [item["name"] for item in data.get("metricHeaders", [])]
     rows = []
     for row in data.get("rows", []):
-        key = row.get("dimensionValues", [{}])[0].get("value", "")
+        dimension_values = {
+            name: value.get("value", "")
+            for name, value in zip(dimension_headers, row.get("dimensionValues", []))
+        }
         values = {
             name: float(value.get("value", 0))
             for name, value in zip(metric_headers, row.get("metricValues", []))
         }
-        rows.append({dimension: key, **values})
+        rows.append({**dimension_values, **values})
     return rows
+
+
+def _commerce_diagnostics(commerce_rows: list[dict], channel_host_rows: list[dict], shop_domain: str) -> dict:
+    event_totals: dict[str, dict[str, float]] = {}
+    for row in commerce_rows:
+        event_name = row.get("eventName", "")
+        totals = event_totals.setdefault(event_name, {"eventCount": 0, "keyEvents": 0, "totalRevenue": 0})
+        for metric in totals:
+            totals[metric] += float(row.get(metric, 0) or 0)
+
+    shop_rows = [row for row in channel_host_rows if row.get("hostName") == shop_domain]
+    shop_sessions = sum(float(row.get("sessions", 0) or 0) for row in shop_rows)
+    direct_sessions = sum(
+        float(row.get("sessions", 0) or 0)
+        for row in shop_rows
+        if row.get("sessionDefaultChannelGroup") == "Direct"
+    )
+    technical_sessions = sum(
+        float(row.get("sessions", 0) or 0)
+        for row in channel_host_rows
+        if row.get("hostName") in {"localhost", "127.0.0.1"}
+    )
+    purchases = event_totals.get("purchase", {})
+    return {
+        "shop_sessions": shop_sessions,
+        "shop_direct_sessions": direct_sessions,
+        "shop_direct_share_percent": round(direct_sessions / shop_sessions * 100, 1) if shop_sessions else 0,
+        "technical_sessions": technical_sessions,
+        "add_to_cart": event_totals.get("add_to_cart", {}).get("eventCount", 0),
+        "begin_checkout": event_totals.get("begin_checkout", {}).get("eventCount", 0),
+        "purchases": purchases.get("eventCount", 0),
+        "purchase_revenue": purchases.get("totalRevenue", 0),
+        "funnel_missing": shop_sessions >= 100 and (
+            event_totals.get("add_to_cart", {}).get("eventCount", 0) == 0
+            or event_totals.get("begin_checkout", {}).get("eventCount", 0) == 0
+        ),
+    }
 
 
 def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckResult:
@@ -103,6 +168,32 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
         "eventName",
         ["eventCount", "keyEvents", "totalRevenue"],
     )
+    commerce_start = current_end - timedelta(days=27)
+    commerce_rows = _multi_dimension_report(
+        session,
+        settings.ga4_property_id,
+        commerce_start,
+        current_end,
+        ["eventName", "hostName"],
+        ["eventCount", "keyEvents", "totalRevenue"],
+        dimension_filter={
+            "filter": {
+                "fieldName": "eventName",
+                "inListFilter": {
+                    "values": ["purchase", "begin_checkout", "add_to_cart"],
+                },
+            }
+        },
+    )
+    channel_host_rows = _multi_dimension_report(
+        session,
+        settings.ga4_property_id,
+        commerce_start,
+        current_end,
+        ["sessionDefaultChannelGroup", "hostName"],
+        ["sessions", "keyEvents", "totalRevenue"],
+    )
+    diagnostics = _commerce_diagnostics(commerce_rows, channel_host_rows, "shop.voyagerballoons.eu")
 
     for period, values in (("current_7d", current), ("previous_7d", previous)):
         for name, value in values.items():
@@ -115,6 +206,24 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
         event_name = row["eventName"]
         for name in ("eventCount", "keyEvents", "totalRevenue"):
             result.add_metric(name, row.get(name, 0), source="ga4_event", dimensions={"event_name": event_name})
+    for row in commerce_rows:
+        for name in ("eventCount", "keyEvents", "totalRevenue"):
+            result.add_metric(
+                name,
+                row.get(name, 0),
+                source="ga4_commerce_28d",
+                dimensions={"event_name": row.get("eventName", ""), "host_name": row.get("hostName", "")},
+            )
+    for row in channel_host_rows:
+        result.add_metric(
+            "sessions",
+            row.get("sessions", 0),
+            source="ga4_channel_host_28d",
+            dimensions={
+                "channel": row.get("sessionDefaultChannelGroup", ""),
+                "host_name": row.get("hostName", ""),
+            },
+        )
 
     threshold = float(config["thresholds"].get("organic_conversion_drop_percent", 30))
     previous_events = previous.get("keyEvents", 0)
@@ -131,6 +240,34 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
                 metadata={"current": current, "previous": previous},
             ))
 
+    if diagnostics["funnel_missing"]:
+        result.alerts.append(AlertSpec(
+            dedupe_key="ga4:commerce-funnel-events-missing",
+            severity="P1",
+            category="ga4",
+            title="El embudo WooCommerce está incompleto en GA4",
+            message=(
+                f"La tienda registra {diagnostics['shop_sessions']:.0f} sesiones en 28 días, "
+                f"pero add_to_cart={diagnostics['add_to_cart']:.0f} y "
+                f"begin_checkout={diagnostics['begin_checkout']:.0f}. "
+                f"Purchase sí registra {diagnostics['purchases']:.0f} eventos."
+            ),
+            action="Ejecutar una compra de prueba con DebugView/Tag Assistant y corregir el disparo de add_to_cart y begin_checkout sin alterar purchase.",
+            evidence_url="https://analytics.google.com/",
+            metadata=diagnostics,
+        ))
+    if diagnostics["technical_sessions"] >= 10:
+        result.alerts.append(AlertSpec(
+            dedupe_key="ga4:technical-host-traffic",
+            severity="P2",
+            category="ga4",
+            title="Tráfico técnico contamina la propiedad GA4",
+            message=f"Se detectan {diagnostics['technical_sessions']:.0f} sesiones de localhost/127.0.0.1 en 28 días.",
+            action="Desactivar la etiqueta en desarrollo o aplicar un filtro de tráfico interno verificado, sin excluir tráfico real de web y tienda.",
+            evidence_url="https://analytics.google.com/",
+            metadata=diagnostics,
+        ))
+
     result.summary = {
         "current_period": [current_start.isoformat(), current_end.isoformat()],
         "previous_period": [previous_start.isoformat(), previous_end.isoformat()],
@@ -143,6 +280,10 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
             row for row in event_rows
             if row.get("keyEvents", 0) > 0 or row.get("eventName") in {"purchase", "begin_checkout", "add_to_cart"}
         ][:20],
+        "commerce_period": [commerce_start.isoformat(), current_end.isoformat()],
+        "commerce_diagnostics": diagnostics,
+        "commerce_events": commerce_rows,
+        "channel_host_rows": channel_host_rows[:30],
         "alerts": len(result.alerts),
     }
     return result

@@ -3,7 +3,7 @@ from __future__ import annotations
 import unittest
 from datetime import date
 
-from seo_monitor.checks.ga4 import _dimension_report, _report
+from seo_monitor.checks.ga4 import _commerce_diagnostics, _dimension_report, _report
 from seo_monitor.checks.gsc import _query, _totals
 
 
@@ -68,6 +68,26 @@ class GoogleContractTests(unittest.TestCase):
     def test_ga4_totals_handle_empty_rows(self) -> None:
         session = FakeSession({"metricHeaders": [{"name": "sessions"}], "rows": []})
         self.assertEqual(_report(session, "123456", date(2026, 7, 1), date(2026, 7, 7)), {})
+
+    def test_ga4_commerce_diagnostics_detect_missing_funnel_events(self) -> None:
+        diagnostics = _commerce_diagnostics(
+            [{
+                "eventName": "purchase", "hostName": "shop.voyagerballoons.eu",
+                "eventCount": 2, "keyEvents": 2, "totalRevenue": 480,
+            }],
+            [
+                {"sessionDefaultChannelGroup": "Organic Search", "hostName": "shop.voyagerballoons.eu", "sessions": 120},
+                {"sessionDefaultChannelGroup": "Direct", "hostName": "shop.voyagerballoons.eu", "sessions": 30},
+                {"sessionDefaultChannelGroup": "Direct", "hostName": "localhost", "sessions": 12},
+            ],
+            "shop.voyagerballoons.eu",
+        )
+
+        self.assertTrue(diagnostics["funnel_missing"])
+        self.assertEqual(diagnostics["purchases"], 2)
+        self.assertEqual(diagnostics["purchase_revenue"], 480)
+        self.assertEqual(diagnostics["shop_direct_share_percent"], 20.0)
+        self.assertEqual(diagnostics["technical_sessions"], 12)
 
 
 if __name__ == "__main__":

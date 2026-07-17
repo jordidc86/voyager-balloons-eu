@@ -23,7 +23,7 @@ Mantener una vigilancia continua y accionable de la web, tienda, posicionamiento
 | `commerce` | 6 horas | Ficha → añadir al carrito → carrito → checkout para los 5 productos publicados |
 | `gsc` | diaria | Clics, impresiones, CTR, posición, páginas y consultas; compara 7 días contra 7 días |
 | `indexing` | semanal | Inspección de las 12 URLs estratégicas indexables, canonical elegido, rastreo, obtención y sitemap |
-| `ga4` | diaria | Sesiones, sesiones con interacción, eventos clave e ingresos procedentes de Organic Search |
+| `ga4` | diaria | Sesiones, eventos e ingresos orgánicos (7 días), embudo WooCommerce y atribución por canal/host (28 días) |
 | `rank` | diaria | 29 keywords iniciales ES/EN/PT, ubicación, móvil, top 100 y competidores SERP |
 | `local_visibility` | semanal | Posición móvil del Perfil de Empresa en 5 consultas/ubicaciones de Segovia, Madrid y Bragança |
 | `ai_visibility` | semanal | 7 preguntas comerciales en ChatGPT, Gemini y Perplexity; menciones, citas y fuentes competidoras |
@@ -157,3 +157,5 @@ Proyecto Railway `zealous-creativity`, entorno `production`:
 - Primera inteligencia de demanda: 10 keywords con datos y 9 oportunidades fuera del top 10 por 0,0252 USD en la ejecución del 17 de julio.
 - Calibración de ruido: una variación aislada de ranking ya no escala a P1; Maps requiere tres observaciones; el estado indeterminado de Search Console es P2; carrito se valida por producto y URL; CrUX de tienda se deduplica por origen.
 - El informe y las alertas urgentes incluyen score 0–100, impacto sobre reservas, horizonte, esfuerzo, destino, potencial basado en evidencia y acción recomendada.
+- Auditoría GA4 de 28 días: `purchase` registra 2 compras y 480 €, y el canal se conserva al entrar en la tienda; faltan eventos `add_to_cart` y `begin_checkout`, por lo que el monitor alerta sobre embudo incompleto sin confundirlo con una rotura de compra.
+- La propiedad recibe tráfico de `localhost`/`127.0.0.1`; se monitoriza como contaminación técnica separada de clientes reales.

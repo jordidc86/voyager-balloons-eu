@@ -146,6 +146,7 @@ def render_markdown(store: Store) -> str:
     demand_summary = _summary_dict(latest_runs["keyword_demand"].summary_json) if latest_runs["keyword_demand"] else {}
     gsc_current = gsc_summary.get("current", {})
     ga4_current = ga4_summary.get("current", {})
+    ga4_commerce = ga4_summary.get("commerce_diagnostics", {})
     lines.extend([
         "",
         "## Protección de reservas directas",
@@ -157,6 +158,8 @@ def render_markdown(store: Store) -> str:
         "",
         f"- Search Console (7 días): {gsc_current.get('clicks', 'sin datos')} clics, {gsc_current.get('impressions', 'sin datos')} impresiones, CTR {_percent(gsc_current.get('ctr'), 100)}.",
         f"- GA4 orgánico (7 días): {ga4_current.get('sessions', 'sin datos')} sesiones, {ga4_current.get('keyEvents', 'sin datos')} eventos clave, {ga4_current.get('totalRevenue', 'sin datos')} € atribuidos.",
+        f"- Embudo GA4 (28 días): {ga4_commerce.get('add_to_cart', 'sin datos')} add_to_cart, {ga4_commerce.get('begin_checkout', 'sin datos')} begin_checkout, {ga4_commerce.get('purchases', 'sin datos')} compras y {ga4_commerce.get('purchase_revenue', 'sin datos')} €.",
+        f"- Atribución tienda (28 días): {ga4_commerce.get('shop_sessions', 'sin datos')} sesiones; Direct representa {_percent(ga4_commerce.get('shop_direct_share_percent'))}.",
         f"- Rankings: {rank_summary.get('found_top_10', 'sin datos')}/{rank_summary.get('keywords_checked', 'sin datos')} keywords comprobadas en top 10.",
         f"- Demanda: datos disponibles para {demand_summary.get('keywords_with_data', 'sin datos')}/{demand_summary.get('keywords_inventory', 'sin datos')} keywords; {demand_summary.get('opportunities', 'sin datos')} oportunidades fuera del top 10.",
         f"- Google Maps: {local_summary.get('found_top_3', 'sin datos')}/{local_summary.get('checks', 'sin datos')} consultas en top 3.",
