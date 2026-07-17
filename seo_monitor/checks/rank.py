@@ -15,6 +15,12 @@ from ..types import AlertSpec, CheckResult
 ENDPOINT = "https://api.dataforseo.com/v3/serp/google/organic/live/advanced"
 
 
+class SearchError(RuntimeError):
+    def __init__(self, message: str, cost: float = 0.0):
+        super().__init__(message)
+        self.cost = cost
+
+
 def _domain(url: str | None) -> str | None:
     if not url:
         return None
@@ -65,9 +71,9 @@ def _search(settings: Settings, row: dict[str, str], depth: int) -> tuple[dict, 
         if attempt < 2 and (int(task.get("status_code") or 0) >= 50000 or "internal" in message.lower()):
             time.sleep(2 ** attempt)
             continue
-        raise RuntimeError(message)
+        raise SearchError(message, total_cost)
 
-    raise RuntimeError("DataForSEO agotó los reintentos")
+    raise SearchError("DataForSEO agotó los reintentos", total_cost)
 
 
 def _is_due(previous, interval_days: int, now: datetime | None = None) -> bool:
@@ -120,6 +126,7 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
             serp, cost = _search(settings, row, depth)
             total_cost += cost
         except Exception as exc:
+            total_cost += float(getattr(exc, "cost", 0) or 0)
             failures.append({"keyword": row["keyword"], "error": str(exc)})
             continue
         checked += 1

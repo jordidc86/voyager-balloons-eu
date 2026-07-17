@@ -199,6 +199,36 @@ class VisibilityTests(unittest.TestCase):
         sleep.assert_called_once_with(1)
         self.assertEqual(cost, 0.002)
 
+    @patch("seo_monitor.checks.rank.time.sleep")
+    @patch("seo_monitor.checks.rank.requests.post")
+    def test_rank_run_counts_cost_of_failed_provider_attempts(self, post, sleep) -> None:
+        failed = Mock()
+        failed.json.return_value = {
+            "tasks": [{"status_code": 50000, "status_message": "Internal SE Server Error.", "cost": 0.01}],
+        }
+        post.return_value = failed
+        settings = replace(Settings.from_env(), dataforseo_login="login", dataforseo_password="password")
+        config = load_config(settings)
+
+        with patch("seo_monitor.checks.rank.load_keywords", return_value=[{
+            "keyword": "hot air balloon madrid day trip",
+            "location_name": "Madrid Spain",
+            "location_code": "1005493",
+            "language_code": "en",
+            "device": "mobile",
+            "priority": "P0",
+            "target_url": "https://www.voyagerballoons.eu/en/hot-air-balloon-segovia-from-madrid",
+            "cluster": "madrid_en",
+        }]), tempfile.TemporaryDirectory() as tmp:
+            store = Store(f"sqlite:///{Path(tmp) / 'monitor.db'}")
+            store.initialize()
+            run_id = store.start_job("rank")
+            result = rank.run(config, store, run_id, settings)
+
+        self.assertEqual(result.summary["failures"], 1)
+        self.assertEqual(result.summary["provider_cost_usd"], 0.03)
+        self.assertEqual(post.call_count, 3)
+
 
 if __name__ == "__main__":
     unittest.main()
