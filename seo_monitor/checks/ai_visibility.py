@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime, timedelta, timezone
 from urllib.parse import urlsplit
 
 import requests
@@ -38,6 +39,15 @@ def _extract_response(api_result: dict) -> tuple[str, list[dict]]:
                     "url": annotation.get("url"),
                 })
     return "\n\n".join(texts).strip(), citations
+
+
+def _is_due(previous, interval_days: int, now: datetime | None = None) -> bool:
+    if previous is None:
+        return True
+    observed_at = previous.observed_at
+    if observed_at.tzinfo is None:
+        observed_at = observed_at.replace(tzinfo=timezone.utc)
+    return (now or datetime.now(timezone.utc)) - observed_at >= timedelta(days=interval_days)
 
 
 def _ask(settings: Settings, provider: dict, prompt: dict) -> tuple[dict, float]:
@@ -85,16 +95,21 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
     failures = []
     total_cost = 0.0
     budget_limited = False
+    deferred = 0
+    secondary_interval_days = int(config["thresholds"].get("ai_secondary_interval_days", 28))
 
     for provider in providers:
         if provider.get("name") not in ENDPOINTS:
             failures.append({"provider": provider.get("name"), "error": "Proveedor no soportado"})
             continue
         for prompt in prompts:
+            previous = store.previous_ai_visibility(prompt["id"], provider["name"])
+            if prompt.get("priority") != "P0" and not _is_due(previous, secondary_interval_days):
+                deferred += 1
+                continue
             if not budget_available(config, total_cost):
                 budget_limited = True
                 break
-            previous = store.previous_ai_visibility(prompt["id"], provider["name"])
             try:
                 api_result, cost = _ask(settings, provider, prompt)
                 total_cost += cost
@@ -159,8 +174,6 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
                         "citations": citations[:20],
                     },
                 ))
-        if budget_limited:
-            break
             if previous and previous.voyager_cited and not voyager_cited:
                 result.alerts.append(AlertSpec(
                     dedupe_key=f"ai_visibility:{provider['name']}:{prompt['id']}:citation-lost",
@@ -171,6 +184,8 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
                     action="Comparar fuentes nuevas, comprobar cambios de indexación y actualizar la página que antes era citada.",
                     metadata={"prompt": prompt["prompt"], "citations": citations[:20]},
                 ))
+        if budget_limited:
+            break
 
     if failures:
         result.alerts.append(AlertSpec(
@@ -189,6 +204,7 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
         "citations": citations_count,
         "mention_share_percent": round((mentions / observations * 100) if observations else 0, 1),
         "citation_share_percent": round((citations_count / observations * 100) if observations else 0, 1),
+        "observations_deferred": deferred,
         "failures": len(failures),
         "provider_cost_usd": round(total_cost, 4),
         "run_budget_usd": dataforseo_run_budget(config),

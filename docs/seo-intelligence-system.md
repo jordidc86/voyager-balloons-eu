@@ -102,7 +102,7 @@ Guardar el JSON completo en `GOOGLE_SERVICE_ACCOUNT_JSON` y el ID numérico en `
 
 Crear cuenta pay-as-you-go, hacer el depósito mínimo y guardar `DATAFORSEO_LOGIN` y `DATAFORSEO_PASSWORD`. El monitor usa SERP orgánica, Google Maps y respuestas de ChatGPT/Gemini/Perplexity con búsqueda web. El coste real de cada tarea se guarda como métrica y el inventario se limita a las consultas aprobadas.
 
-El presupuesto inicial queda limitado a **25 USD/mes** y cada módulo tiene además un máximo de **5 USD por ejecución**. Se pueden ajustar en `thresholds.dataforseo_monthly_budget_usd` y `thresholds.dataforseo_run_budget_usd`. Al alcanzar cualquiera de los límites, la tanda se detiene sin borrar alertas previas ni repetir consultas innecesarias.
+El presupuesto queda limitado a **8 USD/mes** y cada módulo tiene además un máximo de **1 USD por ejecución**. Se avisa si una ejecución alcanza **0,75 USD**. Las palabras P0 se consultan a diario hasta posición 20; las secundarias, semanalmente hasta posición 100. Las preguntas P0 de visibilidad IA se revisan semanalmente y las secundarias cada 28 días. Los límites se ajustan en `thresholds.dataforseo_monthly_budget_usd`, `thresholds.dataforseo_run_budget_usd` y las claves de cadencia relacionadas. Al alcanzar cualquiera de los límites, la tanda se detiene sin borrar alertas previas ni repetir consultas innecesarias.
 
 ### PageSpeed
 
@@ -153,5 +153,5 @@ No se debe desplegar hasta disponer de las credenciales Google, destino de alert
 - Medición validada en navegador: el salto web → producto Comfort queda decorado con `_gl`; las dos propiedades comparten `GT-55NTF5CN`/`AW-11564692382` y WooCommerce declara `add_to_cart` y `purchase`.
 - Control diario de integridad Analytics: 7/7 comprobaciones correctas.
 - Tests locales: 29/29 correctos; contenedor pendiente de construir en Railway porque Docker Desktop no estaba activo durante la validación local.
-- Protección operativa añadida: techo inicial de 25 USD/mes y 5 USD por ejecución para DataForSEO, alertas antiguas preservadas cuando una fuente se omite y heartbeat externo opcional.
-- Pendiente: credenciales Google/DataForSEO/PageSpeed, prueba SMTP y despliegue Railway.
+- Protección operativa añadida: techo de 8 USD/mes, 1 USD por ejecución y aviso a 0,75 USD para DataForSEO; las consultas secundarias se difieren automáticamente para evitar gasto repetido.
+- Google, PageSpeed, Resend, Railway y PostgreSQL están desplegados y verificados con datos reales. Las credenciales API de DataForSEO están guardadas en Railway; queda verificar la cuenta del proveedor y ejecutar la primera tanda controlada con su crédito de prueba.

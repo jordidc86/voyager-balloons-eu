@@ -88,9 +88,13 @@
     "organic_conversion_drop_percent": 30,
     "rank_drop_positions": 3,
     "minimum_impressions_for_alert": 50,
-    "dataforseo_monthly_budget_usd": 25,
-    "dataforseo_run_budget_usd": 5,
-    "dataforseo_run_cost_warning_usd": 5
+    "dataforseo_monthly_budget_usd": 8,
+    "dataforseo_run_budget_usd": 1,
+    "dataforseo_run_cost_warning_usd": 0.75,
+    "rank_critical_depth": 20,
+    "rank_secondary_depth": 100,
+    "rank_secondary_interval_days": 7,
+    "ai_secondary_interval_days": 28
   },
   "schedules_seconds": {
     "health": 21600,

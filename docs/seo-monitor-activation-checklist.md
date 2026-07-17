@@ -21,11 +21,11 @@ Con esto se activan: consultas, páginas, países, dispositivos, oportunidades d
 
 ### 3. DataForSEO
 
-- Crear o facilitar una cuenta pay-as-you-go con saldo.
-- Guardar login y contraseña API en Railway.
-- Techo configurado: **25 USD/mes** y **5 USD por módulo y ejecución**. Al alcanzarlo, el sistema detiene automáticamente las consultas de pago.
+- La cuenta pay-as-you-go y sus credenciales API ya están configuradas en Railway.
+- Completar la verificación del correo de DataForSEO antes de la primera consulta.
+- Techo configurado: **8 USD/mes**, **1 USD por módulo y ejecución** y aviso a **0,75 USD**. Al alcanzarlo, el sistema detiene automáticamente las consultas de pago.
 
-Con esto se activan: 29 rankings orgánicos, cinco búsquedas de Google Maps, 21 observaciones de buscadores IA y seis cruces de backlinks entre competidores.
+Con esto se activan: rankings P0 diarios hasta posición 20, rankings secundarios semanales hasta posición 100, cinco búsquedas de Google Maps, observaciones de buscadores IA escalonadas y seis cruces mensuales de backlinks entre competidores.
 
 ### 4. PageSpeed Insights
 
@@ -41,10 +41,10 @@ La cuota pública sin clave ya está agotada, por lo que la clave propia es nece
 
 ## Trabajo que hará Codex después de las autorizaciones
 
-1. Crear servicio cron y PostgreSQL en Railway; el proceso se ejecutará cada 6 horas y permanecerá apagado entre pasadas para minimizar consumo.
-2. Configurar variables privadas y referencias SMTP sin mostrar secretos.
-3. Desplegar una única réplica y verificar build, arranque y persistencia.
-4. Ejecutar dos ciclos completos y contrastar Search Console, GA4, SERP, Maps, IA y PageSpeed.
+1. Servicio cron y PostgreSQL ya creados en Railway; el proceso se ejecuta cada 6 horas y permanece apagado entre pasadas para minimizar consumo.
+2. Variables privadas, Google, PageSpeed y alertas ya configuradas sin mostrar secretos.
+3. Una única réplica desplegada, con build, arranque, persistencia y envío de informes verificados.
+4. Tras verificar DataForSEO, ejecutar la tanda inicial controlada y contrastar SERP, Maps, IA y backlinks con el crédito de prueba.
 5. Enviar una alerta sintética controlada y comprobar deduplicación y resolución.
 6. Entregar el primer informe real priorizado por impacto en reservas directas.
 7. Ajustar umbrales tras 2-4 semanas de línea base para reducir ruido y detectar tendencias reales.
