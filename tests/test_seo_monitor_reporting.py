@@ -49,6 +49,17 @@ class ReportingTests(unittest.TestCase):
         )])
         self.save("ga4", {
             "current": {"sessions": 64, "keyEvents": 7, "totalRevenue": 845},
+            "commerce_diagnostics": {
+                "complete_days": 0,
+                "minimum_shop_sessions": 50,
+                "evaluation_ready": False,
+            },
+            "commerce_baseline_diagnostics": {
+                "shop_sessions": 1131,
+                "shop_direct_share_percent": 18.3,
+                "purchases": 2,
+                "purchase_revenue": 480,
+            },
         })
 
         report = render_markdown(self.store)
@@ -57,11 +68,36 @@ class ReportingTests(unittest.TestCase):
         self.assertIn("Flujos de compra correctos: 5/5", report)
         self.assertIn("80 clics, 4000 impresiones, CTR 2.0%", report)
         self.assertIn("64 sesiones, 7 eventos clave, 845 € atribuidos", report)
+        self.assertIn("Embudo GA4 post-reparación: en calentamiento", report)
+        self.assertIn("Histórico tienda (28 días): 2 compras y 480 €", report)
+        self.assertIn("Atribución tienda (28 días): 1131 sesiones", report)
         self.assertIn("Consulta `vuelo en globo segovia`", report)
         self.assertIn("brecha estimada 18 clics", report)
         self.assertIn("crecimiento de reservas", report)
         self.assertIn("El score ordena el trabajo", report)
         self.assertIn("hasta 18.0 clics orgánicos adicionales", report)
+
+    def test_dynamic_keyword_evidence_does_not_render_missing_values(self) -> None:
+        self.save("gsc", {}, alerts=[AlertSpec(
+            dedupe_key="gsc:new-commercial-keywords",
+            severity="P2",
+            category="gsc",
+            title="Nuevas consultas",
+            message="Se han activado consultas.",
+            action="Revisarlas.",
+            metadata={"queries": [{
+                "query": "viaje en globo segovia",
+                "position": 13.903,
+                "impressions": 498,
+                "ctr": 0,
+            }]},
+        )])
+
+        report = render_markdown(self.store)
+
+        self.assertIn("posición 13.9", report)
+        self.assertIn("CTR 0.0%", report)
+        self.assertNotIn("None", report)
 
     def test_commerce_failure_outranks_ctr_opportunity_and_pagespeed(self) -> None:
         commerce = Alert(

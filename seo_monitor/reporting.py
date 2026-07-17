@@ -47,11 +47,16 @@ def _alert_evidence(raw: str) -> list[str]:
     metadata = _summary_dict(raw)
     lines = []
     for item in metadata.get("queries", [])[:5]:
-        lines.append(
-            f"- Consulta `{item.get('query')}` · posición {item.get('position')} · "
-            f"{item.get('impressions')} impresiones · CTR {item.get('ctr_percent')}% · "
-            f"brecha estimada {item.get('estimated_click_gap')} clics"
+        ctr_percent = item.get("ctr_percent")
+        if ctr_percent is None and item.get("ctr") is not None:
+            ctr_percent = round(float(item["ctr"]) * 100, 2)
+        details = (
+            f"- Consulta `{item.get('query')}` · posición {round(float(item.get('position') or 0), 1)} · "
+            f"{item.get('impressions')} impresiones · CTR {ctr_percent if ctr_percent is not None else 'sin datos'}%"
         )
+        if item.get("estimated_click_gap") is not None:
+            details += f" · brecha estimada {item.get('estimated_click_gap')} clics"
+        lines.append(details)
     for item in metadata.get("pages", [])[:5]:
         lines.append(
             f"- Página `{item.get('page')}` · {item.get('previous_clicks')} → "
@@ -147,6 +152,21 @@ def render_markdown(store: Store) -> str:
     gsc_current = gsc_summary.get("current", {})
     ga4_current = ga4_summary.get("current", {})
     ga4_commerce = ga4_summary.get("commerce_diagnostics", {})
+    ga4_baseline = ga4_summary.get("commerce_baseline_diagnostics") or ga4_commerce
+    if ga4_commerce.get("evaluation_ready"):
+        ga4_funnel_line = (
+            f"- Embudo GA4 post-reparación ({ga4_commerce.get('complete_days', 'sin datos')} días completos): "
+            f"{ga4_commerce.get('add_to_cart', 'sin datos')} add_to_cart, "
+            f"{ga4_commerce.get('begin_checkout', 'sin datos')} begin_checkout, "
+            f"{ga4_commerce.get('purchases', 'sin datos')} compras y "
+            f"{ga4_commerce.get('purchase_revenue', 'sin datos')} €."
+        )
+    else:
+        ga4_funnel_line = (
+            f"- Embudo GA4 post-reparación: en calentamiento "
+            f"({ga4_commerce.get('complete_days', 0)} días completos; se evaluará al alcanzar "
+            f"{ga4_commerce.get('minimum_shop_sessions', 'sin datos')} sesiones de tienda)."
+        )
     lines.extend([
         "",
         "## Protección de reservas directas",
@@ -158,8 +178,9 @@ def render_markdown(store: Store) -> str:
         "",
         f"- Search Console (7 días): {gsc_current.get('clicks', 'sin datos')} clics, {gsc_current.get('impressions', 'sin datos')} impresiones, CTR {_percent(gsc_current.get('ctr'), 100)}.",
         f"- GA4 orgánico (7 días): {ga4_current.get('sessions', 'sin datos')} sesiones, {ga4_current.get('keyEvents', 'sin datos')} eventos clave, {ga4_current.get('totalRevenue', 'sin datos')} € atribuidos.",
-        f"- Embudo GA4 (28 días): {ga4_commerce.get('add_to_cart', 'sin datos')} add_to_cart, {ga4_commerce.get('begin_checkout', 'sin datos')} begin_checkout, {ga4_commerce.get('purchases', 'sin datos')} compras y {ga4_commerce.get('purchase_revenue', 'sin datos')} €.",
-        f"- Atribución tienda (28 días): {ga4_commerce.get('shop_sessions', 'sin datos')} sesiones; Direct representa {_percent(ga4_commerce.get('shop_direct_share_percent'))}.",
+        ga4_funnel_line,
+        f"- Histórico tienda (28 días): {ga4_baseline.get('purchases', 'sin datos')} compras y {ga4_baseline.get('purchase_revenue', 'sin datos')} €.",
+        f"- Atribución tienda (28 días): {ga4_baseline.get('shop_sessions', 'sin datos')} sesiones; Direct representa {_percent(ga4_baseline.get('shop_direct_share_percent'))}.",
         f"- Rankings: {rank_summary.get('found_top_10', 'sin datos')}/{rank_summary.get('keywords_checked', 'sin datos')} keywords comprobadas en top 10.",
         f"- Demanda: datos disponibles para {demand_summary.get('keywords_with_data', 'sin datos')}/{demand_summary.get('keywords_inventory', 'sin datos')} keywords; {demand_summary.get('opportunities', 'sin datos')} oportunidades fuera del top 10.",
         f"- Google Maps: {local_summary.get('found_top_3', 'sin datos')}/{local_summary.get('checks', 'sin datos')} consultas en top 3.",
