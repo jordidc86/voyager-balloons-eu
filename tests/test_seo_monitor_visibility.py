@@ -10,7 +10,7 @@ from seo_monitor.checks.ai_visibility import _extract_response
 from seo_monitor.checks.local_visibility import _rating
 from seo_monitor.config import Settings, load_config
 from seo_monitor.storage import Store
-from seo_monitor.checks import ai_visibility, backlink_gap, indexing, local_visibility
+from seo_monitor.checks import ai_visibility, backlink_gap, indexing, local_visibility, rank
 from seo_monitor.google_auth import authorized_session
 
 
@@ -62,6 +62,45 @@ class VisibilityTests(unittest.TestCase):
             indexing_run = store.start_job("indexing")
             indexing_result = indexing.run(config, store, indexing_run, settings)
             self.assertEqual(indexing_result.status, "skipped")
+
+    @patch("seo_monitor.checks.rank._search")
+    @patch("seo_monitor.checks.rank.load_keywords")
+    def test_rank_run_uses_configured_thresholds(self, load_keywords, search) -> None:
+        load_keywords.return_value = [{
+            "keyword": "paseo en globo braganza",
+            "location_name": "Braganza,Portugal",
+            "language_code": "es",
+            "device": "desktop",
+            "priority": "P0",
+            "target_url": "https://www.voyagerballoons.eu/es/braganza",
+            "cluster": "braganza",
+        }]
+        search.return_value = ({
+            "items": [{
+                "type": "organic",
+                "rank_absolute": 3,
+                "url": "https://www.voyagerballoons.eu/es/braganza",
+            }],
+            "check_url": "https://example.test/serp",
+        }, 0.002)
+
+        with tempfile.TemporaryDirectory() as tmp:
+            store = Store(f"sqlite:///{Path(tmp) / 'monitor.db'}")
+            store.initialize()
+            settings = replace(
+                Settings.from_env(),
+                dataforseo_login="login",
+                dataforseo_password="password",
+            )
+            config = load_config(settings)
+            run_id = store.start_job("rank")
+
+            result = rank.run(config, store, run_id, settings)
+
+        search.assert_called_once()
+        self.assertEqual(search.call_args.args[2], config["thresholds"]["rank_critical_depth"])
+        self.assertEqual(result.summary["keywords_checked"], 1)
+        self.assertEqual(result.summary["found_top_10"], 1)
 
 
 if __name__ == "__main__":

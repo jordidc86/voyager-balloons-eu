@@ -1,9 +1,10 @@
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 import unittest
+from unittest.mock import Mock, patch
 
 from seo_monitor.checks.ai_visibility import _is_due as ai_is_due
-from seo_monitor.checks.rank import _depth_for
+from seo_monitor.checks.rank import _depth_for, run as run_rank
 
 
 class SeoMonitorCadenceTests(unittest.TestCase):
@@ -43,6 +44,38 @@ class SeoMonitorCadenceTests(unittest.TestCase):
 
     def test_naive_stored_timestamp_is_treated_as_utc(self):
         self.assertTrue(ai_is_due(self.previous(29, naive=True), 28, now=self.now))
+
+    @patch("seo_monitor.checks.rank._search", return_value=({"items": []}, 0.01))
+    @patch("seo_monitor.checks.rank.load_keywords")
+    def test_rank_run_passes_thresholds_to_cadence_logic(self, load_keywords, search):
+        load_keywords.return_value = [{
+            "keyword": "vuelo en globo segovia",
+            "location_name": "Madrid,Community of Madrid,Spain",
+            "language_code": "es",
+            "device": "mobile",
+            "priority": "P0",
+            "cluster": "segovia",
+            "target_url": "https://www.voyagerballoons.eu/vuelo-en-globo-segovia",
+        }]
+        store = Mock()
+        store.previous_keyword_ranking.return_value = None
+        settings = SimpleNamespace(dataforseo_login="login", dataforseo_password="password")
+        config = {
+            "target_domains": ["www.voyagerballoons.eu"],
+            "thresholds": {
+                **self.thresholds,
+                "rank_drop_positions": 3,
+                "dataforseo_run_budget_usd": 1,
+            },
+            "_runtime": {"dataforseo_budget_remaining_usd": 1},
+        }
+
+        result = run_rank(config, store, 1, settings)
+
+        self.assertEqual(result.status, "success")
+        self.assertEqual(result.summary["keywords_checked"], 1)
+        self.assertEqual(result.summary["provider_cost_usd"], 0.01)
+        search.assert_called_once()
 
 
 if __name__ == "__main__":

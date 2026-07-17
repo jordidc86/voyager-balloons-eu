@@ -74,7 +74,8 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
         return result
 
     target_domains = {domain.removeprefix("www.") for domain in config["target_domains"]}
-    threshold = float(config["thresholds"].get("rank_drop_positions", 3))
+    thresholds = config["thresholds"]
+    threshold = float(thresholds.get("rank_drop_positions", 3))
     keywords = load_keywords(settings)
     found = 0
     top_ten = 0
