@@ -69,6 +69,14 @@ def _alert_evidence(raw: str) -> list[str]:
                 f"- Keyword `{item.get('keyword')}` · {item.get('search_volume')} búsquedas/mes · "
                 f"CPC ${item.get('cpc')} · posición {position} · intención {item.get('intent') or 'sin clasificar'}"
             )
+    for item in metadata.get("performance_opportunities", [])[:4]:
+        savings = []
+        if item.get("savings_ms"):
+            savings.append(f"{item['savings_ms']} ms")
+        if item.get("savings_kib"):
+            savings.append(f"{item['savings_kib']} KiB")
+        display = item.get("display_value") or ("ahorro " + " / ".join(savings) if savings else "oportunidad detectada")
+        lines.append(f"- {item.get('label')} · {display}")
     return lines
 
 

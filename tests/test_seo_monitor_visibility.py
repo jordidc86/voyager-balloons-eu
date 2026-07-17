@@ -11,7 +11,7 @@ from seo_monitor.checks.local_visibility import _absence_streak, _drop_assessmen
 from seo_monitor.config import Settings, load_config
 from seo_monitor.storage import Store
 from seo_monitor.checks import ai_visibility, backlink_gap, indexing, keyword_demand, local_visibility, rank
-from seo_monitor.checks.pagespeed import _field_scope
+from seo_monitor.checks.pagespeed import _field_scope, _performance_opportunities
 from seo_monitor.google_auth import authorized_session
 
 
@@ -87,6 +87,23 @@ class VisibilityTests(unittest.TestCase):
             ),
             ("origin", "https://shop.voyagerballoons.eu"),
         )
+
+    def test_pagespeed_opportunities_are_ranked_by_estimated_savings(self) -> None:
+        opportunities = _performance_opportunities({
+            "unused-css-rules": {
+                "score": 0,
+                "displayValue": "Est savings of 43 KiB",
+                "details": {"overallSavingsBytes": 44032},
+            },
+            "render-blocking-insight": {
+                "score": 0,
+                "displayValue": "Est savings of 1,220 ms",
+                "details": {"items": [{"wastedMs": 1220}]},
+            },
+        })
+
+        self.assertEqual(opportunities[0]["audit"], "render-blocking-insight")
+        self.assertEqual(opportunities[0]["savings_ms"], 1220)
 
     @patch("seo_monitor.checks.keyword_demand.requests.post")
     def test_keyword_overview_accepts_null_items(self, post) -> None:
