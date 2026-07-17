@@ -65,7 +65,7 @@ class SeoMonitorCadenceTests(unittest.TestCase):
         self.assertEqual(drop["baseline"], 10)
 
     @patch("seo_monitor.checks.rank._search", return_value=({"items": []}, 0.01))
-    @patch("seo_monitor.checks.rank.load_keywords")
+    @patch("seo_monitor.checks.rank.load_keyword_inventory")
     def test_rank_run_passes_thresholds_to_cadence_logic(self, load_keywords, search):
         load_keywords.return_value = [{
             "keyword": "vuelo en globo segovia",

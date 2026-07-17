@@ -70,3 +70,26 @@ def load_config(settings: Settings) -> dict[str, Any]:
 def load_keywords(settings: Settings) -> list[dict[str, str]]:
     with settings.keywords_path.open(encoding="utf-8", newline="") as handle:
         return list(csv.DictReader(handle))
+
+
+def load_keyword_inventory(settings: Settings, store=None, dynamic_limit: int = 20) -> list[dict[str, str]]:
+    inventory = load_keywords(settings)
+    seen = {" ".join(row["keyword"].casefold().split()) for row in inventory}
+    if store is None:
+        return inventory
+    for candidate in store.active_keyword_candidates(limit=dynamic_limit):
+        normalized = " ".join(candidate.query.casefold().split())
+        if normalized in seen:
+            continue
+        inventory.append({
+            "keyword": candidate.query,
+            "language_code": candidate.language_code,
+            "location_name": candidate.location_name,
+            "location_code": candidate.location_code,
+            "device": candidate.device,
+            "cluster": candidate.cluster,
+            "target_url": candidate.target_url,
+            "priority": candidate.priority,
+        })
+        seen.add(normalized)
+    return inventory

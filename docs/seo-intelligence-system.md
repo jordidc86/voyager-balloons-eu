@@ -23,8 +23,8 @@ Mantener una vigilancia continua y accionable de la web, tienda, posicionamiento
 | `commerce` | 6 horas | Ficha → añadir al carrito → carrito → checkout para los 5 productos publicados |
 | `gsc` | diaria | Clics, impresiones, CTR, posición, páginas y consultas; compara 7 días contra 7 días |
 | `indexing` | semanal | Inspección de las 12 URLs estratégicas indexables, canonical elegido, rastreo, obtención y sitemap |
-| `ga4` | diaria | Sesiones, eventos e ingresos orgánicos (7 días), embudo WooCommerce y atribución por canal/host (28 días) |
-| `rank` | diaria | 29 keywords iniciales ES/EN/PT, ubicación, móvil, top 100 y competidores SERP |
+| `ga4` | diaria | Sesiones, eventos e ingresos orgánicos (7 días), atribución por canal/host (28 días) y embudo WooCommerce evaluado solo con datos posteriores a su reparación |
+| `rank` | diaria/semanal | 29 keywords estratégicas ES/EN/PT más hasta 6 consultas comerciales descubiertas en Search Console, ubicación, móvil, top 100 y competidores SERP |
 | `local_visibility` | semanal | Posición móvil del Perfil de Empresa en 5 consultas/ubicaciones de Segovia, Madrid y Bragança |
 | `ai_visibility` | semanal | 7 preguntas comerciales en ChatGPT, Gemini y Perplexity; menciones, citas y fuentes competidoras |
 | `technical` | semanal | 151 URLs, enlaces, sitemaps, metadatos, canonical, H1 y JSON-LD |
@@ -35,7 +35,7 @@ Mantener una vigilancia continua y accionable de la web, tienda, posicionamiento
 | `backlink_gap` | mensual | Dominios relevantes que enlazan a varios competidores directos pero no a Voyager |
 | `digest` | semanal | Informe único con score 0–100, impacto, horizonte, esfuerzo, destino, evidencia y alertas abiertas |
 
-El conjunto de keywords debe crecer a partir de Search Console y datos SERP. Las 29 iniciales son el núcleo comercial, no el inventario final.
+El conjunto de keywords crece a partir de Search Console sin convertir el monitor en una lista incontrolada. Cada ejecución semanal puede guardar hasta 20 candidatas no branded y activar como máximo 6 consultas comerciales adicionales. Se excluyen páginas técnicas, parámetros, carrito, checkout, taxonomías y marcas competidoras. Las 29 iniciales siguen siendo el núcleo comercial estable.
 
 ## Severidad
 
@@ -55,6 +55,7 @@ PostgreSQL en producción y SQLite en desarrollo. Tablas iniciales:
 - `alerts`: alerta deduplicada, primera/última aparición y resolución.
 - `page_snapshots`: estado e identidad de páginas propias y competidoras.
 - `keyword_rankings`: posición, URL, ubicación, dispositivo y top de la SERP.
+- `keyword_candidates`: consultas comerciales descubiertas en Search Console, estado de activación, landing, mercado y demanda observada.
 - `local_rankings`: posición en Maps, perfil detectado, CID, reseñas y competidores visibles.
 - `ai_visibility_observations`: respuesta, modelo, mención, cita, fuentes y competidores por pregunta controlada.
 
@@ -151,13 +152,14 @@ Proyecto Railway `zealous-creativity`, entorno `production`:
 - Validación productiva repetida: 14/14 URLs, 5/5 compras, 151 páginas, 2.937 enlaces internos, 0 enlaces rotos y 0 errores de schema.
 - Medición validada en navegador: el salto web → producto Comfort queda decorado con `_gl`; las dos propiedades comparten `GT-55NTF5CN`/`AW-11564692382` y WooCommerce declara `add_to_cart` y `purchase`.
 - Control diario de integridad Analytics: valida etiquetas, linker, eventos declarados y que WP Rocket no retrase el listener WooCommerce de Site Kit.
-- Tests locales: 65/65 correctos; el contenedor está desplegado en Railway.
+- Tests locales: 71/71 correctos antes del siguiente despliegue.
 - Protección operativa añadida: techo de 8 USD/mes, 1 USD por ejecución y aviso a 0,75 USD para DataForSEO; las consultas secundarias se difieren automáticamente para evitar gasto repetido.
 - Google, GA4, PageSpeed, SMTP, Railway, PostgreSQL y DataForSEO están desplegados y verificados con datos reales.
 - Primera inteligencia de demanda: 10 keywords con datos y 9 oportunidades fuera del top 10 por 0,0252 USD en la ejecución del 17 de julio.
 - Calibración de ruido: una variación aislada de ranking ya no escala a P1; Maps requiere tres observaciones; el estado indeterminado de Search Console es P2; carrito se valida por producto y URL; CrUX de tienda se deduplica por origen.
 - El informe y las alertas urgentes incluyen score 0–100, impacto sobre reservas, horizonte, esfuerzo, destino, potencial basado en evidencia y acción recomendada.
 - Auditoría GA4 de 28 días: `purchase` registra 2 compras y 480 €, y el canal se conserva al entrar en la tienda. Se corrigió la causa probable del `add_to_cart` ausente excluyendo solo el listener WooCommerce de Site Kit del retraso de WP Rocket; el monitor comprobará diariamente que siga cargando de inmediato.
-- `begin_checkout` se emite mediante un snippet JavaScript seguro en el checkout, después de que Site Kit esté disponible y respetando el consentimiento. La integridad publicada pasa 9/9 comprobaciones; la alerta histórica del embudo se mantendrá hasta que GA4 procese un nuevo evento consentido real.
+- `begin_checkout` se emite mediante un snippet JavaScript seguro en el checkout, después de que Site Kit esté disponible y respetando el consentimiento. La integridad publicada pasa 9/9 comprobaciones. Para no mezclar el fallo antiguo con el código reparado, el embudo se evalúa desde el 17 de julio y solo genera alerta tras dos días completos y 50 sesiones de tienda.
 - Los tres avisos urgentes iniciales de Maps y de `segovia balloon ride` se cerraron tras recalibrar el ruido: Maps requiere tres ausencias consecutivas y se trata como P2; una caída orgánica solo escala a P1 cuando la referencia histórica y una segunda observación degradada la confirman.
 - La propiedad recibe tráfico de `localhost`/`127.0.0.1`; el script propio ya no carga en esos hosts y el monitor mantiene la contaminación histórica como aviso separado hasta que salga de la ventana de 28 días.
+- Descubrimiento real de Search Console validado: 20 candidatas comerciales detectadas en 28 días, 6 activadas como inventario dinámico y 2 oportunidades de CTR, sin incorporar búsquedas branded, marcas competidoras ni URLs técnicas.

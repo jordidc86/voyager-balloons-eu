@@ -96,6 +96,30 @@ class KeywordRanking(Base):
     job_run_id: Mapped[Optional[int]] = mapped_column(Integer, index=True)
 
 
+class KeywordCandidate(Base):
+    __tablename__ = "keyword_candidates"
+    __table_args__ = (UniqueConstraint("query", name="uq_keyword_candidate_query"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    query: Mapped[str] = mapped_column(Text, index=True)
+    language_code: Mapped[str] = mapped_column(String(10))
+    location_name: Mapped[str] = mapped_column(Text)
+    location_code: Mapped[str] = mapped_column(String(20))
+    device: Mapped[str] = mapped_column(String(20), default="mobile")
+    cluster: Mapped[str] = mapped_column(String(80), index=True)
+    target_url: Mapped[str] = mapped_column(Text)
+    priority: Mapped[str] = mapped_column(String(4), default="P1")
+    status: Mapped[str] = mapped_column(String(24), default="candidate", index=True)
+    source: Mapped[str] = mapped_column(String(40), default="gsc")
+    impressions: Mapped[float] = mapped_column(Float, default=0)
+    clicks: Mapped[float] = mapped_column(Float, default=0)
+    ctr: Mapped[float] = mapped_column(Float, default=0)
+    position: Mapped[float] = mapped_column(Float, default=0)
+    first_seen_at: Mapped[datetime] = mapped_column(default=utcnow)
+    last_seen_at: Mapped[datetime] = mapped_column(default=utcnow, index=True)
+    last_job_run_id: Mapped[Optional[int]] = mapped_column(Integer, index=True)
+
+
 class LocalRanking(Base):
     __tablename__ = "local_rankings"
 

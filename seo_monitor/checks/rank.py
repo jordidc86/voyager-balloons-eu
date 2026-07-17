@@ -7,7 +7,7 @@ from urllib.parse import urlsplit
 
 import requests
 
-from ..config import Settings, load_keywords
+from ..config import Settings, load_keyword_inventory
 from ..costs import budget_available, dataforseo_run_budget
 from ..storage import Store
 from ..types import AlertSpec, CheckResult
@@ -136,7 +136,11 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
     target_domains = {domain.removeprefix("www.") for domain in config["target_domains"]}
     thresholds = config["thresholds"]
     threshold = float(thresholds.get("rank_drop_positions", 3))
-    keywords = load_keywords(settings)
+    keywords = load_keyword_inventory(
+        settings,
+        store,
+        dynamic_limit=int(config.get("keyword_discovery", {}).get("maximum_auto_active_keywords", 6)),
+    )
     found = 0
     top_ten = 0
     failures = []

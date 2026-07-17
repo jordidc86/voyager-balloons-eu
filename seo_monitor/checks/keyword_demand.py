@@ -4,7 +4,7 @@ from collections import defaultdict
 
 import requests
 
-from ..config import Settings, load_keywords
+from ..config import Settings, load_keyword_inventory
 from ..costs import budget_available, dataforseo_run_budget
 from ..storage import Store
 from ..types import AlertSpec, CheckResult
@@ -15,9 +15,10 @@ ENDPOINT = "https://api.dataforseo.com/v3/dataforseo_labs/google/keyword_overvie
 
 def _market(row: dict[str, str]) -> tuple[str, str, int]:
     is_portugal = "braganca" in row.get("cluster", "")
+    language_code = row.get("language_code") or ("pt" if is_portugal else "es")
     if is_portugal:
-        return "Portugal", "pt", 2620
-    return "Spain", "es", 2724
+        return "Portugal", language_code, 2620
+    return "Spain", language_code, 2724
 
 
 def _overview(
@@ -55,7 +56,11 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
         result.summary = {"reason": "DATAFORSEO_LOGIN/PASSWORD no configurados"}
         return result
 
-    inventory = load_keywords(settings)
+    inventory = load_keyword_inventory(
+        settings,
+        store,
+        dynamic_limit=int(config.get("keyword_discovery", {}).get("maximum_auto_active_keywords", 6)),
+    )
     grouped: dict[tuple[str, str, int], list[dict[str, str]]] = defaultdict(list)
     for row in inventory:
         market_name, api_language_code, location_code = _market(row)

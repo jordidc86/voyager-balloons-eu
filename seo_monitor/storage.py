@@ -13,6 +13,7 @@ from .models import (
     Alert,
     Base,
     JobRun,
+    KeywordCandidate,
     KeywordRanking,
     LocalRanking,
     Metric,
@@ -186,6 +187,53 @@ class Store:
                 payload_json=json.dumps(payload, ensure_ascii=False, sort_keys=True),
                 job_run_id=run_id,
             ))
+
+    def keyword_candidate_count(self, status: str = "active") -> int:
+        with self.sessions() as session:
+            return int(session.scalar(
+                select(func.count(KeywordCandidate.id)).where(KeywordCandidate.status == status)
+            ) or 0)
+
+    def upsert_keyword_candidate(self, run_id: int, payload: dict) -> tuple[KeywordCandidate, bool, bool]:
+        now = utcnow()
+        normalized_query = " ".join(str(payload["query"]).casefold().split())
+        with self.sessions.begin() as session:
+            candidate = session.scalar(
+                select(KeywordCandidate).where(KeywordCandidate.query == normalized_query)
+            )
+            created = candidate is None
+            previous_status = candidate.status if candidate else None
+            if candidate is None:
+                candidate = KeywordCandidate(query=normalized_query, first_seen_at=now)
+                session.add(candidate)
+            candidate.language_code = payload["language_code"]
+            candidate.location_name = payload["location_name"]
+            candidate.location_code = str(payload.get("location_code") or "")
+            candidate.device = payload.get("device", "mobile")
+            candidate.cluster = payload["cluster"]
+            candidate.target_url = payload["target_url"]
+            candidate.priority = payload.get("priority", "P1")
+            if candidate.status != "active":
+                candidate.status = payload.get("status", "candidate")
+            candidate.source = payload.get("source", "gsc")
+            candidate.impressions = float(payload.get("impressions", 0) or 0)
+            candidate.clicks = float(payload.get("clicks", 0) or 0)
+            candidate.ctr = float(payload.get("ctr", 0) or 0)
+            candidate.position = float(payload.get("position", 0) or 0)
+            candidate.last_seen_at = now
+            candidate.last_job_run_id = run_id
+            session.flush()
+            activated = previous_status != "active" and candidate.status == "active"
+            return candidate, created, activated
+
+    def active_keyword_candidates(self, limit: int = 20) -> list[KeywordCandidate]:
+        with self.sessions() as session:
+            return list(session.scalars(
+                select(KeywordCandidate)
+                .where(KeywordCandidate.status == "active")
+                .order_by(KeywordCandidate.impressions.desc(), KeywordCandidate.last_seen_at.desc())
+                .limit(limit)
+            ).all())
 
     def previous_keyword_ranking(self, keyword: str, location_name: str, device: str) -> KeywordRanking | None:
         history = self.keyword_ranking_history(keyword, location_name, device, limit=1)

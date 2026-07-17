@@ -28,7 +28,9 @@ def doctor(settings: Settings, store: Store) -> int:
             * len(config.get("ai_visibility", {}).get("prompts", []))
         ),
         "tracking_checks": 9 if config.get("tracking") else 0,
-        "keywords": len(keywords),
+        "keywords_static": len(keywords),
+        "keywords_dynamic_active": store.keyword_candidate_count("active"),
+        "keywords_dynamic_candidates": store.keyword_candidate_count("candidate"),
         "dataforseo_monthly_budget_usd": config.get("thresholds", {}).get("dataforseo_monthly_budget_usd"),
         "google_credentials": bool(settings.google_service_account_json),
         "gsc_property": settings.gsc_property,

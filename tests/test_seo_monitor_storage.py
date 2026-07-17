@@ -153,6 +153,36 @@ class StoreTests(unittest.TestCase):
         self.assertEqual(previous_ai.voyager_mentioned, 1)
         self.assertEqual(previous_ai.voyager_cited, 1)
 
+    def test_keyword_candidates_are_deduplicated_and_activated(self) -> None:
+        run_id = self.store.start_job("gsc")
+        payload = {
+            "query": "  Balloon Ride Segovia Price ",
+            "language_code": "en",
+            "location_name": "Madrid Spain",
+            "location_code": "1005493",
+            "device": "mobile",
+            "cluster": "segovia",
+            "target_url": "https://www.voyagerballoons.eu/en/hot-air-balloon-segovia",
+            "priority": "P1",
+            "status": "active",
+            "impressions": 40,
+            "clicks": 2,
+            "ctr": 0.05,
+            "position": 12,
+        }
+        candidate, created, activated = self.store.upsert_keyword_candidate(run_id, payload)
+        self.assertTrue(created)
+        self.assertTrue(activated)
+        self.assertEqual(candidate.query, "balloon ride segovia price")
+
+        payload.update({"query": "balloon ride segovia price", "status": "candidate", "impressions": 55})
+        _, created_again, activated_again = self.store.upsert_keyword_candidate(run_id, payload)
+
+        self.assertFalse(created_again)
+        self.assertFalse(activated_again)
+        self.assertEqual(self.store.keyword_candidate_count("active"), 1)
+        self.assertEqual(self.store.active_keyword_candidates()[0].impressions, 55)
+
 
 if __name__ == "__main__":
     unittest.main()

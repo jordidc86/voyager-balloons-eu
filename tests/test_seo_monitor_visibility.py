@@ -209,7 +209,7 @@ class VisibilityTests(unittest.TestCase):
         self.assertEqual(payload["backlinks_filters"], ["dofollow", "=", True])
 
     @patch("seo_monitor.checks.keyword_demand._overview")
-    @patch("seo_monitor.checks.keyword_demand.load_keywords")
+    @patch("seo_monitor.checks.keyword_demand.load_keyword_inventory")
     def test_keyword_demand_uses_native_market_language_and_records_opportunity(self, load_keywords, overview) -> None:
         load_keywords.return_value = [{
             "keyword": "hot air balloon segovia",
@@ -234,13 +234,23 @@ class VisibilityTests(unittest.TestCase):
             run_id = store.start_job("keyword_demand")
             result = keyword_demand.run(config, store, run_id, settings)
 
-        self.assertEqual(overview.call_args.args[2:4], ("es", 2724))
+        self.assertEqual(overview.call_args.args[2:4], ("en", 2724))
         self.assertEqual(result.summary["keywords_with_data"], 1)
         self.assertEqual(result.summary["opportunities"], 1)
         self.assertEqual(result.summary["provider_cost_usd"], 0.012)
 
+    def test_keyword_demand_uses_each_language_in_the_portugal_market(self) -> None:
+        self.assertEqual(
+            keyword_demand._market({"cluster": "braganca_en", "language_code": "en"}),
+            ("Portugal", "en", 2620),
+        )
+        self.assertEqual(
+            keyword_demand._market({"cluster": "braganca", "language_code": "es"}),
+            ("Portugal", "es", 2620),
+        )
+
     @patch("seo_monitor.checks.rank._search")
-    @patch("seo_monitor.checks.rank.load_keywords")
+    @patch("seo_monitor.checks.rank.load_keyword_inventory")
     def test_rank_run_uses_configured_thresholds(self, load_keywords, search) -> None:
         load_keywords.return_value = [{
             "keyword": "paseo en globo braganza",
@@ -348,7 +358,7 @@ class VisibilityTests(unittest.TestCase):
         settings = replace(Settings.from_env(), dataforseo_login="login", dataforseo_password="password")
         config = load_config(settings)
 
-        with patch("seo_monitor.checks.rank.load_keywords", return_value=[{
+        with patch("seo_monitor.checks.rank.load_keyword_inventory", return_value=[{
             "keyword": "hot air balloon madrid day trip",
             "location_name": "Madrid Spain",
             "location_code": "1005493",

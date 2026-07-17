@@ -9,7 +9,8 @@
     "main_domain": "voyagerballoons.eu",
     "shop_domain": "shop.voyagerballoons.eu",
     "google_tag_id": "GT-55NTF5CN",
-    "google_ads_id": "AW-11564692382"
+    "google_ads_id": "AW-11564692382",
+    "funnel_tracking_start_date": "2026-07-17"
   },
   "strategic_pages": [
     {"name": "Home ES", "url": "https://www.voyagerballoons.eu/", "canonical": "https://www.voyagerballoons.eu/", "severity": "P0"},
@@ -53,6 +54,21 @@
       {"keyword": "passeio de balao braganca", "language_code": "pt", "location_label": "Braganca centro", "location_coordinate": "41.8061,-6.7567,12z", "required": false, "priority": "P1"}
     ]
   },
+  "keyword_discovery": {
+    "enabled": true,
+    "minimum_impressions_28d": 20,
+    "maximum_candidates_per_run": 20,
+    "maximum_auto_active_keywords": 6,
+    "commercial_terms": ["globo", "balloon", "balão", "balao"],
+    "excluded_terms": [
+      "voyager",
+      "globos boreal",
+      "siempre en las nubes",
+      "aerotours",
+      "aerodifusion",
+      "aerodifusión"
+    ]
+  },
   "ai_visibility": {
     "providers": [
       {"name": "chat_gpt", "model_name": "gpt-4.1-mini"},
@@ -86,6 +102,8 @@
     "cls_warning": 0.1,
     "organic_click_drop_percent": 30,
     "organic_conversion_drop_percent": 30,
+    "ga4_funnel_minimum_complete_days": 2,
+    "ga4_funnel_minimum_shop_sessions": 50,
     "rank_drop_positions": 3,
     "rank_drop_history_window": 7,
     "rank_drop_minimum_history": 3,

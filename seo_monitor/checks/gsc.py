@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 from datetime import date, timedelta
-from urllib.parse import quote
+from urllib.parse import quote, urlsplit
 
-from ..config import Settings
+from ..config import Settings, load_keywords
 from ..google_auth import authorized_session
 from ..storage import Store
 from ..types import AlertSpec, CheckResult
@@ -37,8 +37,138 @@ def _rows_by_key(rows: list[dict]) -> dict[str, dict]:
     return {str(row.get("keys", [""])[0]): row for row in rows}
 
 
+def _candidate_route(query: str, page: str) -> dict[str, str]:
+    text = query.casefold()
+    path = urlsplit(page).path.casefold()
+    if "/pt/" in path or any(token in text for token in (" balão", " balao", "voo ", "passeio ")):
+        language_code = "pt"
+        location_name = "Portugal"
+        location_code = "2620"
+    elif "/en/" in path or any(token in text for token in ("balloon", "things to do", "day trip")):
+        language_code = "en"
+        location_name = "Madrid Spain"
+        location_code = "1005493"
+    else:
+        language_code = "es"
+        location_name = "Madrid Spain"
+        location_code = "1005493"
+    if "bragan" in text or "bragan" in path:
+        cluster = "braganca"
+        if language_code == "pt":
+            location_name = "Braganca Portugal"
+            location_code = "9051350"
+        elif language_code == "en":
+            location_name = "Portugal"
+            location_code = "2620"
+        else:
+            location_name = "Spain"
+            location_code = "2724"
+    elif "regal" in text or "gift" in text or "regal" in path or "gift" in path:
+        cluster = "gift"
+    elif "comfort" in text or "comfort" in path or "pareja" in text or "couple" in text:
+        cluster = "comfort"
+    elif "madrid" in text or "madrid" in path or "day trip" in text:
+        cluster = "madrid"
+    else:
+        cluster = "segovia"
+    return {
+        "language_code": language_code,
+        "location_name": location_name,
+        "location_code": location_code,
+        "cluster": cluster,
+    }
+
+
+def _discover_keyword_candidates(
+    rows: list[dict],
+    existing_keywords: set[str],
+    discovery_config: dict,
+) -> list[dict]:
+    minimum_impressions = float(discovery_config.get("minimum_impressions_28d", 20))
+    commercial_terms = tuple(
+        str(term).casefold() for term in discovery_config.get(
+            "commercial_terms",
+            ["globo", "balloon", "balão", "balao"],
+        )
+    )
+    excluded_terms = tuple(
+        str(term).casefold() for term in discovery_config.get("excluded_terms", ["voyager"])
+    )
+    grouped: dict[str, dict] = {}
+    for row in rows:
+        keys = row.get("keys", [])
+        if len(keys) < 2:
+            continue
+        query = " ".join(str(keys[0]).casefold().split())
+        page = str(keys[1])
+        if not query or query in existing_keywords:
+            continue
+        if not any(term in query for term in commercial_terms) or any(term in query for term in excluded_terms):
+            continue
+        parsed = urlsplit(page)
+        if parsed.netloc not in {"www.voyagerballoons.eu", "shop.voyagerballoons.eu"}:
+            continue
+        blocked_prefixes = (
+            "/cart",
+            "/carrito",
+            "/checkout",
+            "/finalizar-compra",
+            "/my-account",
+            "/mi-cuenta",
+            "/wp-",
+            "/tag/",
+            "/feed/",
+            "/categoria-producto/",
+            "/etiqueta-producto/",
+        )
+        if parsed.query or parsed.path.casefold().startswith(blocked_prefixes):
+            continue
+        impressions = float(row.get("impressions", 0) or 0)
+        clicks = float(row.get("clicks", 0) or 0)
+        current = grouped.setdefault(query, {
+            "query": query,
+            "impressions": 0.0,
+            "clicks": 0.0,
+            "weighted_position": 0.0,
+            "target_url": page,
+            "best_page_score": (-1.0, -1.0),
+        })
+        current["impressions"] += impressions
+        current["clicks"] += clicks
+        current["weighted_position"] += float(row.get("position", 0) or 0) * impressions
+        page_score = (clicks, impressions)
+        if page_score > current["best_page_score"]:
+            current["target_url"] = page
+            current["best_page_score"] = page_score
+
+    candidates = []
+    for current in grouped.values():
+        impressions = current["impressions"]
+        if impressions < minimum_impressions:
+            continue
+        target_parts = urlsplit(current["target_url"])
+        target_url = f"{target_parts.scheme}://{target_parts.netloc}{target_parts.path.rstrip('/') or '/'}"
+        position = current["weighted_position"] / impressions if impressions else 0
+        candidates.append({
+            "query": current["query"],
+            **_candidate_route(current["query"], target_url),
+            "device": "mobile",
+            "target_url": target_url,
+            "priority": "P1",
+            "source": "gsc",
+            "impressions": impressions,
+            "clicks": current["clicks"],
+            "ctr": current["clicks"] / impressions if impressions else 0,
+            "position": position,
+        })
+    candidates.sort(
+        key=lambda item: (item["impressions"], item["clicks"], -item["position"]),
+        reverse=True,
+    )
+    return candidates[:int(discovery_config.get("maximum_candidates_per_run", 20))]
+
+
 def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckResult:
-    del store, run_id
     result = CheckResult(job_name="gsc")
     if not settings.google_service_account_json:
         result.status = "skipped"
@@ -59,6 +189,18 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
     previous_query_rows = _query(session, settings.gsc_property, previous_start, previous_end, ["query"], row_limit=5000)
     country_rows = _query(session, settings.gsc_property, current_start, current_end, ["country"])
     device_rows = _query(session, settings.gsc_property, current_start, current_end, ["device"])
+    discovery_config = config.get("keyword_discovery", {})
+    discovery_rows = []
+    if discovery_config.get("enabled", True):
+        discovery_start = current_end - timedelta(days=27)
+        discovery_rows = _query(
+            session,
+            settings.gsc_property,
+            discovery_start,
+            current_end,
+            ["query", "page"],
+            row_limit=25000,
+        )
 
     for period, values in (("current_7d", current), ("previous_7d", previous)):
         for name, value in values.items():
@@ -156,6 +298,50 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
         if query not in previous_queries and float(row.get("impressions", 0)) >= minimum_impressions
     ]
 
+    static_keywords = {
+        " ".join(row["keyword"].casefold().split())
+        for row in load_keywords(settings)
+    }
+    candidates = _discover_keyword_candidates(discovery_rows, static_keywords, discovery_config)
+    active_candidates = store.active_keyword_candidates(
+        limit=int(discovery_config.get("maximum_auto_active_keywords", 6))
+    )
+    active_queries = {candidate.query for candidate in active_candidates}
+    available_slots = max(
+        0,
+        int(discovery_config.get("maximum_auto_active_keywords", 6)) - store.keyword_candidate_count("active"),
+    )
+    created_candidates = 0
+    activated_candidates = []
+    for candidate in candidates:
+        if candidate["query"] in active_queries:
+            candidate["status"] = "active"
+        elif available_slots > 0:
+            candidate["status"] = "active"
+            available_slots -= 1
+        else:
+            candidate["status"] = "candidate"
+        _, created, activated = store.upsert_keyword_candidate(run_id, candidate)
+        created_candidates += int(created)
+        if activated:
+            activated_candidates.append(candidate)
+    if activated_candidates:
+        result.alerts.append(AlertSpec(
+            dedupe_key="gsc:new-commercial-keywords",
+            severity="P2",
+            category="gsc",
+            title="Nuevas consultas comerciales incorporadas al seguimiento",
+            message=(
+                f"Search Console ha activado {len(activated_candidates)} consultas reales nuevas "
+                "sin superar el límite de inventario dinámico."
+            ),
+            action="Revisarlas en el informe semanal; solo crear o modificar contenido cuando la intención y la landing posicionada lo justifiquen.",
+            evidence_url="https://search.google.com/search-console/performance/search-analytics?resource_id=sc-domain:voyagerballoons.eu",
+            metadata={"queries": activated_candidates},
+        ))
+    result.add_metric("keyword_candidates_discovered", len(candidates), source="gsc_discovery")
+    result.add_metric("keyword_candidates_activated", len(activated_candidates), source="gsc_discovery")
+
     result.summary = {
         "current_period": [current_start.isoformat(), current_end.isoformat()],
         "previous_period": [previous_start.isoformat(), previous_end.isoformat()],
@@ -168,6 +354,10 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
         "page_declines": len(page_declines),
         "ctr_opportunities": len(opportunities),
         "new_queries": len(new_queries),
+        "keyword_candidates": len(candidates),
+        "keyword_candidates_created": created_candidates,
+        "keyword_candidates_activated": len(activated_candidates),
+        "dynamic_keywords_active": store.keyword_candidate_count("active"),
         "alerts": len(result.alerts),
     }
     return result

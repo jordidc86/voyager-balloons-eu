@@ -100,7 +100,13 @@ def _multi_dimension_report(
     return rows
 
 
-def _commerce_diagnostics(commerce_rows: list[dict], channel_host_rows: list[dict], shop_domain: str) -> dict:
+def _commerce_diagnostics(
+    commerce_rows: list[dict],
+    channel_host_rows: list[dict],
+    shop_domain: str,
+    minimum_shop_sessions: float = 100,
+    evaluation_ready: bool = True,
+) -> dict:
     event_totals: dict[str, dict[str, float]] = {}
     for row in commerce_rows:
         event_name = row.get("eventName", "")
@@ -123,7 +129,7 @@ def _commerce_diagnostics(commerce_rows: list[dict], channel_host_rows: list[dic
     purchases = event_totals.get("purchase", {})
     add_to_cart = event_totals.get("add_to_cart", {}).get("eventCount", 0)
     begin_checkout = event_totals.get("begin_checkout", {}).get("eventCount", 0)
-    enough_shop_traffic = shop_sessions >= 100
+    enough_shop_traffic = shop_sessions >= minimum_shop_sessions
     return {
         "shop_sessions": shop_sessions,
         "shop_direct_sessions": direct_sessions,
@@ -133,10 +139,23 @@ def _commerce_diagnostics(commerce_rows: list[dict], channel_host_rows: list[dic
         "begin_checkout": begin_checkout,
         "purchases": purchases.get("eventCount", 0),
         "purchase_revenue": purchases.get("totalRevenue", 0),
-        "add_to_cart_missing": enough_shop_traffic and add_to_cart == 0,
-        "begin_checkout_missing": enough_shop_traffic and begin_checkout == 0,
-        "funnel_missing": enough_shop_traffic and (add_to_cart == 0 or begin_checkout == 0),
+        "minimum_shop_sessions": minimum_shop_sessions,
+        "evaluation_ready": evaluation_ready and enough_shop_traffic,
+        "add_to_cart_missing": evaluation_ready and enough_shop_traffic and add_to_cart == 0,
+        "begin_checkout_missing": evaluation_ready and enough_shop_traffic and begin_checkout == 0,
+        "funnel_missing": evaluation_ready and enough_shop_traffic and (add_to_cart == 0 or begin_checkout == 0),
     }
+
+
+def _funnel_window(config: dict, current_end: date, default_start: date) -> tuple[date, int, bool]:
+    configured = config.get("tracking", {}).get("funnel_tracking_start_date")
+    try:
+        start = max(default_start, date.fromisoformat(str(configured))) if configured else default_start
+    except ValueError:
+        start = default_start
+    complete_days = max(0, (current_end - start).days + 1)
+    minimum_days = int(config.get("thresholds", {}).get("ga4_funnel_minimum_complete_days", 2))
+    return start, complete_days, complete_days >= minimum_days
 
 
 def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckResult:
@@ -195,7 +214,51 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
         ["sessionDefaultChannelGroup", "hostName"],
         ["sessions", "keyEvents", "totalRevenue"],
     )
-    diagnostics = _commerce_diagnostics(commerce_rows, channel_host_rows, "shop.voyagerballoons.eu")
+    historical_diagnostics = _commerce_diagnostics(
+        commerce_rows,
+        channel_host_rows,
+        "shop.voyagerballoons.eu",
+        evaluation_ready=False,
+    )
+    funnel_start, funnel_complete_days, funnel_days_ready = _funnel_window(config, current_end, commerce_start)
+    funnel_rows: list[dict] = []
+    funnel_channel_host_rows: list[dict] = []
+    if funnel_start <= current_end:
+        funnel_rows = _multi_dimension_report(
+            session,
+            settings.ga4_property_id,
+            funnel_start,
+            current_end,
+            ["eventName", "hostName"],
+            ["eventCount", "keyEvents", "totalRevenue"],
+            dimension_filter={
+                "filter": {
+                    "fieldName": "eventName",
+                    "inListFilter": {
+                        "values": ["purchase", "begin_checkout", "add_to_cart"],
+                    },
+                }
+            },
+        )
+        funnel_channel_host_rows = _multi_dimension_report(
+            session,
+            settings.ga4_property_id,
+            funnel_start,
+            current_end,
+            ["sessionDefaultChannelGroup", "hostName"],
+            ["sessions", "keyEvents", "totalRevenue"],
+        )
+    minimum_funnel_sessions = float(
+        config.get("thresholds", {}).get("ga4_funnel_minimum_shop_sessions", 50)
+    )
+    diagnostics = _commerce_diagnostics(
+        funnel_rows,
+        funnel_channel_host_rows,
+        "shop.voyagerballoons.eu",
+        minimum_shop_sessions=minimum_funnel_sessions,
+        evaluation_ready=funnel_days_ready,
+    )
+    diagnostics["complete_days"] = funnel_complete_days
 
     for period, values in (("current_7d", current), ("previous_7d", previous)):
         for name, value in values.items():
@@ -226,6 +289,14 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
                 "host_name": row.get("hostName", ""),
             },
         )
+    for row in funnel_rows:
+        for name in ("eventCount", "keyEvents", "totalRevenue"):
+            result.add_metric(
+                name,
+                row.get(name, 0),
+                source="ga4_commerce_post_fix",
+                dimensions={"event_name": row.get("eventName", ""), "host_name": row.get("hostName", "")},
+            )
 
     threshold = float(config["thresholds"].get("organic_conversion_drop_percent", 30))
     previous_events = previous.get("keyEvents", 0)
@@ -272,16 +343,16 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
             evidence_url="https://analytics.google.com/",
             metadata=diagnostics,
         ))
-    if diagnostics["technical_sessions"] >= 10:
+    if historical_diagnostics["technical_sessions"] >= 10:
         result.alerts.append(AlertSpec(
             dedupe_key="ga4:technical-host-traffic",
             severity="P2",
             category="ga4",
             title="Tráfico técnico contamina la propiedad GA4",
-            message=f"Se detectan {diagnostics['technical_sessions']:.0f} sesiones de localhost/127.0.0.1 en 28 días.",
+            message=f"Se detectan {historical_diagnostics['technical_sessions']:.0f} sesiones de localhost/127.0.0.1 en 28 días.",
             action="Desactivar la etiqueta en desarrollo o aplicar un filtro de tráfico interno verificado, sin excluir tráfico real de web y tienda.",
             evidence_url="https://analytics.google.com/",
-            metadata=diagnostics,
+            metadata=historical_diagnostics,
         ))
 
     result.summary = {
@@ -297,8 +368,12 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
             if row.get("keyEvents", 0) > 0 or row.get("eventName") in {"purchase", "begin_checkout", "add_to_cart"}
         ][:20],
         "commerce_period": [commerce_start.isoformat(), current_end.isoformat()],
+        "funnel_evaluation_period": [funnel_start.isoformat(), current_end.isoformat()],
+        "funnel_evaluation_ready": diagnostics["evaluation_ready"],
         "commerce_diagnostics": diagnostics,
+        "commerce_baseline_diagnostics": historical_diagnostics,
         "commerce_events": commerce_rows,
+        "funnel_events": funnel_rows,
         "channel_host_rows": channel_host_rows[:30],
         "alerts": len(result.alerts),
     }
