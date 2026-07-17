@@ -21,7 +21,7 @@ from .checks import (
     tracking,
 )
 from .config import Settings, load_config
-from .costs import dataforseo_run_budget
+from .costs import dataforseo_account_budget, dataforseo_run_budget
 from .notifications import send_email
 from .reporting import render_markdown
 from .storage import Store
@@ -65,6 +65,40 @@ def execute(job_name: str, settings: Settings, store: Store) -> tuple[object, li
                     summary={"reason": "DataForSEO pausado mediante DATAFORSEO_ENABLED"},
                 )
                 return result, store.save_result(run_id, result)
+            provider_budget = None
+            if settings.dataforseo_login and settings.dataforseo_password:
+                try:
+                    provider_budget = dataforseo_account_budget(settings)
+                except Exception as exc:
+                    result = CheckResult(
+                        job_name=job_name,
+                        status="skipped",
+                        summary={
+                            "reason": "No se pudo comprobar el presupuesto de DataForSEO",
+                            "error": str(exc),
+                        },
+                    )
+                    return result, store.save_result(run_id, result)
+                balance = float(provider_budget["balance"])
+                day_limit = float(provider_budget["day_limit_usd"])
+                day_spent = float(provider_budget["day_spent_usd"])
+                daily_reserve = float(
+                    config.get("thresholds", {}).get("dataforseo_daily_budget_reserve_usd", 0.02)
+                )
+                daily_remaining = day_limit - day_spent - daily_reserve if day_limit > 0 else balance
+                if balance <= 0 or daily_remaining <= 0:
+                    result = CheckResult(
+                        job_name=job_name,
+                        status="skipped",
+                        summary={
+                            "reason": "Presupuesto diario de DataForSEO alcanzado",
+                            "provider_day": provider_budget["day"],
+                            "provider_day_spent_usd": round(day_spent, 4),
+                            "provider_day_limit_usd": round(day_limit, 4),
+                            "provider_balance_usd": round(balance, 4),
+                        },
+                    )
+                    return result, store.save_result(run_id, result)
             now = datetime.now(timezone.utc)
             month_start = datetime(now.year, now.month, 1, tzinfo=timezone.utc)
             budget = float(config.get("thresholds", {}).get("dataforseo_monthly_budget_usd", 25))
@@ -81,9 +115,22 @@ def execute(job_name: str, settings: Settings, store: Store) -> tuple[object, li
                 )
                 return result, store.save_result(run_id, result)
             configured_run_budget = dataforseo_run_budget(config)
+            provider_remaining = configured_run_budget
+            if provider_budget:
+                day_limit = float(provider_budget["day_limit_usd"])
+                day_spent = float(provider_budget["day_spent_usd"])
+                daily_reserve = float(
+                    config.get("thresholds", {}).get("dataforseo_daily_budget_reserve_usd", 0.02)
+                )
+                if day_limit > 0:
+                    provider_remaining = max(0.0, day_limit - day_spent - daily_reserve)
             config["_runtime"] = {
                 **config.get("_runtime", {}),
-                "dataforseo_budget_remaining_usd": min(configured_run_budget, max(0.0, budget - spent)),
+                "dataforseo_budget_remaining_usd": min(
+                    configured_run_budget,
+                    max(0.0, budget - spent),
+                    provider_remaining,
+                ),
             }
         if job_name in {
             "gsc",
