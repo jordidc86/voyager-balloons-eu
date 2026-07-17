@@ -9,7 +9,7 @@ from pathlib import Path
 from .config import Settings, load_config, load_keywords
 from .notifications import email_configured
 from .reporting import render_markdown
-from .runner import JOBS, execute
+from .runner import JOBS, execute, send_digest
 from .storage import Store
 from .worker import run_due_once, run_forever
 
@@ -54,6 +54,7 @@ def main() -> int:
     report_parser.add_argument("--output")
     subparsers.add_parser("worker")
     subparsers.add_parser("tick")
+    subparsers.add_parser("verify-connected")
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -77,6 +78,28 @@ def main() -> int:
         summary = run_due_once(settings, store)
         print(json.dumps(summary, ensure_ascii=False, indent=2))
         return 1 if summary["failed"] else 0
+    if args.command == "verify-connected":
+        exit_code = 0
+        for job_name in ("gsc", "indexing", "ga4", "pagespeed"):
+            try:
+                result, changed = execute(job_name, settings, store)
+                print(json.dumps({
+                    "job": job_name,
+                    "status": result.status,
+                    "summary": result.summary,
+                    "open_alerts_in_run": len(result.alerts),
+                    "changed_alerts": len(changed),
+                }, ensure_ascii=False))
+            except Exception as exc:
+                print(json.dumps({"job": job_name, "status": "failed", "error": str(exc)}, ensure_ascii=False), file=sys.stderr)
+                exit_code = 1
+        try:
+            report = send_digest(store, settings)
+            print(json.dumps({"digest": "sent", "characters": len(report)}, ensure_ascii=False))
+        except Exception as exc:
+            print(json.dumps({"digest": "failed", "error": str(exc)}, ensure_ascii=False), file=sys.stderr)
+            exit_code = 1
+        return exit_code
 
     jobs = list(JOBS) if args.job == "all" else [args.job]
     exit_code = 0
