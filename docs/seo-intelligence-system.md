@@ -139,7 +139,7 @@ Proyecto Railway `zealous-creativity`, entorno `production`:
 6. Un reinicio del worker conserva histórico y no duplica trabajos.
 7. El informe semanal distingue acciones urgentes, estratégicas y observacionales.
 
-## Estado del 17 de julio de 2026
+## Estado del 18 de julio de 2026
 
 - Crawl productivo: 151 URLs, 12 sitemaps, 2.937 enlaces internos, 0 destinos rotos, 0 errores JSON-LD.
 - Prueba de compra completa: clásico, oferta, privado, Comfort y Bragança llegan correctamente hasta checkout con formulario y medios de pago visibles.
@@ -152,7 +152,7 @@ Proyecto Railway `zealous-creativity`, entorno `production`:
 - Validación productiva repetida: 14/14 URLs, 5/5 compras, 151 páginas, 2.937 enlaces internos, 0 enlaces rotos y 0 errores de schema.
 - Medición validada en navegador: el salto web → producto Comfort queda decorado con `_gl`; las dos propiedades comparten `GT-55NTF5CN`/`AW-11564692382` y WooCommerce declara `add_to_cart` y `purchase`.
 - Control diario de integridad Analytics: valida etiquetas, linker, eventos declarados y que WP Rocket no retrase el listener WooCommerce de Site Kit.
-- Tests locales: 74/74 correctos antes del siguiente despliegue.
+- Tests locales: 75/75 correctos antes del siguiente despliegue.
 - Protección operativa añadida: techo de 8 USD/mes, 1 USD por ejecución y aviso a 0,75 USD para DataForSEO; las consultas secundarias se difieren automáticamente para evitar gasto repetido.
 - Google, GA4, PageSpeed, SMTP, Railway, PostgreSQL y DataForSEO están desplegados y verificados con datos reales.
 - Primera inteligencia de demanda: 10 keywords con datos y 9 oportunidades fuera del top 10 por 0,0252 USD en la ejecución del 17 de julio.
@@ -161,6 +161,7 @@ Proyecto Railway `zealous-creativity`, entorno `production`:
 - Auditoría GA4 de 28 días: `purchase` registra 2 compras y 480 €, y el canal se conserva al entrar en la tienda. Se corrigió la causa probable del `add_to_cart` ausente excluyendo solo el listener WooCommerce de Site Kit del retraso de WP Rocket; el monitor comprobará diariamente que siga cargando de inmediato.
 - `begin_checkout` se emite mediante un snippet JavaScript seguro en el checkout, después de que Site Kit esté disponible y respetando el consentimiento. La integridad publicada pasa 9/9 comprobaciones. Para no mezclar el fallo antiguo con el código reparado, el embudo se evalúa desde el 17 de julio y solo genera alerta tras dos días completos y 50 sesiones de tienda.
 - Los tres avisos urgentes iniciales de Maps y de `segovia balloon ride` se cerraron tras recalibrar el ruido: Maps requiere tres ausencias consecutivas y se trata como P2; una caída orgánica solo escala a P1 cuando la referencia histórica y una segunda observación degradada la confirman.
+- DataForSEO detectó una canibalización inglesa real: para `segovia balloon ride` Google mostraba `/en/` en lugar de `/en/hot-air-balloon-segovia`. La home inglesa se ha reorientado como selector de destinos España/Portugal y la landing dedicada conserva la intención exacta de Segovia, con sitemap y fuentes para IA actualizados.
 - La propiedad recibe tráfico de `localhost`/`127.0.0.1`; el script propio ya no carga en esos hosts y el monitor mantiene la contaminación histórica como aviso separado hasta que salga de la ventana de 28 días.
 - Descubrimiento real de Search Console validado: 20 candidatas comerciales detectadas en 28 días, 6 activadas como inventario dinámico y 2 oportunidades de CTR, sin incorporar búsquedas branded, marcas competidoras ni URLs técnicas.
 - PageSpeed completo revalidado: 20/20 pruebas correctas a nivel de proveedor. CrUX confirma que el principal problema real de la tienda es TTFB (p75 3,13 s), con INP y CLS correctos; la ficha Bragança obtiene SEO 92 por controles de cantidad de Astra implementados como enlaces no rastreables.

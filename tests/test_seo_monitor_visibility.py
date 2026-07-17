@@ -185,6 +185,13 @@ class VisibilityTests(unittest.TestCase):
         self.assertEqual(_absence_streak(history, None), 3)
         self.assertEqual(_absence_streak(history, 8), 0)
 
+    def test_maps_two_absences_are_not_enough_for_configured_alert(self) -> None:
+        history = [Mock(position=None), Mock(position=4)]
+        streak = _absence_streak(history, None)
+
+        self.assertEqual(streak, 2)
+        self.assertLess(streak, 3)
+
     def test_maps_drop_requires_stable_history_and_confirmation(self) -> None:
         history = [Mock(position=8), Mock(position=3), Mock(position=3)]
         drop = _maps_drop(history, 8, 3)

@@ -26,7 +26,7 @@ Bookings and gift tickets are handled through the shop at https://shop.voyagerba
 Important booking links:
 
 - Main website: https://www.voyagerballoons.eu/
-- English home: https://www.voyagerballoons.eu/en/
+- English destinations hub for Spain and Portugal: https://www.voyagerballoons.eu/en/
 - Main flight page: https://www.voyagerballoons.eu/vuelo-en-globo-segovia
 - Spanish broad-intent hub for globos aerostaticos in Segovia: https://www.voyagerballoons.eu/globos-aerostaticos-segovia
 - English Segovia flight page: https://www.voyagerballoons.eu/en/hot-air-balloon-segovia
