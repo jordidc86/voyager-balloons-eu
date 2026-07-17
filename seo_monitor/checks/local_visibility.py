@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from statistics import median
+
 import requests
 
 from ..config import Settings
@@ -9,6 +11,33 @@ from ..types import AlertSpec, CheckResult
 
 
 ENDPOINT = "https://api.dataforseo.com/v3/serp/google/maps/live/advanced"
+
+
+def _absence_streak(history: list, current_position: float | None) -> int:
+    if current_position is not None:
+        return 0
+    streak = 1
+    for item in history:
+        if item.position is not None:
+            break
+        streak += 1
+    return streak
+
+
+def _drop_assessment(history: list, current_position: float | None, threshold: float) -> dict | None:
+    if current_position is None:
+        return None
+    positions = [float(item.position) for item in history if item.position is not None]
+    if len(positions) < 3:
+        return None
+    baseline = float(median(positions))
+    if float(current_position) - baseline < threshold:
+        return None
+    return {
+        "baseline": baseline,
+        "current": float(current_position),
+        "confirmed": positions[0] - baseline >= threshold,
+    }
 
 
 def _rating(item: dict) -> tuple[float | None, int | None]:
@@ -67,7 +96,12 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
         if not budget_available(config, total_cost):
             budget_limited = True
             break
-        previous = store.previous_local_ranking(check["keyword"], check["location_label"])
+        history = store.local_ranking_history(
+            check["keyword"],
+            check["location_label"],
+            limit=int(config["thresholds"].get("local_visibility_history_window", 7)),
+        )
+        previous = history[0] if history else None
         try:
             api_result, cost = _search(settings, check)
             total_cost += cost
@@ -119,28 +153,44 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
         )
 
         key = f"local_visibility:{check['location_label']}:{check['keyword']}"
-        if previous and previous.position is not None and position is not None:
-            if position - previous.position >= config["thresholds"].get("rank_drop_positions", 3):
-                result.alerts.append(AlertSpec(
-                    dedupe_key=f"{key}:drop",
-                    severity="P1" if check.get("priority") == "P0" else "P2",
-                    category="local_visibility",
-                    title=f"Caída en Google Maps: {check['keyword']}",
-                    message=f"El perfil pasa de la posición {previous.position:.0f} a {position:.0f} en {check['location_label']}.",
-                    action="Revisar cambios del perfil, reseñas recientes, categoría, servicios y competidores del mapa antes de editar la ficha.",
-                    evidence_url=api_result.get("check_url"),
-                    metadata={"previous": previous.position, "current": position, "top_results": payload["top_results"]},
-                ))
-        elif check.get("required") and previous and previous.position is None and position is None:
+        drop = _drop_assessment(
+            history,
+            position,
+            float(config["thresholds"].get("rank_drop_positions", 3)),
+        )
+        if drop:
+            severity = "P1" if check.get("priority") == "P0" and drop["confirmed"] else "P2"
+            result.alerts.append(AlertSpec(
+                dedupe_key=f"{key}:drop",
+                severity=severity,
+                category="local_visibility",
+                title=f"Caída en Google Maps: {check['keyword']}",
+                message=(
+                    f"La ficha está en la posición {position:.0f}, frente a una referencia estable "
+                    f"de {drop['baseline']:.0f}, en {check['location_label']}."
+                ),
+                action="Confirmar la tendencia y revisar reseñas, categoría, servicios y competidores del mapa antes de editar la ficha.",
+                evidence_url=api_result.get("check_url"),
+                metadata={**drop, "top_results": payload["top_results"]},
+            ))
+        absence_streak = _absence_streak(history, position)
+        if (
+            check.get("required")
+            and absence_streak >= int(config["thresholds"].get("local_visibility_absence_confirmations", 3))
+        ):
             result.alerts.append(AlertSpec(
                 dedupe_key=f"{key}:absent",
-                severity="P1",
+                severity="P2",
                 category="local_visibility",
-                title=f"Perfil ausente en Google Maps: {check['keyword']}",
-                message=f"Voyager no aparece entre los 20 resultados móviles durante dos mediciones en {check['location_label']}.",
+                title=f"Sin visibilidad top 20 en Google Maps: {check['keyword']}",
+                message=(
+                    f"La ficha no aparece entre los 20 resultados móviles durante "
+                    f"{absence_streak} mediciones consecutivas en {check['location_label']}. "
+                    "Esto no significa que el perfil haya desaparecido."
+                ),
                 action="Comparar las fichas visibles, comprobar elegibilidad del área de servicio y preparar mejoras verificables de categoría, servicios, fotos y reseñas.",
                 evidence_url=api_result.get("check_url"),
-                metadata={"top_results": payload["top_results"]},
+                metadata={"absence_streak": absence_streak, "top_results": payload["top_results"]},
             ))
 
     if failures:

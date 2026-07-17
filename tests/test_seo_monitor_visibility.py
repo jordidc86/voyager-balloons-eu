@@ -7,7 +7,7 @@ from pathlib import Path
 from unittest.mock import Mock, patch
 
 from seo_monitor.checks.ai_visibility import _extract_response
-from seo_monitor.checks.local_visibility import _rating
+from seo_monitor.checks.local_visibility import _absence_streak, _drop_assessment as _maps_drop, _rating
 from seo_monitor.config import Settings, load_config
 from seo_monitor.storage import Store
 from seo_monitor.checks import ai_visibility, backlink_gap, indexing, keyword_demand, local_visibility, rank
@@ -77,6 +77,18 @@ class VisibilityTests(unittest.TestCase):
 
     def test_maps_rating_object_is_normalized(self) -> None:
         self.assertEqual(_rating({"rating": {"value": 4.9, "votes_count": 365}}), (4.9, 365))
+
+    def test_maps_absence_requires_consecutive_observations(self) -> None:
+        history = [Mock(position=None), Mock(position=None), Mock(position=4)]
+        self.assertEqual(_absence_streak(history, None), 3)
+        self.assertEqual(_absence_streak(history, 8), 0)
+
+    def test_maps_drop_requires_stable_history_and_confirmation(self) -> None:
+        history = [Mock(position=8), Mock(position=3), Mock(position=3)]
+        drop = _maps_drop(history, 8, 3)
+        self.assertIsNotNone(drop)
+        self.assertTrue(drop["confirmed"])
+        self.assertEqual(drop["baseline"], 3)
 
     def test_paid_visibility_jobs_skip_cleanly_without_credentials(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

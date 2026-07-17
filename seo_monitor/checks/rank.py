@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
+from statistics import median
 import time
 from urllib.parse import urlsplit
 
@@ -25,6 +26,37 @@ def _domain(url: str | None) -> str | None:
     if not url:
         return None
     return urlsplit(url).netloc.lower().removeprefix("www.")
+
+
+def _normalized_url(url: str | None) -> str | None:
+    if not url:
+        return None
+    parts = urlsplit(url)
+    path = parts.path.rstrip("/") or "/"
+    return f"{parts.scheme.lower()}://{parts.netloc.lower()}{path}"
+
+
+def _drop_assessment(
+    history: list,
+    position: float | None,
+    depth: int,
+    threshold: float,
+    minimum_history: int = 3,
+) -> dict | None:
+    if len(history) < minimum_history:
+        return None
+    values = [float(item.position) if item.position is not None else float(depth + 1) for item in history]
+    baseline = float(median(values))
+    current = float(position) if position is not None else float(depth + 1)
+    if current - baseline < threshold:
+        return None
+    previous = values[0]
+    return {
+        "baseline": baseline,
+        "current": current,
+        "confirmed": previous - baseline >= threshold,
+        "observations": len(values),
+    }
 
 
 def _search(settings: Settings, row: dict[str, str], depth: int) -> tuple[dict, float]:
@@ -114,7 +146,13 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
     deferred = 0
 
     for row in keywords:
-        previous = store.previous_keyword_ranking(row["keyword"], row["location_name"], row["device"])
+        history = store.keyword_ranking_history(
+            row["keyword"],
+            row["location_name"],
+            row["device"],
+            limit=int(thresholds.get("rank_drop_history_window", 7)),
+        )
+        previous = history[0] if history else None
         depth = _depth_for(row, previous, thresholds)
         if depth is None:
             deferred += 1
@@ -157,18 +195,29 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
         )
 
         key = f"rank:{row['language_code']}:{row['location_name']}:{row['device']}:{row['keyword']}"
-        if previous and previous.position is not None and (position is not None or previous.position <= depth):
-            if position is None or position - previous.position >= threshold:
-                new_position = f">{depth}" if position is None else f"{position:.0f}"
-                result.alerts.append(AlertSpec(
-                    dedupe_key=f"{key}:drop",
-                    severity="P1" if row["priority"] == "P0" else "P2",
-                    category="rank",
-                    title=f"Pérdida de posición: {row['keyword']}",
-                    message=f"Voyager pasa de {previous.position:.0f} a {new_position} en {row['location_name']} ({row['device']}).",
-                    action="Comprobar SERP, URL posicionada, competidor ascendente, indexación y cambios recientes antes de modificar contenido.",
-                    evidence_url=row["target_url"], metadata={"previous": previous.position, "current": position, "top_domain": top_domain},
-                ))
+        drop = _drop_assessment(
+            history,
+            position,
+            depth,
+            threshold,
+            minimum_history=int(thresholds.get("rank_drop_minimum_history", 3)),
+        )
+        if drop:
+            new_position = f">{depth}" if position is None else f"{position:.0f}"
+            severity = "P1" if row["priority"] == "P0" and drop["confirmed"] else "P2"
+            result.alerts.append(AlertSpec(
+                dedupe_key=f"{key}:drop",
+                severity=severity,
+                category="rank",
+                title=f"Pérdida de posición: {row['keyword']}",
+                message=(
+                    f"Voyager está en {new_position}, frente a una referencia estable de "
+                    f"{drop['baseline']:.0f}, en {row['location_name']} ({row['device']})."
+                ),
+                action="Confirmar la tendencia, URL posicionada, competidor ascendente, indexación y cambios recientes antes de modificar contenido.",
+                evidence_url=row["target_url"],
+                metadata={**drop, "position": position, "top_domain": top_domain},
+            ))
         elif position is None and row["priority"] == "P0":
             result.alerts.append(AlertSpec(
                 dedupe_key=f"{key}:absent", severity="P2", category="rank",
@@ -176,6 +225,18 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
                 message=f"No se encuentra Voyager entre los {depth} primeros resultados en {row['location_name']} ({row['device']}).",
                 action="Auditar intención, indexación, autoridad y contenido de la landing objetivo; convertirlo en acción del backlog SEO.",
                 evidence_url=row["target_url"], metadata={"top_domain": top_domain},
+            ))
+
+        if ranking_url and _normalized_url(ranking_url) != _normalized_url(row["target_url"]):
+            result.alerts.append(AlertSpec(
+                dedupe_key=f"{key}:url-mismatch",
+                severity="P2",
+                category="rank",
+                title=f"Google posiciona otra URL: {row['keyword']}",
+                message=f"Google muestra {ranking_url} en lugar de la landing objetivo {row['target_url']}.",
+                action="Revisar canibalización, títulos, enlaces internos y relevancia de ambas URLs; no redirigir ni cambiar canonical sin validar la intención.",
+                evidence_url=row["target_url"],
+                metadata={"ranking_url": ranking_url, "target_url": row["target_url"], "position": position},
             ))
 
     if failures:

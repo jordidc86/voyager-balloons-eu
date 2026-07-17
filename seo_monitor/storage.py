@@ -173,8 +173,18 @@ class Store:
             ))
 
     def previous_keyword_ranking(self, keyword: str, location_name: str, device: str) -> KeywordRanking | None:
+        history = self.keyword_ranking_history(keyword, location_name, device, limit=1)
+        return history[0] if history else None
+
+    def keyword_ranking_history(
+        self,
+        keyword: str,
+        location_name: str,
+        device: str,
+        limit: int = 7,
+    ) -> list[KeywordRanking]:
         with self.sessions() as session:
-            return session.scalar(
+            return list(session.scalars(
                 select(KeywordRanking)
                 .where(
                     KeywordRanking.keyword == keyword,
@@ -182,7 +192,8 @@ class Store:
                     KeywordRanking.device == device,
                 )
                 .order_by(KeywordRanking.observed_at.desc())
-            )
+                .limit(limit)
+            ).all())
 
     def add_local_ranking(self, run_id: int, payload: dict) -> None:
         with self.sessions.begin() as session:
@@ -202,12 +213,22 @@ class Store:
             ))
 
     def previous_local_ranking(self, keyword: str, location_label: str) -> LocalRanking | None:
+        history = self.local_ranking_history(keyword, location_label, limit=1)
+        return history[0] if history else None
+
+    def local_ranking_history(
+        self,
+        keyword: str,
+        location_label: str,
+        limit: int = 7,
+    ) -> list[LocalRanking]:
         with self.sessions() as session:
-            return session.scalar(
+            return list(session.scalars(
                 select(LocalRanking)
                 .where(LocalRanking.keyword == keyword, LocalRanking.location_label == location_label)
                 .order_by(LocalRanking.observed_at.desc())
-            )
+                .limit(limit)
+            ).all())
 
     def add_ai_visibility_observation(self, run_id: int, payload: dict) -> None:
         with self.sessions.begin() as session:

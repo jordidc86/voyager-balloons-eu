@@ -4,7 +4,7 @@ import unittest
 from unittest.mock import Mock, patch
 
 from seo_monitor.checks.ai_visibility import _is_due as ai_is_due
-from seo_monitor.checks.rank import _depth_for, run as run_rank
+from seo_monitor.checks.rank import _depth_for, _drop_assessment, run as run_rank
 
 
 class SeoMonitorCadenceTests(unittest.TestCase):
@@ -45,6 +45,25 @@ class SeoMonitorCadenceTests(unittest.TestCase):
     def test_naive_stored_timestamp_is_treated_as_utc(self):
         self.assertTrue(ai_is_due(self.previous(29, naive=True), 28, now=self.now))
 
+    def test_rank_drop_uses_stable_median_instead_of_last_fluctuation(self):
+        history = [
+            SimpleNamespace(position=24),
+            SimpleNamespace(position=33),
+            SimpleNamespace(position=33),
+        ]
+        self.assertIsNone(_drop_assessment(history, 33, 100, 3))
+
+    def test_rank_drop_becomes_confirmed_after_two_bad_observations(self):
+        history = [
+            SimpleNamespace(position=20),
+            SimpleNamespace(position=10),
+            SimpleNamespace(position=10),
+        ]
+        drop = _drop_assessment(history, 20, 100, 3)
+        self.assertIsNotNone(drop)
+        self.assertTrue(drop["confirmed"])
+        self.assertEqual(drop["baseline"], 10)
+
     @patch("seo_monitor.checks.rank._search", return_value=({"items": []}, 0.01))
     @patch("seo_monitor.checks.rank.load_keywords")
     def test_rank_run_passes_thresholds_to_cadence_logic(self, load_keywords, search):
@@ -59,6 +78,7 @@ class SeoMonitorCadenceTests(unittest.TestCase):
         }]
         store = Mock()
         store.previous_keyword_ranking.return_value = None
+        store.keyword_ranking_history.return_value = []
         settings = SimpleNamespace(dataforseo_login="login", dataforseo_password="password")
         config = {
             "target_domains": ["www.voyagerballoons.eu"],

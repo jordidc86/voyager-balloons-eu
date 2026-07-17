@@ -115,6 +115,10 @@ class StoreTests(unittest.TestCase):
         previous_local = self.store.previous_local_ranking("vuelo en globo segovia", "Segovia centro")
         self.assertIsNotNone(previous_local)
         self.assertEqual(previous_local.position, 2)
+        self.assertEqual(
+            len(self.store.local_ranking_history("vuelo en globo segovia", "Segovia centro")),
+            1,
+        )
 
         ai_run = self.store.start_job("ai_visibility")
         self.store.add_ai_visibility_observation(ai_run, {
