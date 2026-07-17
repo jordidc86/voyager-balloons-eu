@@ -57,11 +57,18 @@ def _ask(settings: Settings, provider: dict, prompt: dict) -> tuple[dict, float]
         "model_name": provider["model_name"],
         "max_output_tokens": 1200,
         "temperature": 0,
-        "web_search": True,
-        "web_search_country_iso_code": prompt["country"],
-        "web_search_city": prompt["city"],
         "tag": prompt["id"],
     }
+    if provider["name"] == "chat_gpt":
+        payload.update({
+            "web_search": True,
+            "web_search_country_iso_code": prompt["country"],
+            "web_search_city": prompt["city"],
+        })
+    elif provider["name"] == "gemini":
+        payload["web_search"] = True
+    elif provider["name"] == "perplexity":
+        payload["web_search_country_iso_code"] = prompt["country"]
     response = requests.post(
         endpoint,
         auth=(settings.dataforseo_login or "", settings.dataforseo_password or ""),

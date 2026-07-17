@@ -37,6 +37,44 @@ class VisibilityTests(unittest.TestCase):
         self.assertIn("Voyager Balloons", text)
         self.assertEqual(citations[0]["url"], "https://www.voyagerballoons.eu/")
 
+    @patch("seo_monitor.checks.ai_visibility.requests.post")
+    def test_ai_provider_payloads_only_use_supported_localization(self, post) -> None:
+        response = Mock()
+        response.json.return_value = {
+            "tasks": [{
+                "status_code": 20000,
+                "cost": 0.01,
+                "result": [{"items": []}],
+            }],
+        }
+        post.return_value = response
+        settings = replace(Settings.from_env(), dataforseo_login="login", dataforseo_password="password")
+        prompt = {
+            "id": "pt-braganca",
+            "prompt": "Passeio de balao em Braganca?",
+            "country": "PT",
+            "city": "Braganca",
+        }
+
+        for name, model_name in (
+            ("chat_gpt", "gpt-4.1-mini"),
+            ("gemini", "gemini-2.5-flash"),
+            ("perplexity", "sonar"),
+        ):
+            ai_visibility._ask(settings, {"name": name, "model_name": model_name}, prompt)
+
+        chat_gpt = post.call_args_list[0].kwargs["json"][0]
+        gemini = post.call_args_list[1].kwargs["json"][0]
+        perplexity = post.call_args_list[2].kwargs["json"][0]
+        self.assertEqual(chat_gpt["web_search_city"], "Braganca")
+        self.assertEqual(chat_gpt["web_search_country_iso_code"], "PT")
+        self.assertTrue(gemini["web_search"])
+        self.assertNotIn("web_search_city", gemini)
+        self.assertNotIn("web_search_country_iso_code", gemini)
+        self.assertEqual(perplexity["web_search_country_iso_code"], "PT")
+        self.assertNotIn("web_search_city", perplexity)
+        self.assertNotIn("web_search", perplexity)
+
     def test_maps_rating_object_is_normalized(self) -> None:
         self.assertEqual(_rating({"rating": {"value": 4.9, "votes_count": 365}}), (4.9, 365))
 
