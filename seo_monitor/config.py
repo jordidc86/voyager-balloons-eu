@@ -33,6 +33,7 @@ class Settings:
     ga4_property_id: str | None
     dataforseo_login: str | None
     dataforseo_password: str | None
+    dataforseo_enabled: bool
     pagespeed_api_key: str | None
     alert_email_to: str | None
     heartbeat_url: str | None
@@ -53,6 +54,7 @@ class Settings:
             ga4_property_id=os.getenv("GA4_PROPERTY_ID") or None,
             dataforseo_login=os.getenv("DATAFORSEO_LOGIN") or None,
             dataforseo_password=os.getenv("DATAFORSEO_PASSWORD") or None,
+            dataforseo_enabled=env_bool("DATAFORSEO_ENABLED", True),
             pagespeed_api_key=os.getenv("PAGESPEED_API_KEY") or None,
             alert_email_to=os.getenv("SEO_ALERT_EMAIL_TO") or None,
             heartbeat_url=os.getenv("SEO_MONITOR_HEARTBEAT_URL") or None,

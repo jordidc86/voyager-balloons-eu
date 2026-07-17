@@ -58,6 +58,13 @@ def execute(job_name: str, settings: Settings, store: Store) -> tuple[object, li
     run_id = store.start_job(job_name)
     try:
         if job_name in PAID_JOBS:
+            if not settings.dataforseo_enabled:
+                result = CheckResult(
+                    job_name=job_name,
+                    status="skipped",
+                    summary={"reason": "DataForSEO pausado mediante DATAFORSEO_ENABLED"},
+                )
+                return result, store.save_result(run_id, result)
             now = datetime.now(timezone.utc)
             month_start = datetime(now.year, now.month, 1, tzinfo=timezone.utc)
             budget = float(config.get("thresholds", {}).get("dataforseo_monthly_budget_usd", 25))
