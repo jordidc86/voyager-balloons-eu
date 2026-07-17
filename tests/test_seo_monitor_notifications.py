@@ -8,6 +8,28 @@ from seo_monitor.notifications import email_configured, send_email, smtp_config
 
 
 class NotificationsTests(unittest.TestCase):
+    @patch("seo_monitor.notifications.smtplib.SMTP")
+    @patch("seo_monitor.notifications.requests.post")
+    @patch.dict(os.environ, {
+        "SEO_ALERT_EMAIL_TO": "info@voyagerballoons.eu",
+        "RESEND_API_KEY": "re_secret",
+        "RESEND_FROM": "Voyager Balloons <info@voyagerballoons.eu>",
+        "RESEND_REPLY_TO": "info@voyagerballoons.eu",
+        "SMTP_HOST": "smtp.example.com",
+        "SMTP_PORT": "587",
+        "SMTP_USER": "info@voyagerballoons.eu",
+    }, clear=True)
+    def test_resend_is_preferred_over_smtp(self, post, smtp_class) -> None:
+        self.assertTrue(email_configured())
+        send_email("Prueba", "Contenido")
+        post.assert_called_once()
+        request = post.call_args
+        self.assertEqual(request.args[0], "https://api.resend.com/emails")
+        self.assertEqual(request.kwargs["json"]["to"], ["info@voyagerballoons.eu"])
+        self.assertEqual(request.kwargs["json"]["reply_to"], "info@voyagerballoons.eu")
+        request.return_value.raise_for_status.assert_called_once_with()
+        smtp_class.assert_not_called()
+
     @patch.dict(os.environ, {
         "SEO_ALERT_EMAIL_TO": "info@voyagerballoons.eu",
         "SMTP_HOST": "smtp.example.com",

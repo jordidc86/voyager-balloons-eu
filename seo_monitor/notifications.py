@@ -31,11 +31,38 @@ def smtp_config() -> dict[str, object]:
 
 def email_configured() -> bool:
     config = smtp_config()
-    return bool(os.getenv("SEO_ALERT_EMAIL_TO") and config["host"] and config["sender"])
+    resend_ready = bool(os.getenv("RESEND_API_KEY") and os.getenv("RESEND_FROM"))
+    smtp_ready = bool(config["host"] and config["sender"])
+    return bool(os.getenv("SEO_ALERT_EMAIL_TO") and (resend_ready or smtp_ready))
+
+
+def _send_with_resend(subject: str, body: str) -> bool:
+    api_key = os.getenv("RESEND_API_KEY")
+    sender = os.getenv("RESEND_FROM")
+    if not api_key or not sender:
+        return False
+    payload = {
+        "from": sender,
+        "to": [os.environ["SEO_ALERT_EMAIL_TO"]],
+        "subject": subject,
+        "text": body,
+    }
+    if reply_to := os.getenv("RESEND_REPLY_TO"):
+        payload["reply_to"] = reply_to
+    response = requests.post(
+        "https://api.resend.com/emails",
+        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+        json=payload,
+        timeout=30,
+    )
+    response.raise_for_status()
+    return True
 
 
 def send_email(subject: str, body: str) -> None:
     if not email_configured():
+        return
+    if _send_with_resend(subject, body):
         return
     config = smtp_config()
     message = EmailMessage()
