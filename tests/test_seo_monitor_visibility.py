@@ -11,6 +11,7 @@ from seo_monitor.checks.local_visibility import _absence_streak, _drop_assessmen
 from seo_monitor.config import Settings, load_config
 from seo_monitor.storage import Store
 from seo_monitor.checks import ai_visibility, backlink_gap, indexing, keyword_demand, local_visibility, rank
+from seo_monitor.checks.pagespeed import _field_scope
 from seo_monitor.google_auth import authorized_session
 
 
@@ -77,6 +78,15 @@ class VisibilityTests(unittest.TestCase):
 
     def test_maps_rating_object_is_normalized(self) -> None:
         self.assertEqual(_rating({"rating": {"value": 4.9, "votes_count": 365}}), (4.9, 365))
+
+    def test_pagespeed_origin_field_data_is_not_treated_as_page_specific(self) -> None:
+        self.assertEqual(
+            _field_scope(
+                "https://shop.voyagerballoons.eu/producto/comfort/",
+                "https://shop.voyagerballoons.eu",
+            ),
+            ("origin", "https://shop.voyagerballoons.eu"),
+        )
 
     @patch("seo_monitor.checks.keyword_demand.requests.post")
     def test_keyword_overview_accepts_null_items(self, post) -> None:

@@ -24,6 +24,7 @@ from .checks import (
 from .config import Settings, load_config
 from .costs import dataforseo_account_budget, dataforseo_run_budget
 from .notifications import send_email
+from .prioritization import prioritize_alert
 from .reporting import render_markdown
 from .storage import Store
 from .types import AlertSpec, CheckResult
@@ -163,7 +164,15 @@ def execute(job_name: str, settings: Settings, store: Store) -> tuple[object, li
         changed = store.save_result(run_id, result)
         urgent = [item for item in changed if item.status == "open" and item.severity in {"P0", "P1"}]
         if urgent and not settings.dry_run:
-            lines = [f"{item.severity}: {item.title}\n{item.message}\nAcción: {item.action}" for item in urgent]
+            lines = []
+            for item in urgent:
+                priority = prioritize_alert(item)
+                lines.append(
+                    f"{item.severity} · {priority.score}/100 · {item.title}\n"
+                    f"Impacto: {priority.impact} · Horizonte: {priority.horizon} · "
+                    f"Destino: {priority.destination}\n"
+                    f"{item.message}\nPotencial: {priority.upside}\nAcción: {item.action}"
+                )
             send_email(f"Voyager SEO · {len(urgent)} alerta(s) urgente(s)", "\n\n".join(lines))
         return result, changed
     except Exception as exc:

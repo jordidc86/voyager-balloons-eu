@@ -4,6 +4,7 @@ import json
 from datetime import datetime, timezone
 
 from .storage import Store
+from .prioritization import prioritized_alerts
 from .types import SEVERITY_ORDER
 
 
@@ -91,6 +92,7 @@ def _percent(value, scale: float = 1.0) -> str:
 def render_markdown(store: Store) -> str:
     now = datetime.now(timezone.utc)
     alerts = sorted(store.open_alerts(), key=lambda item: (SEVERITY_ORDER.get(item.severity, 9), item.category, item.title))
+    prioritized = prioritized_alerts(alerts)
     runs = list(store.recent_runs(20))
     latest_runs = {job_name: store.latest_run(job_name) for job_name in JOB_LABELS}
     operational_sources = sum(1 for run in latest_runs.values() if run and run.status == "success")
@@ -157,11 +159,31 @@ def render_markdown(store: Store) -> str:
     ])
     if not alerts:
         lines.append("No hay alertas abiertas.")
-    for item in alerts:
+    else:
         lines.extend([
-            f"### {item.severity} · {item.title}",
+            "El score ordena el trabajo por riesgo, cercanía a la reserva y evidencia disponible; no representa ingresos garantizados.",
+            "",
+            "| Score | Horizonte | Impacto | Destino | Acción |",
+            "| ---: | --- | --- | --- | --- |",
+        ])
+        for item, priority in prioritized[:5]:
+            lines.append(
+                f"| {priority.score}/100 | {priority.horizon} | {priority.impact} | "
+                f"{priority.destination} | {item.title} |"
+            )
+        lines.extend(["", "## Detalle de acciones", ""])
+    for item, priority in prioritized:
+        lines.extend([
+            f"### {priority.score}/100 · {item.severity} · {item.title}",
             "",
             item.message,
+            "",
+            f"**Impacto:** {priority.impact} · **Horizonte:** {priority.horizon} · "
+            f"**Esfuerzo:** {priority.effort} · **Destino:** {priority.destination}",
+            "",
+            f"**Potencial:** {priority.upside}",
+            "",
+            f"**Criterio:** {priority.rationale}",
             "",
             f"**Acción:** {item.action}",
             *( [f"**Evidencia:** {item.evidence_url}"] if item.evidence_url else [] ),

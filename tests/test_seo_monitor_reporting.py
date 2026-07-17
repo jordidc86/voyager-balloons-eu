@@ -5,6 +5,8 @@ import unittest
 from pathlib import Path
 
 from seo_monitor.reporting import render_markdown
+from seo_monitor.prioritization import prioritize_alert, prioritized_alerts
+from seo_monitor.models import Alert
 from seo_monitor.storage import Store
 from seo_monitor.types import AlertSpec, CheckResult
 
@@ -57,6 +59,42 @@ class ReportingTests(unittest.TestCase):
         self.assertIn("64 sesiones, 7 eventos clave, 845 € atribuidos", report)
         self.assertIn("Consulta `vuelo en globo segovia`", report)
         self.assertIn("brecha estimada 18 clics", report)
+        self.assertIn("crecimiento de reservas", report)
+        self.assertIn("El score ordena el trabajo", report)
+        self.assertIn("hasta 18.0 clics orgánicos adicionales", report)
+
+    def test_commerce_failure_outranks_ctr_opportunity_and_pagespeed(self) -> None:
+        commerce = Alert(
+            dedupe_key="commerce:test", severity="P0", category="commerce",
+            title="Checkout roto", message="No se puede completar la compra.",
+            action="Corregir checkout.", metadata_json="{}", status="open",
+        )
+        ctr = Alert(
+            dedupe_key="gsc:test", severity="P1", category="gsc",
+            title="Oportunidad CTR", message="Hay impresiones sin clics.",
+            action="Mejorar snippet.",
+            metadata_json='{"queries":[{"estimated_click_gap":12}]}', status="open",
+        )
+        pagespeed = Alert(
+            dedupe_key="pagespeed:test", severity="P1", category="pagespeed",
+            title="Origen lento", message="CrUX clasifica la tienda como lenta.",
+            action="Optimizar recursos.", metadata_json="{}", status="open",
+        )
+
+        ordered = prioritized_alerts([pagespeed, ctr, commerce])
+
+        self.assertEqual(ordered[0][0].category, "commerce")
+        self.assertGreater(ordered[1][1].score, ordered[2][1].score)
+        self.assertLessEqual(prioritize_alert(commerce).score, 100)
+
+    def test_destination_is_inferred_from_alert_context(self) -> None:
+        alert = Alert(
+            dedupe_key="indexing:braganca", severity="P2", category="indexing",
+            title="Bragança pendiente", message="Google aún no reconoce la landing.",
+            action="Mantener enlaces internos.", metadata_json="{}", status="open",
+        )
+
+        self.assertEqual(prioritize_alert(alert).destination, "Bragança")
 
 
 if __name__ == "__main__":

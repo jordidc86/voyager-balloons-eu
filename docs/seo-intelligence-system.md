@@ -32,7 +32,7 @@ Mantener una vigilancia continua y accionable de la web, tienda, posicionamiento
 | `competitors` | semanal | Títulos, H1, precios y cambios de páginas de 7 competidores/canales |
 | `backlinks` | mensual | Enlaces/menciones ganados y relaciones contactadas del sistema de outreach |
 | `backlink_gap` | mensual | Dominios relevantes que enlazan a varios competidores directos pero no a Voyager |
-| `digest` | semanal | Informe único con alertas abiertas y ejecuciones recientes |
+| `digest` | semanal | Informe único con score 0–100, impacto, horizonte, esfuerzo, destino, evidencia y alertas abiertas |
 
 El conjunto de keywords debe crecer a partir de Search Console y datos SERP. Las 29 iniciales son el núcleo comercial, no el inventario final.
 
@@ -43,7 +43,7 @@ El conjunto de keywords debe crecer a partir de Search Console y datos SERP. Las
 - **P2:** rendimiento degradado confirmado, cambio competidor, keyword ausente, enlace externo roto, oportunidad de CTR.
 - **P3:** información y observación sin impacto inmediato.
 
-P0/P1 nuevos o reabiertos se notifican inmediatamente. P2/P3 aparecen en el informe semanal. Una alerta que deja de reproducirse se marca `resolved` automáticamente.
+P0/P1 nuevos o reabiertos se notifican inmediatamente. P2/P3 aparecen en el informe semanal. Una alerta que deja de reproducirse se marca `resolved` automáticamente. El score de prioridad combina severidad, cercanía a la reserva y evidencia cuantitativa; sirve para ordenar trabajo y no debe interpretarse como una previsión garantizada de ingresos.
 
 ## Almacenamiento
 
@@ -87,26 +87,26 @@ El modo continuo local también existe:
 .venv-seo-monitor/bin/python -m seo_monitor worker
 ```
 
-## Accesos pendientes
+## Integraciones operativas
 
 ### Google
 
-Crear o reutilizar una cuenta de servicio y añadir su email como lector en:
+La cuenta de servicio está conectada como lectora a:
 
 1. Search Console, propiedad de dominio `voyagerballoons.eu`.
 2. GA4, propiedad que recibe los eventos de web y tienda.
 
-Guardar el JSON completo en `GOOGLE_SERVICE_ACCOUNT_JSON` y el ID numérico en `GA4_PROPERTY_ID` dentro de Railway. La cuenta no necesita permisos de edición.
+El JSON vive en `GOOGLE_SERVICE_ACCOUNT_JSON` y el ID numérico en `GA4_PROPERTY_ID` dentro de Railway. La cuenta no necesita permisos de edición.
 
 ### DataForSEO
 
-Crear cuenta pay-as-you-go, hacer el depósito mínimo y guardar `DATAFORSEO_LOGIN` y `DATAFORSEO_PASSWORD`. El monitor usa SERP orgánica, Google Maps y respuestas de ChatGPT/Gemini/Perplexity con búsqueda web. El coste real de cada tarea se guarda como métrica y el inventario se limita a las consultas aprobadas.
+La cuenta pay-as-you-go y sus credenciales están activas. El monitor usa SERP orgánica, Google Maps, demanda de keywords, brecha de dominios y respuestas de ChatGPT/Gemini/Perplexity con búsqueda web. El coste real de cada tarea se guarda como métrica y el inventario se limita a las consultas aprobadas.
 
 El presupuesto queda limitado a **8 USD/mes** y cada módulo tiene además un máximo de **1 USD por ejecución**. Se avisa si una ejecución alcanza **0,75 USD**. Las palabras P0 se consultan a diario hasta posición 20; las secundarias, semanalmente hasta posición 100. Las preguntas P0 de visibilidad IA se revisan semanalmente y las secundarias cada 28 días. Los límites se ajustan en `thresholds.dataforseo_monthly_budget_usd`, `thresholds.dataforseo_run_budget_usd` y las claves de cadencia relacionadas. `DATAFORSEO_ENABLED=false` permite pausar todas las consultas pagadas sin eliminar credenciales ni generar fallos. Al alcanzar cualquiera de los límites, la tanda se detiene sin borrar alertas previas ni repetir consultas innecesarias.
 
 ### PageSpeed
 
-Crear una API key restringida a PageSpeed Insights API y guardarla en `PAGESPEED_API_KEY`.
+La API key restringida a PageSpeed Insights API está configurada en `PAGESPEED_API_KEY`. Los datos CrUX de origen se deduplican: si Chrome solo dispone de datos agregados para toda la tienda, se genera una alerta de origen y no una copia por cada producto.
 
 ### Alertas
 
@@ -118,16 +118,14 @@ El 17 de julio se verificó que los servicios actuales de Railway ya disponen de
 
 Crear un monitor de tipo *dead man's switch* (por ejemplo, Better Uptime o Healthchecks.io) y guardar su URL privada en `SEO_MONITOR_HEARTBEAT_URL`. El cron solo confirma la señal tras un ciclo sin fallos; si deja de ejecutarse o algún trabajo falla persistentemente, el proveedor externo avisa aunque Railway, SMTP o el proceso hayan caído.
 
-## Despliegue previsto
+## Despliegue actual
 
-Proyecto Railway existente: `zealous-creativity`, entorno `production`. Se añadirá:
+Proyecto Railway `zealous-creativity`, entorno `production`:
 
 - servicio cron `voyager-seo-monitor` usando `Dockerfile.seo-monitor`, ejecutado cada 6 horas y apagado entre pasadas;
-- PostgreSQL dedicado o compartido solo si existe separación lógica y copias adecuadas;
-- variables privadas anteriores;
+- PostgreSQL persistente con histórico de ejecuciones, métricas, rankings, snapshots y alertas;
+- secretos privados de Google, DataForSEO, PageSpeed y SMTP;
 - una única ejecución cron para evitar trabajos duplicados.
-
-No se debe desplegar hasta disponer de las credenciales Google, destino de alertas y autorización para crear el servicio/DB con coste.
 
 ## Criterios de aceptación de la primera versión
 
@@ -148,10 +146,13 @@ No se debe desplegar hasta disponer de las credenciales Google, destino de alert
 - Base histórica, deduplicación, resolución y reporting implementados y probados localmente.
 - Inspección automática de indexación preparada para 12 URLs indexables prioritarias mediante Search Console URL Inspection API.
 - Observatorios preparados: 5 consultas locales en Google Maps y 21 respuestas IA controladas por ciclo (7 preguntas × 3 proveedores).
-- Cruce mensual de enlaces preparado: 6 intersecciones entre 4 competidores directos, filtradas por autoridad, spam y enlaces `dofollow`.
+- Cruce mensual de enlaces preparado sobre 4 competidores directos, filtrado por relevancia, autoridad, spam y enlaces `dofollow`.
 - Validación productiva repetida: 14/14 URLs, 5/5 compras, 151 páginas, 2.937 enlaces internos, 0 enlaces rotos y 0 errores de schema.
 - Medición validada en navegador: el salto web → producto Comfort queda decorado con `_gl`; las dos propiedades comparten `GT-55NTF5CN`/`AW-11564692382` y WooCommerce declara `add_to_cart` y `purchase`.
 - Control diario de integridad Analytics: 7/7 comprobaciones correctas.
-- Tests locales: 29/29 correctos; contenedor pendiente de construir en Railway porque Docker Desktop no estaba activo durante la validación local.
+- Tests locales: 60/60 correctos; el contenedor está desplegado en Railway.
 - Protección operativa añadida: techo de 8 USD/mes, 1 USD por ejecución y aviso a 0,75 USD para DataForSEO; las consultas secundarias se difieren automáticamente para evitar gasto repetido.
-- Google, PageSpeed, Resend, Railway y PostgreSQL están desplegados y verificados con datos reales. Las credenciales API de DataForSEO están guardadas en Railway; queda verificar la cuenta del proveedor y ejecutar la primera tanda controlada con su crédito de prueba.
+- Google, GA4, PageSpeed, SMTP, Railway, PostgreSQL y DataForSEO están desplegados y verificados con datos reales.
+- Primera inteligencia de demanda: 10 keywords con datos y 9 oportunidades fuera del top 10 por 0,0252 USD en la ejecución del 17 de julio.
+- Calibración de ruido: una variación aislada de ranking ya no escala a P1; Maps requiere tres observaciones; el estado indeterminado de Search Console es P2; carrito se valida por producto y URL; CrUX de tienda se deduplica por origen.
+- El informe y las alertas urgentes incluyen score 0–100, impacto sobre reservas, horizonte, esfuerzo, destino, potencial basado en evidencia y acción recomendada.
