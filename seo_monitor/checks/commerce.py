@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import time
+from urllib.parse import urlsplit
 
 import requests
 from bs4 import BeautifulSoup
@@ -12,6 +13,22 @@ from ..types import AlertSpec, CheckResult
 USER_AGENT = "VoyagerSEOCheckoutTest/0.1 (+https://www.voyagerballoons.eu/)"
 CART_URL = "https://shop.voyagerballoons.eu/cart/"
 CHECKOUT_URL = "https://shop.voyagerballoons.eu/checkout/"
+
+
+def _normalized_path(url: str | None) -> str | None:
+    if not url:
+        return None
+    return urlsplit(url).path.rstrip("/") or "/"
+
+
+def _cart_contains_product(soup: BeautifulSoup, product_id: str, product: dict) -> bool:
+    if soup.find(attrs={"data-product_id": str(product_id)}):
+        return True
+    expected_path = _normalized_path(product.get("url"))
+    if expected_path and any(_normalized_path(link.get("href")) == expected_path for link in soup.find_all("a", href=True)):
+        return True
+    expected_text = str(product.get("expected_text") or "").strip().casefold()
+    return bool(expected_text and expected_text in soup.get_text(" ", strip=True).casefold())
 
 
 def _alert(product: dict, stage: str, message: str, metadata: dict | None = None) -> AlertSpec:
@@ -34,16 +51,17 @@ def test_product(product: dict, timeout: float) -> tuple[dict, list[AlertSpec]]:
     started = time.perf_counter()
 
     response = session.get(product["url"], timeout=timeout, allow_redirects=True)
-    if response.status_code >= 400:
-        return {"product": product["name"], "stage": "product", "status": response.status_code}, [
-            _alert(product, "product", f"La ficha devuelve HTTP {response.status_code}.")
+    product_status = response.status_code
+    if product_status >= 400:
+        return {"product": product["name"], "stage": "product", "status": product_status, "flow_ok": False}, [
+            _alert(product, "product", f"La ficha devuelve HTTP {product_status}.")
         ]
     soup = BeautifulSoup(response.text, "html.parser")
     add_button = soup.find(attrs={"name": "add-to-cart"})
     cart_form = soup.find("form", class_=lambda value: value and "cart" in value)
     product_id = add_button.get("value") if add_button else None
     if not product_id or not cart_form:
-        return {"product": product["name"], "stage": "product", "status": response.status_code}, [
+        return {"product": product["name"], "stage": "product", "status": product_status, "flow_ok": False}, [
             _alert(product, "product-form", "La ficha carga, pero no contiene un formulario de añadir al carrito utilizable.")
         ]
     visible = soup.get_text(" ", strip=True)
@@ -67,10 +85,14 @@ def test_product(product: dict, timeout: float) -> tuple[dict, list[AlertSpec]]:
     cart = session.get(CART_URL, timeout=timeout, allow_redirects=True)
     cart_soup = BeautifulSoup(cart.text, "html.parser")
     cart_empty = bool(cart_soup.select_one(".cart-empty, .wc-block-cart__empty-cart__title"))
-    cart_text = cart_soup.get_text(" ", strip=True)
-    if cart.status_code >= 400 or cart_empty or product["expected_text"].lower() not in cart_text.lower():
+    cart_has_product = _cart_contains_product(cart_soup, product_id, product)
+    if cart.status_code >= 400 or cart_empty or not cart_has_product:
         alerts.append(_alert(product, "cart", "El carrito no muestra correctamente el producto recién añadido.", {
-            "status": cart.status_code, "empty": cart_empty, "final_url": cart.url,
+            "status": cart.status_code,
+            "empty": cart_empty,
+            "product_detected": cart_has_product,
+            "product_id": product_id,
+            "final_url": cart.url,
         }))
 
     checkout = session.get(CHECKOUT_URL, timeout=timeout, allow_redirects=True)
@@ -88,11 +110,13 @@ def test_product(product: dict, timeout: float) -> tuple[dict, list[AlertSpec]]:
     return {
         "product": product["name"],
         "product_id": product_id,
-        "product_status": response.status_code,
+        "product_status": product_status,
         "cart_status": cart.status_code,
+        "cart_product": cart_has_product,
         "checkout_status": checkout.status_code,
         "checkout_form": has_form,
         "payment_section": has_payment,
+        "flow_ok": not alerts and has_form and has_payment,
         "elapsed_ms": round((time.perf_counter() - started) * 1000, 1),
     }, alerts
 
@@ -115,7 +139,7 @@ def run(config: dict, store: Store, run_id: int) -> CheckResult:
             result.add_metric("flow_elapsed_ms", outcome["elapsed_ms"], source="commerce", dimensions={"product": product["name"]})
     result.summary = {
         "products_tested": len(outcomes),
-        "successful_flows": sum(1 for outcome in outcomes if "error" not in outcome and outcome.get("checkout_form") and outcome.get("payment_section")),
+        "successful_flows": sum(1 for outcome in outcomes if outcome.get("flow_ok")),
         "alerts": len(result.alerts),
         "outcomes": outcomes,
     }

@@ -79,7 +79,12 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
             dimensions={"url": page["url"], "coverage": coverage or "unknown"},
         )
 
-        if verdict == "FAIL" or indexing_state not in {None, "INDEXING_ALLOWED"}:
+        explicitly_blocked = verdict == "FAIL" or indexing_state not in {
+            None,
+            "INDEXING_ALLOWED",
+            "INDEXING_STATE_UNSPECIFIED",
+        }
+        if explicitly_blocked:
             result.alerts.append(AlertSpec(
                 dedupe_key=f"indexing:not-indexed:{page['url']}",
                 severity=page.get("severity", "P1"),
@@ -90,7 +95,7 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
                 evidence_url=page["url"],
                 metadata=status,
             ))
-        elif verdict == "NEUTRAL":
+        elif verdict in {"NEUTRAL", "VERDICT_UNSPECIFIED"}:
             result.alerts.append(AlertSpec(
                 dedupe_key=f"indexing:neutral:{page['url']}",
                 severity="P2",

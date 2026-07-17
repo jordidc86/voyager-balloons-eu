@@ -44,8 +44,8 @@ def _overview(
     task = data.get("tasks", [{}])[0]
     if task.get("status_code") != 20000:
         raise RuntimeError(task.get("status_message") or "DataForSEO Labs no devolvió una tarea válida")
-    api_result = task.get("result", [{}])[0]
-    return api_result.get("items", []), float(task.get("cost") or 0)
+    api_result = (task.get("result") or [{}])[0] or {}
+    return api_result.get("items") or [], float(task.get("cost") or 0)
 
 
 def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckResult:

@@ -78,6 +78,54 @@ class VisibilityTests(unittest.TestCase):
     def test_maps_rating_object_is_normalized(self) -> None:
         self.assertEqual(_rating({"rating": {"value": 4.9, "votes_count": 365}}), (4.9, 365))
 
+    @patch("seo_monitor.checks.keyword_demand.requests.post")
+    def test_keyword_overview_accepts_null_items(self, post) -> None:
+        response = Mock()
+        response.json.return_value = {
+            "tasks": [{
+                "status_code": 20000,
+                "cost": 0.012,
+                "result": [{"items": None}],
+            }],
+        }
+        post.return_value = response
+        settings = replace(Settings.from_env(), dataforseo_login="login", dataforseo_password="password")
+
+        items, cost = keyword_demand._overview(settings, ["passeio de balao braganca"], "pt", 2620, "pt")
+
+        self.assertEqual(items, [])
+        self.assertEqual(cost, 0.012)
+
+    @patch("seo_monitor.checks.indexing._inspect")
+    @patch("seo_monitor.checks.indexing.authorized_session", return_value=Mock())
+    def test_unknown_url_is_pending_not_critical(self, authorized_session, inspect) -> None:
+        inspect.return_value = {
+            "indexStatusResult": {
+                "verdict": "NEUTRAL",
+                "coverageState": "Google no reconoce esta URL",
+                "indexingState": "INDEXING_STATE_UNSPECIFIED",
+                "robotsTxtState": "ROBOTS_TXT_STATE_UNSPECIFIED",
+                "pageFetchState": "PAGE_FETCH_STATE_UNSPECIFIED",
+            },
+        }
+        settings = replace(Settings.from_env(), google_service_account_json='{"type":"service_account"}')
+        config = {
+            "strategic_pages": [{
+                "name": "Braganca PT",
+                "url": "https://www.voyagerballoons.eu/pt/passeio-de-balao-braganca",
+                "severity": "P0",
+            }],
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            store = Store(f"sqlite:///{Path(tmp) / 'monitor.db'}")
+            store.initialize()
+            run_id = store.start_job("indexing")
+            result = indexing.run(config, store, run_id, settings)
+
+        self.assertEqual(len(result.alerts), 1)
+        self.assertEqual(result.alerts[0].severity, "P2")
+        self.assertIn("pendiente", result.alerts[0].title.lower())
+
     def test_maps_absence_requires_consecutive_observations(self) -> None:
         history = [Mock(position=None), Mock(position=None), Mock(position=4)]
         self.assertEqual(_absence_streak(history, None), 3)
