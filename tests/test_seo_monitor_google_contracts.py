@@ -84,6 +84,8 @@ class GoogleContractTests(unittest.TestCase):
         )
 
         self.assertTrue(diagnostics["funnel_missing"])
+        self.assertTrue(diagnostics["add_to_cart_missing"])
+        self.assertTrue(diagnostics["begin_checkout_missing"])
         self.assertEqual(diagnostics["purchases"], 2)
         self.assertEqual(diagnostics["purchase_revenue"], 480)
         self.assertEqual(diagnostics["shop_direct_share_percent"], 20.0)

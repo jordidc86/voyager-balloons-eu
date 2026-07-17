@@ -1,10 +1,27 @@
 from __future__ import annotations
 
+from html.parser import HTMLParser
 import requests
 from urllib.parse import urlsplit
 
 from ..storage import Store
 from ..types import AlertSpec, CheckResult
+
+
+class _ScriptParser(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__()
+        self.scripts: list[dict[str, str]] = []
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        if tag == "script":
+            self.scripts.append({name: value or "" for name, value in attrs})
+
+
+def _script_attributes(html: str) -> list[dict[str, str]]:
+    parser = _ScriptParser()
+    parser.feed(html)
+    return parser.scripts
 
 
 def _fetch(url: str) -> str:
@@ -20,6 +37,11 @@ def _audit(main_html: str, tracking_js: str, shop_html: str, tracking_config: di
     shop_domain = tracking_config["shop_domain"]
     script_url = tracking_config["main_script_url"]
     script_path = urlsplit(script_url).path
+    shop_scripts = _script_attributes(shop_html)
+    woo_provider = next(
+        (script for script in shop_scripts if script.get("id") == "googlesitekit-events-provider-woocommerce-js"),
+        None,
+    )
     return [
         {
             "key": "main-script",
@@ -56,6 +78,12 @@ def _audit(main_html: str, tracking_js: str, shop_html: str, tracking_config: di
             "ok": "eventsToTrack" in shop_html and "add_to_cart" in shop_html and "purchase" in shop_html,
             "severity": "P1",
             "message": "Site Kit/WooCommerce ya no declara los eventos add_to_cart y purchase.",
+        },
+        {
+            "key": "woocommerce-listener-immediate",
+            "ok": bool(woo_provider) and woo_provider.get("type") != "rocketlazyloadscript",
+            "severity": "P1",
+            "message": "WP Rocket vuelve a retrasar el listener de Site Kit que registra los productos añadidos al carrito.",
         },
         {
             "key": "shop-links",

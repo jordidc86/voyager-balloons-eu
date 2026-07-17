@@ -121,19 +121,21 @@ def _commerce_diagnostics(commerce_rows: list[dict], channel_host_rows: list[dic
         if row.get("hostName") in {"localhost", "127.0.0.1"}
     )
     purchases = event_totals.get("purchase", {})
+    add_to_cart = event_totals.get("add_to_cart", {}).get("eventCount", 0)
+    begin_checkout = event_totals.get("begin_checkout", {}).get("eventCount", 0)
+    enough_shop_traffic = shop_sessions >= 100
     return {
         "shop_sessions": shop_sessions,
         "shop_direct_sessions": direct_sessions,
         "shop_direct_share_percent": round(direct_sessions / shop_sessions * 100, 1) if shop_sessions else 0,
         "technical_sessions": technical_sessions,
-        "add_to_cart": event_totals.get("add_to_cart", {}).get("eventCount", 0),
-        "begin_checkout": event_totals.get("begin_checkout", {}).get("eventCount", 0),
+        "add_to_cart": add_to_cart,
+        "begin_checkout": begin_checkout,
         "purchases": purchases.get("eventCount", 0),
         "purchase_revenue": purchases.get("totalRevenue", 0),
-        "funnel_missing": shop_sessions >= 100 and (
-            event_totals.get("add_to_cart", {}).get("eventCount", 0) == 0
-            or event_totals.get("begin_checkout", {}).get("eventCount", 0) == 0
-        ),
+        "add_to_cart_missing": enough_shop_traffic and add_to_cart == 0,
+        "begin_checkout_missing": enough_shop_traffic and begin_checkout == 0,
+        "funnel_missing": enough_shop_traffic and (add_to_cart == 0 or begin_checkout == 0),
     }
 
 
@@ -240,19 +242,33 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
                 metadata={"current": current, "previous": previous},
             ))
 
-    if diagnostics["funnel_missing"]:
+    if diagnostics["add_to_cart_missing"]:
         result.alerts.append(AlertSpec(
             dedupe_key="ga4:commerce-funnel-events-missing",
             severity="P1",
             category="ga4",
-            title="El embudo WooCommerce está incompleto en GA4",
+            title="GA4 no registra los productos añadidos al carrito",
             message=(
                 f"La tienda registra {diagnostics['shop_sessions']:.0f} sesiones en 28 días, "
-                f"pero add_to_cart={diagnostics['add_to_cart']:.0f} y "
-                f"begin_checkout={diagnostics['begin_checkout']:.0f}. "
-                f"Purchase sí registra {diagnostics['purchases']:.0f} eventos."
+                f"pero add_to_cart={diagnostics['add_to_cart']:.0f}. "
+                f"Purchase sí registra {diagnostics['purchases']:.0f} eventos, por lo que la venta funciona "
+                "y el fallo está en la instrumentación del embudo."
             ),
-            action="Ejecutar una compra de prueba con DebugView/Tag Assistant y corregir el disparo de add_to_cart y begin_checkout sin alterar purchase.",
+            action="Validar el evento de WooCommerce al añadir un producto y corregir add_to_cart sin alterar el purchase que ya funciona.",
+            evidence_url="https://analytics.google.com/",
+            metadata=diagnostics,
+        ))
+    if diagnostics["begin_checkout_missing"]:
+        result.alerts.append(AlertSpec(
+            dedupe_key="ga4:begin-checkout-not-measured",
+            severity="P2",
+            category="ga4",
+            title="GA4 no mide todavía el inicio del checkout",
+            message=(
+                f"La tienda registra {diagnostics['shop_sessions']:.0f} sesiones en 28 días y "
+                f"{diagnostics['purchases']:.0f} compras, pero begin_checkout={diagnostics['begin_checkout']:.0f}."
+            ),
+            action="Añadir una medición begin_checkout sin duplicar add_to_cart ni purchase y validarla en DebugView.",
             evidence_url="https://analytics.google.com/",
             metadata=diagnostics,
         ))

@@ -150,12 +150,13 @@ Proyecto Railway `zealous-creativity`, entorno `production`:
 - Cruce mensual de enlaces preparado sobre 4 competidores directos, filtrado por relevancia, autoridad, spam y enlaces `dofollow`.
 - Validación productiva repetida: 14/14 URLs, 5/5 compras, 151 páginas, 2.937 enlaces internos, 0 enlaces rotos y 0 errores de schema.
 - Medición validada en navegador: el salto web → producto Comfort queda decorado con `_gl`; las dos propiedades comparten `GT-55NTF5CN`/`AW-11564692382` y WooCommerce declara `add_to_cart` y `purchase`.
-- Control diario de integridad Analytics: 7/7 comprobaciones correctas.
-- Tests locales: 60/60 correctos; el contenedor está desplegado en Railway.
+- Control diario de integridad Analytics: valida etiquetas, linker, eventos declarados y que WP Rocket no retrase el listener WooCommerce de Site Kit.
+- Tests locales: 64/64 correctos; el contenedor está desplegado en Railway.
 - Protección operativa añadida: techo de 8 USD/mes, 1 USD por ejecución y aviso a 0,75 USD para DataForSEO; las consultas secundarias se difieren automáticamente para evitar gasto repetido.
 - Google, GA4, PageSpeed, SMTP, Railway, PostgreSQL y DataForSEO están desplegados y verificados con datos reales.
 - Primera inteligencia de demanda: 10 keywords con datos y 9 oportunidades fuera del top 10 por 0,0252 USD en la ejecución del 17 de julio.
 - Calibración de ruido: una variación aislada de ranking ya no escala a P1; Maps requiere tres observaciones; el estado indeterminado de Search Console es P2; carrito se valida por producto y URL; CrUX de tienda se deduplica por origen.
 - El informe y las alertas urgentes incluyen score 0–100, impacto sobre reservas, horizonte, esfuerzo, destino, potencial basado en evidencia y acción recomendada.
-- Auditoría GA4 de 28 días: `purchase` registra 2 compras y 480 €, y el canal se conserva al entrar en la tienda; faltan eventos `add_to_cart` y `begin_checkout`, por lo que el monitor alerta sobre embudo incompleto sin confundirlo con una rotura de compra.
-- La propiedad recibe tráfico de `localhost`/`127.0.0.1`; se monitoriza como contaminación técnica separada de clientes reales.
+- Auditoría GA4 de 28 días: `purchase` registra 2 compras y 480 €, y el canal se conserva al entrar en la tienda. Se corrigió la causa probable del `add_to_cart` ausente excluyendo solo el listener WooCommerce de Site Kit del retraso de WP Rocket; el monitor comprobará diariamente que siga cargando de inmediato.
+- `begin_checkout` no forma parte del contrato actual de Site Kit y queda como mejora P2 independiente, sin presentarlo como una rotura de la compra.
+- La propiedad recibe tráfico de `localhost`/`127.0.0.1`; el script propio ya no carga en esos hosts y el monitor mantiene la contaminación histórica como aviso separado hasta que salga de la ventana de 28 días.

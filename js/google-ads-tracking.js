@@ -1,4 +1,13 @@
 (function () {
+  if (
+    window.location.hostname === 'localhost' ||
+    window.location.hostname === '127.0.0.1' ||
+    window.location.hostname === '[::1]' ||
+    window.location.hostname.endsWith('.localhost')
+  ) {
+    return;
+  }
+
   var GTAG_ID = 'GT-55NTF5CN';
   var ADS_ID = 'AW-11564692382';
   var loaded = false;
