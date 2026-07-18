@@ -344,6 +344,40 @@ class VisibilityTests(unittest.TestCase):
         self.assertEqual(result.summary["failures"], 1)
         self.assertTrue(any(alert.dedupe_key == "backlink_gap:provider-failures" for alert in result.alerts))
 
+    @patch("seo_monitor.checks.backlink_gap._referring_domains")
+    def test_backlink_gap_keeps_weak_candidates_without_recommending_them(self, referring_domains) -> None:
+        weak = {
+            "domain": "directory.example",
+            "rank": 15,
+            "backlinks_spam_score": 0,
+            "backlinks": 3,
+            "referring_pages": 3,
+            "referring_pages_nofollow": 0,
+            "referring_links_platform_types": {"organization": 3},
+        }
+        settings = replace(Settings.from_env(), dataforseo_login="login", dataforseo_password="password")
+        config = {
+            "primary_domain": "www.voyagerballoons.eu",
+            "backlink_gap_competitors": [{"name": "Competitor", "domain": "competitor.example"}],
+            "thresholds": {
+                "backlink_gap_minimum_rank": 12,
+                "backlink_gap_maximum_spam_score": 30,
+                "backlink_gap_minimum_score": 35,
+                "dataforseo_run_budget_usd": 1,
+            },
+        }
+        referring_domains.side_effect = [([], 0.02), ([weak], 0.02)]
+        with tempfile.TemporaryDirectory() as tmp:
+            store = Store(f"sqlite:///{Path(tmp) / 'monitor.db'}")
+            store.initialize()
+            run_id = store.start_job("backlink_gap")
+
+            result = backlink_gap.run(config, store, run_id, settings)
+
+        self.assertEqual(result.summary["candidates_discovered"], 1)
+        self.assertEqual(result.summary["qualified_opportunities"], 0)
+        self.assertFalse(any(alert.dedupe_key == "backlink_gap:qualified-opportunities" for alert in result.alerts))
+
     @patch("seo_monitor.checks.keyword_demand._overview")
     @patch("seo_monitor.checks.keyword_demand.load_keyword_inventory")
     def test_keyword_demand_uses_native_market_language_and_records_opportunity(self, load_keywords, overview) -> None:

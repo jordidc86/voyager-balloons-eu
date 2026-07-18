@@ -170,6 +170,7 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
     thresholds = config.get("thresholds", {})
     minimum_rank = float(thresholds.get("backlink_gap_minimum_rank", 8))
     maximum_spam = float(thresholds.get("backlink_gap_maximum_spam_score", 30))
+    minimum_score = float(thresholds.get("backlink_gap_minimum_score", 35))
     profile_limit = int(thresholds.get("backlink_profile_limit", 500))
     profile_minimum_rank = float(thresholds.get("backlink_profile_minimum_rank", 15))
     profile_maximum_spam = float(thresholds.get("backlink_profile_maximum_spam_score", 30))
@@ -251,6 +252,7 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
         )
         ranked.append(opportunity)
     ranked.sort(key=lambda item: (item["score"], item["rank"], len(item["competitors"])), reverse=True)
+    qualified = [item for item in ranked if item["score"] >= minimum_score]
 
     for opportunity in ranked[:100]:
         store.add_page_snapshot(run_id, "backlink_gap", {
@@ -261,15 +263,15 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
             **opportunity,
         })
 
-    if ranked:
+    if qualified:
         result.alerts.append(AlertSpec(
             dedupe_key="backlink_gap:qualified-opportunities",
             severity="P2",
             category="backlink_gap",
             title="Nuevas oportunidades de enlaces frente a competidores",
-            message=f"Se han identificado {len(ranked)} dominios relevantes que enlazan a competidores directos y no a Voyager.",
+            message=f"Se han identificado {len(qualified)} dominios con autoridad suficiente que enlazan a competidores directos y no a Voyager.",
             action="Revisar los dominios mejor puntuados, descartar medios irrelevantes y preparar colaboraciones editoriales personalizadas por tandas aprobadas.",
-            metadata={"opportunities": ranked[:30]},
+            metadata={"opportunities": qualified[:30]},
         ))
     if profile:
         if profile["new_domains"]:
@@ -316,7 +318,9 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
     result.summary = {
         "competitors": len(competitors),
         "targets_checked": len(referring_domains),
-        "qualified_opportunities": len(ranked),
+        "candidates_discovered": len(ranked),
+        "qualified_opportunities": len(qualified),
+        "minimum_opportunity_score": minimum_score,
         "profile_baseline_initialized": bool(profile and profile["baseline_initialized"]),
         "profile_domains": profile["domains"] if profile else 0,
         "profile_dofollow_domains": profile["dofollow_domains"] if profile else 0,
@@ -330,7 +334,8 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
         "budget_limited": budget_limited,
         "alerts": len(result.alerts),
     }
-    result.add_metric("qualified_opportunities", len(ranked), source="backlink_gap")
+    result.add_metric("candidates_discovered", len(ranked), source="backlink_gap")
+    result.add_metric("qualified_opportunities", len(qualified), source="backlink_gap")
     result.add_metric("profile_domains", profile["domains"] if profile else 0, source="backlink_profile")
     result.add_metric("profile_dofollow_domains", profile["dofollow_domains"] if profile else 0, source="backlink_profile")
     result.add_metric("profile_new_domains", len(profile["new_domains"]) if profile else 0, source="backlink_profile")

@@ -106,6 +106,8 @@ La cuenta pay-as-you-go y sus credenciales están activas. El monitor usa SERP o
 
 El presupuesto queda limitado a **8 USD/mes** y cada módulo tiene además un máximo de **1 USD por ejecución**. Se avisa si una ejecución alcanza **0,75 USD**. Las palabras P0 se consultan a diario hasta posición 20; las secundarias, semanalmente hasta posición 100. Las preguntas P0 de visibilidad IA se revisan semanalmente y las secundarias cada 28 días. Los límites se ajustan en `thresholds.dataforseo_monthly_budget_usd`, `thresholds.dataforseo_run_budget_usd` y las claves de cadencia relacionadas. `DATAFORSEO_ENABLED=false` permite pausar todas las consultas pagadas sin eliminar credenciales ni generar fallos. Al alcanzar cualquiera de los límites, la tanda se detiene sin borrar alertas previas ni repetir consultas innecesarias.
 
+La brecha de backlinks conserva candidatos de baja autoridad para análisis, pero solo los eleva a oportunidad cuando alcanzan el score mínimo configurado. Esto evita convertir directorios locales débiles en trabajo de outreach y mantiene la prioridad en medios turísticos nacionales e internacionales.
+
 ### PageSpeed
 
 La API key restringida a PageSpeed Insights API está configurada en `PAGESPEED_API_KEY`. Los datos CrUX de origen se deduplican: si Chrome solo dispone de datos agregados para toda la tienda, se genera una alerta de origen y no una copia por cada producto.
