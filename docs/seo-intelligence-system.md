@@ -148,7 +148,7 @@ La web pública sigue servida por Netlify. Existe además un alojamiento estáti
 - Crawl productivo: 151 URLs, 12 sitemaps, 2.937 enlaces internos, 0 destinos rotos, 0 errores JSON-LD.
 - Prueba de compra completa: clásico, oferta, privado, Comfort y Bragança llegan correctamente hasta checkout con formulario y medios de pago visibles.
 - Configuración calibrada para `/cart/` y `/checkout/`; el checkout vacío redirige legítimamente al carrito.
-- Dos ciclos de salud completados: 14/14 URLs disponibles. El segundo ciclo abrió una alerta P2 por respuesta sostenida del checkout cercana a 3 segundos, pendiente de contrastar con PageSpeed/CrUX.
+- Los ciclos de salud mantienen 14/14 URLs disponibles. El checkout vacío redirige legítimamente al carrito y ya no genera un falso aviso de latencia; la prueba comercial sigue validando el checkout real después de añadir cada producto.
 - Base histórica, deduplicación, resolución y reporting implementados y probados localmente.
 - Inspección automática de indexación preparada para 12 URLs indexables prioritarias mediante Search Console URL Inspection API.
 - Observatorios preparados: 5 consultas locales en Google Maps y 21 respuestas IA controladas por ciclo (7 preguntas × 3 proveedores).
@@ -156,7 +156,7 @@ La web pública sigue servida por Netlify. Existe además un alojamiento estáti
 - Validación productiva repetida: 14/14 URLs, 5/5 compras, 151 páginas, 2.937 enlaces internos, 0 enlaces rotos y 0 errores de schema.
 - Medición validada en navegador: el salto web → producto Comfort queda decorado con `_gl`; las dos propiedades comparten `GT-55NTF5CN`/`AW-11564692382` y WooCommerce declara `add_to_cart` y `purchase`.
 - Control diario de integridad Analytics: valida etiquetas, linker, eventos declarados y que WP Rocket no retrase el listener WooCommerce de Site Kit.
-- Tests locales: 91/91 correctos, incluyendo configuración multservicio de Railway y equivalencia de redirecciones del alojamiento estático.
+- Tests locales: 100/100 correctos, incluyendo configuración multservicio de Railway, equivalencia de redirecciones, confirmación temporal de alertas y diagnóstico accionable de PageSpeed.
 - Protección operativa añadida: techo de 8 USD/mes, 1 USD por ejecución y aviso a 0,75 USD para DataForSEO; las consultas secundarias se difieren automáticamente para evitar gasto repetido.
 - Google, GA4, PageSpeed, SMTP, Railway, PostgreSQL y DataForSEO están desplegados y verificados con datos reales.
 - Primera inteligencia de demanda: 10 keywords con datos y 9 oportunidades fuera del top 10 por 0,0252 USD en la ejecución del 17 de julio.
@@ -170,4 +170,4 @@ La web pública sigue servida por Netlify. Existe además un alojamiento estáti
 - Los cinco desfases de despliegue detectados el 18 de julio quedaron resueltos tras publicar la versión ya validada. El respaldo Railway sirve las 27 URLs del sitemap, no presenta destinos internos rotos, conserva los hashes críticos, responde con 404 real y reproduce correctamente las 60 redirecciones sin degradar HTTPS.
 - La propiedad recibe tráfico de `localhost`/`127.0.0.1`; el script propio ya no carga en esos hosts y el monitor mantiene la contaminación histórica como aviso separado hasta que salga de la ventana de 28 días.
 - Descubrimiento real de Search Console validado: 20 candidatas comerciales detectadas en 28 días, 6 activadas como inventario dinámico y 2 oportunidades de CTR, sin incorporar búsquedas branded, marcas competidoras ni URLs técnicas.
-- PageSpeed completo revalidado: 20/20 pruebas correctas a nivel de proveedor. CrUX confirma que el principal problema real de la tienda es TTFB (p75 3,13 s), con INP y CLS correctos; la ficha Bragança obtiene SEO 92 por controles de cantidad de Astra implementados como enlaces no rastreables.
+- PageSpeed completo revalidado: 20/20 pruebas correctas a nivel de proveedor. CrUX conserva una ventana móvil de 28 días con TTFB p75 de 3,13 s, FCP de 3,50 s y LCP de 3,52 s; INP y CLS son correctos. En la medición actual con caché caliente el documento responde en unos 10 ms, pero Lighthouse detecta unos 2,18 s de retraso de render del elemento LCP por CSS bloqueante. El monitor guarda ahora el elemento, las fases del LCP y los recursos concretos con mayor ahorro. Las fichas Bragança y Comfort obtienen SEO 92 por controles de cantidad de Astra implementados como enlaces no rastreables.

@@ -174,6 +174,38 @@ class ReportingTests(unittest.TestCase):
         self.assertIn("Incidencias urgentes cerradas", report)
         self.assertIn("Caída temporal", report)
 
+    def test_pagespeed_report_includes_resources_and_lcp_breakdown(self) -> None:
+        self.save("pagespeed", {}, alerts=[AlertSpec(
+            dedupe_key="pagespeed:performance:mobile:shop",
+            severity="P2",
+            category="pagespeed",
+            title="Rendimiento mobile bajo en Shop home",
+            message="Lighthouse confirma una degradación.",
+            action="Reducir CSS bloqueante.",
+            metadata={
+                "performance_opportunities": [{
+                    "label": "Recursos que bloquean el renderizado",
+                    "display_value": "Ahorro estimado 1.230 ms",
+                    "resources": [{
+                        "url": "https://shop.example/block-library/style.min.css",
+                        "wasted_ms": 1097,
+                        "wasted_kib": 17.0,
+                    }],
+                }],
+                "lcp_diagnostic": {
+                    "node": {"selector": "img.product", "node_label": "Product image"},
+                    "phases": [{"label": "Element render delay", "duration_ms": 2184}],
+                },
+            },
+        )])
+
+        report = render_markdown(self.store)
+
+        self.assertIn("shop.example/block-library/style.min.css", report)
+        self.assertIn("ahorro 1097 ms / 17.0 KiB", report)
+        self.assertIn("Elemento LCP: `img.product`", report)
+        self.assertIn("Element render delay · 2184 ms", report)
+
 
 if __name__ == "__main__":
     unittest.main()

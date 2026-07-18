@@ -59,18 +59,97 @@ def _performance_opportunities(audits: dict) -> list[dict]:
                 + [float(item.get("wastedMs") or 0) for item in items if isinstance(item, dict)]
             )
             savings_bytes = max(savings_bytes, sum(float(item.get("wastedBytes") or 0) for item in items if isinstance(item, dict)))
+        resources = []
+        if isinstance(items, list):
+            for item in items:
+                if not isinstance(item, dict) or not item.get("url"):
+                    continue
+                resources.append({
+                    "url": item["url"],
+                    "wasted_ms": round(float(item.get("wastedMs") or 0)),
+                    "wasted_kib": round(float(item.get("wastedBytes") or 0) / 1024, 1),
+                })
+            resources.sort(
+                key=lambda item: (item["wasted_ms"], item["wasted_kib"]),
+                reverse=True,
+            )
         opportunities.append({
             "audit": audit_id,
             "label": label,
             "display_value": audit.get("displayValue"),
             "savings_ms": round(savings_ms),
             "savings_kib": round(savings_bytes / 1024, 1),
+            "resources": resources[:5],
         })
     return sorted(
         opportunities,
         key=lambda item: (item["savings_ms"], item["savings_kib"]),
         reverse=True,
     )
+
+
+def _compact_resource_label(url: str) -> str:
+    parts = urlsplit(url)
+    if not parts.netloc:
+        return url[:80]
+    path_parts = [part for part in parts.path.split("/") if part]
+    path = "/".join(path_parts[-2:]) if path_parts else ""
+    query = f"?{parts.query}" if parts.query else ""
+    return f"{parts.netloc}/{path}{query}".rstrip("/")[:120]
+
+
+def _lcp_diagnostic(audits: dict) -> dict:
+    audit = audits.get("lcp-breakdown-insight", {})
+    items = (audit.get("details") or {}).get("items") or []
+    phases = []
+    node = {}
+    for item in items:
+        if not isinstance(item, dict):
+            continue
+        if item.get("type") == "table":
+            for phase in item.get("items") or []:
+                if not isinstance(phase, dict) or phase.get("duration") is None:
+                    continue
+                phases.append({
+                    "subpart": phase.get("subpart"),
+                    "label": phase.get("label"),
+                    "duration_ms": round(float(phase["duration"])),
+                })
+        elif item.get("type") == "node":
+            node = {
+                "selector": item.get("selector"),
+                "node_label": item.get("nodeLabel"),
+                "snippet": item.get("snippet"),
+            }
+    phases.sort(key=lambda item: item["duration_ms"], reverse=True)
+    return {
+        "node": node,
+        "phases": phases,
+        "largest_phase": phases[0] if phases else None,
+    }
+
+
+def _performance_action(opportunities: list[dict], lcp_diagnostic: dict) -> str:
+    if not opportunities:
+        return "Revisar el elemento LCP y validar el cambio con una nueva medición móvil."
+    top = opportunities[0]
+    targets = [
+        _compact_resource_label(item["url"])
+        for item in top.get("resources", [])[:3]
+    ]
+    target_text = f" Revisar primero: {', '.join(targets)}." if targets else ""
+    largest_phase = lcp_diagnostic.get("largest_phase") or {}
+    if top["audit"] == "render-blocking-insight":
+        return (
+            "Reducir o cargar de forma no bloqueante el CSS no esencial anterior al elemento LCP; "
+            "conservar síncronos únicamente los estilos necesarios para la primera pantalla."
+            + target_text
+        )
+    if top["audit"] == "unused-javascript":
+        return "Eliminar cargas duplicadas y retrasar JavaScript no necesario para la primera interacción." + target_text
+    if largest_phase.get("subpart") == "elementRenderDelay":
+        return "Reducir el retraso de renderizado del elemento LCP y comprobar CSS, fuentes y trabajo de main thread." + target_text
+    return "Aplicar la oportunidad de mayor ahorro y repetir Lighthouse móvil antes de ampliar el cambio." + target_text
 
 
 def _failed_category_audits(categories: dict, audits: dict, category: str) -> list[dict]:
@@ -202,6 +281,7 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
             lcp_ms = float(audits.get("largest-contentful-paint", {}).get("numericValue", 0))
             cls = float(audits.get("cumulative-layout-shift", {}).get("numericValue", 0))
             performance_opportunities = _performance_opportunities(audits)
+            lcp_diagnostic = _lcp_diagnostic(audits)
             failed_seo_audits = _failed_category_audits(categories, audits, "seo")
             dimensions = {"url": page["url"], "strategy": strategy}
             performance_history = store.metric_history(
@@ -245,6 +325,12 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
             )
             if lab_assessment:
                 top_opportunity = performance_opportunities[0]["label"] if performance_opportunities else None
+                largest_lcp_phase = lcp_diagnostic.get("largest_phase") or {}
+                phase_summary = (
+                    f" La fase dominante del LCP es {largest_lcp_phase.get('label')} "
+                    f"({largest_lcp_phase.get('duration_ms') / 1000:.2f}s)."
+                    if largest_lcp_phase.get("duration_ms") is not None else ""
+                )
                 result.alerts.append(AlertSpec(
                     dedupe_key=f"pagespeed:performance:{strategy}:{page['url']}", severity=lab_assessment["severity"], category="pagespeed",
                     title=f"Rendimiento {strategy} bajo en {page['name']}",
@@ -252,8 +338,9 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
                         f"Lighthouse Performance {performance}/100; LCP {lcp_ms / 1000:.2f}s; CLS {cls:.3f}; "
                         f"resultado degradado durante {lab_assessment['streak']} ejecuciones consecutivas."
                         + (f" Principal oportunidad detectada: {top_opportunity}." if top_opportunity else "")
+                        + phase_summary
                     ),
-                    action="Revisar el elemento LCP, CSS/fuentes bloqueantes, imágenes y JavaScript; validar después con datos de campo.",
+                    action=_performance_action(performance_opportunities, lcp_diagnostic),
                     evidence_url=f"https://pagespeed.web.dev/analysis?url={page['url']}",
                     metadata={
                         "scores": scores,
@@ -261,6 +348,7 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
                         "cls": cls,
                         "confirmation_streak": lab_assessment["streak"],
                         "performance_opportunities": performance_opportunities,
+                        "lcp_diagnostic": lcp_diagnostic,
                     },
                 ))
             if strategy == "mobile" and scores.get("seo", 100) < 100:

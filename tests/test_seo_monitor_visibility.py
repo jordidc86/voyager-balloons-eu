@@ -12,11 +12,14 @@ from seo_monitor.config import Settings, load_config
 from seo_monitor.storage import Store
 from seo_monitor.checks import ai_visibility, backlink_gap, indexing, keyword_demand, local_visibility, rank
 from seo_monitor.checks.pagespeed import (
+    _compact_resource_label,
     _failed_category_audits,
     _field_problem_metrics,
     _field_scope,
     _format_field_problem,
     _lab_performance_assessment,
+    _lcp_diagnostic,
+    _performance_action,
     _performance_opportunities,
 )
 from seo_monitor.google_auth import authorized_session
@@ -132,6 +135,51 @@ class VisibilityTests(unittest.TestCase):
         })
 
         self.assertEqual(opportunities[0]["savings_ms"], 1220)
+
+    def test_pagespeed_preserves_ranked_resource_evidence(self) -> None:
+        opportunities = _performance_opportunities({
+            "render-blocking-insight": {
+                "score": 0,
+                "details": {"items": [
+                    {"url": "https://example.com/small.css", "wastedMs": 100},
+                    {"url": "https://example.com/critical.css", "wastedMs": 900},
+                ]},
+            },
+        })
+
+        self.assertEqual(opportunities[0]["resources"][0]["url"], "https://example.com/critical.css")
+        self.assertEqual(opportunities[0]["resources"][0]["wasted_ms"], 900)
+
+    def test_lcp_diagnostic_identifies_render_delay_and_element(self) -> None:
+        diagnostic = _lcp_diagnostic({
+            "lcp-breakdown-insight": {
+                "details": {"items": [
+                    {"type": "table", "items": [
+                        {"subpart": "timeToFirstByte", "label": "Time to first byte", "duration": 10.4},
+                        {"subpart": "elementRenderDelay", "label": "Element render delay", "duration": 2184.3},
+                    ]},
+                    {"type": "node", "selector": "img.product", "nodeLabel": "Product image"},
+                ]},
+            },
+        })
+
+        self.assertEqual(diagnostic["largest_phase"]["subpart"], "elementRenderDelay")
+        self.assertEqual(diagnostic["node"]["selector"], "img.product")
+
+    def test_performance_action_names_top_render_blocking_resource(self) -> None:
+        opportunities = [{
+            "audit": "render-blocking-insight",
+            "resources": [{"url": "https://shop.example/wp-includes/css/block-library/style.min.css"}],
+        }]
+
+        action = _performance_action(opportunities, {"largest_phase": {"subpart": "elementRenderDelay"}})
+
+        self.assertIn("CSS no esencial", action)
+        self.assertIn("shop.example/block-library/style.min.css", action)
+        self.assertEqual(
+            _compact_resource_label("https://www.googletagmanager.com/gtag/js?id=AW-1"),
+            "www.googletagmanager.com/gtag/js?id=AW-1",
+        )
 
     def test_failed_seo_audits_capture_actionable_nodes(self) -> None:
         failures = _failed_category_audits(

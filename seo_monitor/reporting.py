@@ -83,6 +83,23 @@ def _alert_evidence(raw: str) -> list[str]:
             savings.append(f"{item['savings_kib']} KiB")
         display = item.get("display_value") or ("ahorro " + " / ".join(savings) if savings else "oportunidad detectada")
         lines.append(f"- {item.get('label')} · {display}")
+        for resource in item.get("resources", [])[:3]:
+            resource_savings = []
+            if resource.get("wasted_ms"):
+                resource_savings.append(f"{resource['wasted_ms']} ms")
+            if resource.get("wasted_kib"):
+                resource_savings.append(f"{resource['wasted_kib']} KiB")
+            suffix = f" · ahorro {' / '.join(resource_savings)}" if resource_savings else ""
+            lines.append(f"  - `{resource.get('url')}`{suffix}")
+    lcp_diagnostic = metadata.get("lcp_diagnostic") or {}
+    lcp_node = lcp_diagnostic.get("node") or {}
+    if lcp_node.get("selector"):
+        lines.append(
+            f"- Elemento LCP: `{lcp_node['selector']}`"
+            + (f" · {lcp_node.get('node_label')}" if lcp_node.get("node_label") else "")
+        )
+    for phase in lcp_diagnostic.get("phases", [])[:3]:
+        lines.append(f"  - {phase.get('label')} · {phase.get('duration_ms')} ms")
     return lines
 
 
