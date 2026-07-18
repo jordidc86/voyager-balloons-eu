@@ -258,8 +258,35 @@ class VisibilityTests(unittest.TestCase):
         self.assertEqual(payload["limit"], 500)
         self.assertNotIn("backlinks_filters", payload)
 
+    @patch("seo_monitor.checks.backlink_gap.requests.post")
+    def test_backlink_detail_request_targets_one_referring_domain(self, post) -> None:
+        response = Mock()
+        response.json.return_value = {
+            "tasks": [{"status_code": 20000, "cost": 0.02, "result": [{"items": []}]}],
+        }
+        post.return_value = response
+        settings = replace(Settings.from_env(), dataforseo_login="login", dataforseo_password="password")
+
+        backlink_gap._backlink_details(
+            settings,
+            "www.voyagerballoons.eu",
+            "www.quality.example",
+            status_type="lost",
+        )
+
+        payload = post.call_args.kwargs["json"][0]
+        self.assertEqual(payload["target"], "voyagerballoons.eu")
+        self.assertEqual(payload["backlinks_status_type"], "lost")
+        self.assertEqual(payload["filters"], [
+            ["domain_from", "regex", r"(^|\.)quality\.example$"],
+            "and",
+            ["dofollow", "=", True],
+        ])
+        self.assertEqual(payload["order_by"], ["page_from_rank,desc", "rank,desc"])
+
+    @patch("seo_monitor.checks.backlink_gap._backlink_details")
     @patch("seo_monitor.checks.backlink_gap._referring_domains")
-    def test_backlink_profile_requires_two_misses_before_loss_alert(self, referring_domains) -> None:
+    def test_backlink_profile_requires_two_misses_before_loss_alert(self, referring_domains, backlink_details) -> None:
         original = {
             "domain": "quality.example",
             "rank": 42,
@@ -279,6 +306,18 @@ class VisibilityTests(unittest.TestCase):
             "first_seen": "2026-07-15 10:00:00 +00:00",
         }
         settings = replace(Settings.from_env(), dataforseo_login="login", dataforseo_password="password")
+        backlink_details.return_value = ([{
+            "url_from": "https://quality.example/travel-guide",
+            "page_from_title": "Travel guide",
+            "page_from_status_code": 200,
+            "url_to": "https://www.voyagerballoons.eu/vuelo-en-globo-segovia",
+            "url_to_status_code": 200,
+            "anchor": "vuelo en globo en Segovia",
+            "dofollow": True,
+            "item_type": "anchor",
+            "page_from_rank": 44,
+            "domain_from_rank": 42,
+        }], 0.02)
         config = {
             "primary_domain": "www.voyagerballoons.eu",
             "backlink_gap_competitors": [],
@@ -310,12 +349,20 @@ class VisibilityTests(unittest.TestCase):
             self.assertEqual(second.summary["profile_missing_once"], 1)
             self.assertEqual(second.summary["profile_confirmed_lost"], 0)
             self.assertFalse(any("perdido" in alert.title.lower() for alert in second.alerts))
+            new_alert = next(alert for alert in second.alerts if "Nuevos dominios" in alert.title)
+            self.assertEqual(new_alert.evidence_url, "https://quality.example/travel-guide")
+            self.assertEqual(
+                new_alert.metadata["domains"][0]["links"][0]["target_url"],
+                "https://www.voyagerballoons.eu/vuelo-en-globo-segovia",
+            )
 
             third_run = store.start_job("backlink_gap")
             third = backlink_gap.run(config, store, third_run, settings)
             store.save_result(third_run, third)
             self.assertEqual(third.summary["profile_confirmed_lost"], 1)
-            self.assertTrue(any("quality.example" in alert.title for alert in third.alerts))
+            lost_alert = next(alert for alert in third.alerts if "quality.example" in alert.title)
+            self.assertEqual(lost_alert.evidence_url, "https://quality.example/travel-guide")
+            self.assertIn("vuelo-en-globo-segovia", lost_alert.message)
 
             referring_domains.return_value = ([original, newcomer], 0.02)
             fourth_run = store.start_job("backlink_gap")

@@ -174,6 +174,7 @@ def execute(job_name: str, settings: Settings, store: Store) -> tuple[object, li
                     f"Impacto: {priority.impact} · Horizonte: {priority.horizon} · "
                     f"Destino: {priority.destination}\n"
                     f"{item.message}\nPotencial: {priority.upside}\nAcción: {item.action}"
+                    + (f"\nEvidencia: {item.evidence_url}" if item.evidence_url else "")
                 )
             send_email(f"Voyager SEO · {len(urgent)} alerta(s) urgente(s)", "\n\n".join(lines))
         return result, changed
