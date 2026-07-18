@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Voyager Shop Fixes
  * Description: Small, reversible usability and SEO fixes for the Voyager Balloons WooCommerce store.
- * Version: 1.2.0
+ * Version: 1.3.2
  * Author: Voyager Balloons
  */
 
@@ -43,6 +43,113 @@ function voyager_shop_dequeue_unused_product_styles() {
 	}
 }
 add_action( 'wp_enqueue_scripts', 'voyager_shop_dequeue_unused_product_styles', 999 );
+
+/**
+ * Return the explicit storefront language without changing WordPress globally.
+ */
+function voyager_shop_requested_language() {
+	if ( isset( $_GET['vb_lang'] ) ) {
+		return sanitize_key( wp_unslash( $_GET['vb_lang'] ) );
+	}
+
+	if ( isset( $_COOKIE['vb_shop_lang'] ) ) {
+		return sanitize_key( wp_unslash( $_COOKIE['vb_shop_lang'] ) );
+	}
+
+	return '';
+}
+
+/**
+ * Complete the missing Spanish product copy for the Braganca experience.
+ */
+function voyager_shop_translate_braganca_name( $name, $product ) {
+	if ( 'es' === voyager_shop_requested_language() && $product && 4174 === (int) $product->get_id() ) {
+		return 'Vuelo en globo en Braganza, Portugal';
+	}
+
+	return $name;
+}
+add_filter( 'woocommerce_product_get_name', 'voyager_shop_translate_braganca_name', 20, 2 );
+
+function voyager_shop_translate_braganca_title( $title, $post_id ) {
+	if ( ! is_admin() && 'es' === voyager_shop_requested_language() && 4174 === (int) $post_id ) {
+		return 'Vuelo en globo en Braganza, Portugal';
+	}
+
+	return $title;
+}
+add_filter( 'the_title', 'voyager_shop_translate_braganca_title', 20, 2 );
+
+function voyager_shop_translate_braganca_short_description( $description, $product ) {
+	if ( 'es' !== voyager_shop_requested_language() || ! $product || 4174 !== (int) $product->get_id() ) {
+		return $description;
+	}
+
+	return voyager_shop_braganca_spanish_short_description();
+}
+add_filter( 'woocommerce_product_get_short_description', 'voyager_shop_translate_braganca_short_description', 20, 2 );
+
+function voyager_shop_braganca_spanish_short_description() {
+	return '<p>Vuelo en globo al amanecer en Braganza, Portugal, por 195&nbsp;&euro; por persona. Incluye brindis con cava, diploma y fotos de la tripulaci&oacute;n cuando est&eacute;n disponibles.</p>';
+}
+
+function voyager_shop_translate_braganca_description( $description, $product ) {
+	if ( 'es' !== voyager_shop_requested_language() || ! $product || 4174 !== (int) $product->get_id() ) {
+		return $description;
+	}
+
+	return voyager_shop_braganca_spanish_description();
+}
+add_filter( 'woocommerce_product_get_description', 'voyager_shop_translate_braganca_description', 20, 2 );
+
+function voyager_shop_braganca_spanish_description() {
+	return '<h2>Vuelo en globo al amanecer en Braganza</h2>'
+		. '<p>Descubre el entorno de Braganza desde el aire en una experiencia operada por Ao Sabor do Vento y reservada de forma segura a trav&eacute;s de Voyager Balloons EU.</p>'
+		. '<ul>'
+		. '<li>Vuelo en globo al amanecer en el entorno de Braganza.</li>'
+		. '<li>Brindis con cava despu&eacute;s del aterrizaje.</li>'
+		. '<li>Diploma de vuelo.</li>'
+		. '<li>Fotos de la tripulaci&oacute;n cuando est&eacute;n disponibles.</li>'
+		. '<li>Punto exacto confirmado seg&uacute;n la meteorolog&iacute;a y el viento.</li>'
+		. '</ul>'
+		. '<p><strong>Precio online: 195&nbsp;&euro; por persona.</strong> El pago seguro se procesa en la web de Voyager Balloons EU.</p>';
+}
+
+function voyager_shop_translate_braganca_rendered_short_description( $description ) {
+	if ( ! is_admin() && 'es' === voyager_shop_requested_language() && 4174 === (int) get_the_ID() ) {
+		return voyager_shop_braganca_spanish_short_description();
+	}
+
+	return $description;
+}
+add_filter( 'woocommerce_short_description', 'voyager_shop_translate_braganca_rendered_short_description', 999 );
+
+function voyager_shop_translate_braganca_rendered_description( $description ) {
+	if ( ! is_admin() && function_exists( 'is_product' ) && is_product() && 'es' === voyager_shop_requested_language() && 4174 === (int) get_the_ID() ) {
+		return voyager_shop_braganca_spanish_description();
+	}
+
+	return $description;
+}
+add_filter( 'the_content', 'voyager_shop_translate_braganca_rendered_description', 999 );
+
+function voyager_shop_translate_braganca_add_to_cart( $text, $product = null ) {
+	if ( 'es' !== voyager_shop_requested_language() ) {
+		return $text;
+	}
+
+	if ( ! $product && function_exists( 'wc_get_product' ) ) {
+		$product = wc_get_product( get_the_ID() );
+	}
+
+	if ( $product && 4174 === (int) $product->get_id() ) {
+		return 'Añadir al carrito';
+	}
+
+	return $text;
+}
+add_filter( 'woocommerce_product_single_add_to_cart_text', 'voyager_shop_translate_braganca_add_to_cart', 20, 2 );
+add_filter( 'woocommerce_product_add_to_cart_text', 'voyager_shop_translate_braganca_add_to_cart', 20, 2 );
 
 /**
  * Make Astra quantity controls crawlable and accessible without changing their
