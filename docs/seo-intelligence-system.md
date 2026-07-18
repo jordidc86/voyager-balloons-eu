@@ -126,10 +126,12 @@ Crear un monitor de tipo *dead man's switch* (por ejemplo, Better Uptime o Healt
 
 Proyecto Railway `zealous-creativity`, entorno `production`:
 
-- servicio cron `voyager-seo-monitor` usando `Dockerfile.seo-monitor`, ejecutado cada 6 horas y apagado entre pasadas;
+- servicio cron `voyager-seo-monitor` usando `Dockerfile.seo-monitor`, despertado cada 15 minutos y apagado entre pasadas; cada trabajo conserva la frecuencia indicada en la tabla de cobertura y solo se ejecuta cuando está vencido;
 - PostgreSQL persistente con histórico de ejecuciones, métricas, rankings, snapshots y alertas;
 - secretos privados de Google, DataForSEO, PageSpeed y SMTP;
 - una única ejecución cron para evitar trabajos duplicados.
+
+La web pública sigue servida por Netlify. Existe además un alojamiento estático paralelo en Railway (`voyager-web-static`) construido con `Dockerfile.web`, Nginx y la misma fuente de redirecciones de `netlify.toml`. Este respaldo se valida antes de cualquier cambio DNS: sitemap completo, enlaces internos, las 60 redirecciones, páginas limpias, 404, compresión, cabeceras y archivos SEO críticos. No se cambia el dominio al respaldo mientras esas pruebas no estén completas.
 
 ## Criterios de aceptación de la primera versión
 
@@ -154,7 +156,7 @@ Proyecto Railway `zealous-creativity`, entorno `production`:
 - Validación productiva repetida: 14/14 URLs, 5/5 compras, 151 páginas, 2.937 enlaces internos, 0 enlaces rotos y 0 errores de schema.
 - Medición validada en navegador: el salto web → producto Comfort queda decorado con `_gl`; las dos propiedades comparten `GT-55NTF5CN`/`AW-11564692382` y WooCommerce declara `add_to_cart` y `purchase`.
 - Control diario de integridad Analytics: valida etiquetas, linker, eventos declarados y que WP Rocket no retrase el listener WooCommerce de Site Kit.
-- Tests locales: 75/75 correctos antes del siguiente despliegue.
+- Tests locales: 91/91 correctos, incluyendo configuración multservicio de Railway y equivalencia de redirecciones del alojamiento estático.
 - Protección operativa añadida: techo de 8 USD/mes, 1 USD por ejecución y aviso a 0,75 USD para DataForSEO; las consultas secundarias se difieren automáticamente para evitar gasto repetido.
 - Google, GA4, PageSpeed, SMTP, Railway, PostgreSQL y DataForSEO están desplegados y verificados con datos reales.
 - Primera inteligencia de demanda: 10 keywords con datos y 9 oportunidades fuera del top 10 por 0,0252 USD en la ejecución del 17 de julio.
@@ -165,6 +167,7 @@ Proyecto Railway `zealous-creativity`, entorno `production`:
 - Los tres avisos urgentes iniciales de Maps y de `segovia balloon ride` se cerraron tras recalibrar el ruido: Maps requiere tres ausencias consecutivas y se trata como P2; una caída orgánica solo escala a P1 cuando la referencia histórica y una segunda observación degradada la confirman.
 - DataForSEO detectó una canibalización inglesa real: para `segovia balloon ride` Google mostraba `/en/` en lugar de `/en/hot-air-balloon-segovia`. La home inglesa se ha reorientado como selector de destinos España/Portugal y la landing dedicada conserva la intención exacta de Segovia, con sitemap y fuentes para IA actualizados.
 - Control de despliegues añadido tras detectar el límite de créditos de Netlify: Railway despierta cada 15 minutos, compara cinco archivos críticos del contenedor desplegado con su respuesta pública y abre una P1 solo después de dos diferencias consecutivas. El resto de trabajos conserva su propia cadencia interna.
+- Los cinco desfases de despliegue detectados el 18 de julio quedaron resueltos tras publicar la versión ya validada. El respaldo Railway sirve las 27 URLs del sitemap, no presenta destinos internos rotos, conserva los hashes críticos, responde con 404 real y reproduce correctamente las 60 redirecciones sin degradar HTTPS.
 - La propiedad recibe tráfico de `localhost`/`127.0.0.1`; el script propio ya no carga en esos hosts y el monitor mantiene la contaminación histórica como aviso separado hasta que salga de la ventana de 28 días.
 - Descubrimiento real de Search Console validado: 20 candidatas comerciales detectadas en 28 días, 6 activadas como inventario dinámico y 2 oportunidades de CTR, sin incorporar búsquedas branded, marcas competidoras ni URLs técnicas.
 - PageSpeed completo revalidado: 20/20 pruebas correctas a nivel de proveedor. CrUX confirma que el principal problema real de la tienda es TTFB (p75 3,13 s), con INP y CLS correctos; la ficha Bragança obtiene SEO 92 por controles de cantidad de Astra implementados como enlaces no rastreables.

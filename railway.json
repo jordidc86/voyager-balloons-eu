@@ -1,6 +1,3 @@
 {
-  "$schema": "https://railway.com/railway.schema.json",
-  "deploy": {
-    "cronSchedule": "*/15 * * * *"
-  }
+  "$schema": "https://railway.com/railway.schema.json"
 }

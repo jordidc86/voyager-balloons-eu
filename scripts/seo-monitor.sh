@@ -8,7 +8,7 @@ fi
 
 if [ "${1:-}" = "test" ]; then
   shift
-  exec "$PYTHON" -m unittest discover -s tests -p 'test_seo_monitor_*.py' "$@"
+  exec "$PYTHON" -m unittest discover -s tests -p 'test_*.py' "$@"
 fi
 
 exec "$PYTHON" -m seo_monitor "$@"
