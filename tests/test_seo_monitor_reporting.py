@@ -62,6 +62,12 @@ class ReportingTests(unittest.TestCase):
                 "purchase_revenue": 480,
             },
         })
+        self.save("backlink_gap", {
+            "profile_domains": 18,
+            "profile_dofollow_domains": 11,
+            "profile_new_domains": 1,
+            "profile_confirmed_lost": 0,
+        })
 
         report = render_markdown(self.store)
 
@@ -73,11 +79,25 @@ class ReportingTests(unittest.TestCase):
         self.assertIn("se evaluará al alcanzar 2 días y 50 sesiones", report)
         self.assertIn("Histórico tienda (28 días): 2 compras y 480 €", report)
         self.assertIn("Atribución tienda (28 días): 1131 sesiones", report)
+        self.assertIn("Backlinks: 18 dominios detectados, 11 con enlaces dofollow; 1 nuevos y 0 pérdidas", report)
         self.assertIn("Consulta `vuelo en globo segovia`", report)
         self.assertIn("brecha estimada 18 clics", report)
         self.assertIn("crecimiento de reservas", report)
         self.assertIn("El score ordena el trabajo", report)
         self.assertIn("hasta 18.0 clics orgánicos adicionales", report)
+
+    def test_legacy_ga4_warmup_summary_never_renders_missing_requirements(self) -> None:
+        self.save("ga4", {
+            "commerce_diagnostics": {
+                "complete_days": 1,
+                "evaluation_ready": False,
+            },
+        })
+
+        report = render_markdown(self.store)
+
+        self.assertIn("completar el periodo mínimo configurado", report)
+        self.assertNotIn("sin datos días", report)
 
     def test_dynamic_keyword_evidence_does_not_render_missing_values(self) -> None:
         self.save("gsc", {}, alerts=[AlertSpec(

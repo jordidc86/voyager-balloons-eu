@@ -150,6 +150,7 @@ def render_markdown(store: Store) -> str:
     local_summary = _summary_dict(latest_runs["local_visibility"].summary_json) if latest_runs["local_visibility"] else {}
     ai_summary = _summary_dict(latest_runs["ai_visibility"].summary_json) if latest_runs["ai_visibility"] else {}
     demand_summary = _summary_dict(latest_runs["keyword_demand"].summary_json) if latest_runs["keyword_demand"] else {}
+    backlink_gap_summary = _summary_dict(latest_runs["backlink_gap"].summary_json) if latest_runs["backlink_gap"] else {}
     gsc_current = gsc_summary.get("current", {})
     ga4_current = ga4_summary.get("current", {})
     ga4_commerce = ga4_summary.get("commerce_diagnostics", {})
@@ -163,12 +164,14 @@ def render_markdown(store: Store) -> str:
             f"{ga4_commerce.get('purchase_revenue', 'sin datos')} €."
         )
     else:
-        ga4_funnel_line = (
-            f"- Embudo GA4 post-reparación: en calentamiento "
-            f"({ga4_commerce.get('complete_days', 0)} días completos; se evaluará al alcanzar "
-            f"{ga4_commerce.get('minimum_complete_days', 'sin datos')} días y "
-            f"{ga4_commerce.get('minimum_shop_sessions', 'sin datos')} sesiones de tienda)."
-        )
+        complete_days = ga4_commerce.get("complete_days", 0)
+        minimum_days = ga4_commerce.get("minimum_complete_days")
+        minimum_sessions = ga4_commerce.get("minimum_shop_sessions")
+        if minimum_days is not None and minimum_sessions is not None:
+            maturity = f"se evaluará al alcanzar {minimum_days} días y {minimum_sessions} sesiones de tienda"
+        else:
+            maturity = "se evaluará al completar el periodo mínimo configurado y reunir tráfico suficiente"
+        ga4_funnel_line = f"- Embudo GA4 post-reparación: en calentamiento ({complete_days} días completos; {maturity})."
     lines.extend([
         "",
         "## Protección de reservas directas",
@@ -185,6 +188,7 @@ def render_markdown(store: Store) -> str:
         f"- Atribución tienda (28 días): {ga4_baseline.get('shop_sessions', 'sin datos')} sesiones; Direct representa {_percent(ga4_baseline.get('shop_direct_share_percent'))}.",
         f"- Rankings: {rank_summary.get('found_top_10', 'sin datos')}/{rank_summary.get('keywords_checked', 'sin datos')} keywords comprobadas en top 10.",
         f"- Demanda: datos disponibles para {demand_summary.get('keywords_with_data', 'sin datos')}/{demand_summary.get('keywords_inventory', 'sin datos')} keywords; {demand_summary.get('opportunities', 'sin datos')} oportunidades fuera del top 10.",
+        f"- Backlinks: {backlink_gap_summary.get('profile_domains', 'sin datos')} dominios detectados, {backlink_gap_summary.get('profile_dofollow_domains', 'sin datos')} con enlaces dofollow; {backlink_gap_summary.get('profile_new_domains', 'sin datos')} nuevos y {backlink_gap_summary.get('profile_confirmed_lost', 'sin datos')} pérdidas confirmadas en el último control.",
         f"- Google Maps: {local_summary.get('found_top_3', 'sin datos')}/{local_summary.get('checks', 'sin datos')} consultas en top 3.",
         f"- IA: menciones {_percent(ai_summary.get('mention_share_percent'))}, citas {_percent(ai_summary.get('citation_share_percent'))}.",
         "",

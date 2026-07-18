@@ -54,6 +54,6 @@ La cuota pública sin clave ya está agotada, por lo que la clave propia es nece
 - Cada 6 horas: disponibilidad y cinco recorridos de compra.
 - Diaria: Search Console, GA4 y rankings orgánicos.
 - Semanal: indexación, PageSpeed, crawl, competidores, Maps e IA.
-- Mensual: enlaces ganados y brecha de backlinks.
+- Semanal: baseline de dominios enlazantes, enlaces nuevos/perdidos y brecha frente a competidores.
 - Inmediata: email para incidencias P0/P1 nuevas o reabiertas.
 - Semanal: un único informe ejecutivo con acciones P2/P3 y oportunidades.

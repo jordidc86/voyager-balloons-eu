@@ -172,6 +172,23 @@ class Store:
                 .order_by(PageSnapshot.observed_at.desc())
             )
 
+    def page_snapshots_for_latest_success(self, source: str, job_name: str) -> list[PageSnapshot]:
+        """Return one complete snapshot set from the latest successful job run."""
+        with self.sessions() as session:
+            run_id = session.scalar(
+                select(JobRun.id)
+                .where(JobRun.job_name == job_name, JobRun.status == "success")
+                .order_by(JobRun.finished_at.desc())
+                .limit(1)
+            )
+            if run_id is None:
+                return []
+            return list(session.scalars(
+                select(PageSnapshot)
+                .where(PageSnapshot.source == source, PageSnapshot.job_run_id == run_id)
+                .order_by(PageSnapshot.url)
+            ).all())
+
     def add_keyword_ranking(self, run_id: int, payload: dict) -> None:
         with self.sessions.begin() as session:
             session.add(KeywordRanking(

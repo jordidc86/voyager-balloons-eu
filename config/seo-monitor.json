@@ -150,6 +150,10 @@
     "dataforseo_daily_budget_reserve_usd": 0.02,
     "backlink_gap_minimum_rank": 8,
     "backlink_gap_maximum_spam_score": 30,
+    "backlink_profile_limit": 500,
+    "backlink_profile_minimum_rank": 15,
+    "backlink_profile_maximum_spam_score": 30,
+    "backlink_profile_loss_confirmations": 2,
     "rank_critical_depth": 20,
     "rank_secondary_depth": 100,
     "rank_secondary_interval_days": 7,
@@ -170,7 +174,7 @@
     "pagespeed": 604800,
     "competitors": 604800,
     "backlinks": 2592000,
-    "backlink_gap": 2592000,
+    "backlink_gap": 604800,
     "ai_visibility": 604800,
     "digest": 604800
   }

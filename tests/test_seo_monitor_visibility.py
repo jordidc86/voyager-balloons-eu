@@ -242,6 +242,108 @@ class VisibilityTests(unittest.TestCase):
         self.assertEqual(payload["order_by"], ["rank,desc"])
         self.assertEqual(payload["backlinks_filters"], ["dofollow", "=", True])
 
+    @patch("seo_monitor.checks.backlink_gap.requests.post")
+    def test_backlink_profile_request_includes_nofollow_domains(self, post) -> None:
+        response = Mock()
+        response.json.return_value = {
+            "tasks": [{"status_code": 20000, "cost": 0.02, "result": [{"items": []}]}],
+        }
+        post.return_value = response
+        settings = replace(Settings.from_env(), dataforseo_login="login", dataforseo_password="password")
+
+        backlink_gap._referring_domains(settings, "www.example.com", limit=500, dofollow_only=False)
+
+        payload = post.call_args.kwargs["json"][0]
+        self.assertEqual(payload["target"], "example.com")
+        self.assertEqual(payload["limit"], 500)
+        self.assertNotIn("backlinks_filters", payload)
+
+    @patch("seo_monitor.checks.backlink_gap._referring_domains")
+    def test_backlink_profile_requires_two_misses_before_loss_alert(self, referring_domains) -> None:
+        original = {
+            "domain": "quality.example",
+            "rank": 42,
+            "backlinks_spam_score": 3,
+            "backlinks": 2,
+            "referring_pages": 2,
+            "referring_pages_nofollow": 0,
+            "first_seen": "2026-07-01 10:00:00 +00:00",
+        }
+        newcomer = {
+            "domain": "new.example",
+            "rank": 35,
+            "backlinks_spam_score": 2,
+            "backlinks": 1,
+            "referring_pages": 1,
+            "referring_pages_nofollow": 0,
+            "first_seen": "2026-07-15 10:00:00 +00:00",
+        }
+        settings = replace(Settings.from_env(), dataforseo_login="login", dataforseo_password="password")
+        config = {
+            "primary_domain": "www.voyagerballoons.eu",
+            "backlink_gap_competitors": [],
+            "thresholds": {
+                "backlink_profile_limit": 500,
+                "backlink_profile_minimum_rank": 15,
+                "backlink_profile_maximum_spam_score": 30,
+                "backlink_profile_loss_confirmations": 2,
+                "dataforseo_run_budget_usd": 1,
+            },
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            store = Store(f"sqlite:///{Path(tmp) / 'monitor.db'}")
+            store.initialize()
+
+            referring_domains.return_value = ([original], 0.02)
+            first_run = store.start_job("backlink_gap")
+            first = backlink_gap.run(config, store, first_run, settings)
+            store.save_result(first_run, first)
+            self.assertFalse(first.summary["profile_baseline_initialized"])
+            self.assertFalse(any("Nuevos dominios" in alert.title for alert in first.alerts))
+
+            referring_domains.return_value = ([newcomer], 0.02)
+            second_run = store.start_job("backlink_gap")
+            second = backlink_gap.run(config, store, second_run, settings)
+            store.save_result(second_run, second)
+            self.assertEqual(second.summary["profile_new_domains"], 1)
+            self.assertEqual(second.summary["profile_missing_once"], 1)
+            self.assertEqual(second.summary["profile_confirmed_lost"], 0)
+            self.assertFalse(any("perdido" in alert.title.lower() for alert in second.alerts))
+
+            third_run = store.start_job("backlink_gap")
+            third = backlink_gap.run(config, store, third_run, settings)
+            store.save_result(third_run, third)
+            self.assertEqual(third.summary["profile_confirmed_lost"], 1)
+            self.assertTrue(any("quality.example" in alert.title for alert in third.alerts))
+
+            referring_domains.return_value = ([original, newcomer], 0.02)
+            fourth_run = store.start_job("backlink_gap")
+            fourth = backlink_gap.run(config, store, fourth_run, settings)
+            store.save_result(fourth_run, fourth)
+            self.assertEqual(fourth.summary["profile_recovered_domains"], 1)
+            self.assertFalse(any("quality.example" in alert.title for alert in fourth.alerts))
+            self.assertFalse(any(alert.dedupe_key == "backlink_gap:lost:quality.example" for alert in store.open_alerts()))
+
+    @patch("seo_monitor.checks.backlink_gap._referring_domains", side_effect=RuntimeError("provider unavailable"))
+    def test_backlink_profile_provider_failure_does_not_claim_success(self, referring_domains) -> None:
+        settings = replace(Settings.from_env(), dataforseo_login="login", dataforseo_password="password")
+        config = {
+            "primary_domain": "www.voyagerballoons.eu",
+            "backlink_gap_competitors": [],
+            "thresholds": {"dataforseo_run_budget_usd": 1},
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            store = Store(f"sqlite:///{Path(tmp) / 'monitor.db'}")
+            store.initialize()
+            run_id = store.start_job("backlink_gap")
+
+            result = backlink_gap.run(config, store, run_id, settings)
+
+        self.assertEqual(result.status, "skipped")
+        self.assertEqual(result.summary["failures"], 1)
+        self.assertTrue(any(alert.dedupe_key == "backlink_gap:provider-failures" for alert in result.alerts))
+
     @patch("seo_monitor.checks.keyword_demand._overview")
     @patch("seo_monitor.checks.keyword_demand.load_keyword_inventory")
     def test_keyword_demand_uses_native_market_language_and_records_opportunity(self, load_keywords, overview) -> None:

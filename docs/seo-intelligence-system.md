@@ -32,7 +32,7 @@ Mantener una vigilancia continua y accionable de la web, tienda, posicionamiento
 | `pagespeed` | semanal | Rendimiento, accesibilidad, SEO, LCP y CLS en móvil/escritorio; conserva los tests SEO concretos y los selectores afectados |
 | `competitors` | semanal | Títulos, H1, precios y cambios de páginas de 7 competidores/canales |
 | `backlinks` | mensual | Enlaces/menciones ganados y relaciones contactadas del sistema de outreach |
-| `backlink_gap` | mensual | Dominios relevantes que enlazan a varios competidores directos pero no a Voyager |
+| `backlink_gap` | semanal | Baseline propio, dominios nuevos/perdidos y dominios relevantes que enlazan a competidores pero no a Voyager |
 | `digest` | semanal | Informe único con score 0–100, impacto, horizonte, esfuerzo, destino, evidencia y alertas abiertas |
 
 El conjunto de keywords crece a partir de Search Console sin convertir el monitor en una lista incontrolada. Cada ejecución semanal puede guardar hasta 20 candidatas no branded y activar como máximo 6 consultas comerciales adicionales. Se excluyen páginas técnicas, parámetros, carrito, checkout, taxonomías y marcas competidoras. Las 29 iniciales siguen siendo el núcleo comercial estable.
@@ -40,7 +40,7 @@ El conjunto de keywords crece a partir de Search Console sin convertir el monito
 ## Severidad
 
 - **P0:** compra rota, 5XX, producto no disponible, página comercial noindex, sitemap crítico caído.
-- **P1:** 4XX, canonical incorrecto, caída significativa de clics o conversiones, posición estratégica perdida, backlink ganado retirado.
+- **P1:** 4XX, canonical incorrecto, caída significativa de clics o conversiones, posición estratégica perdida, backlink valioso ausente en dos controles consecutivos.
 - **P2:** rendimiento degradado confirmado, cambio competidor, keyword ausente, enlace externo roto, oportunidad de CTR.
 - **P3:** información y observación sin impacto inmediato.
 

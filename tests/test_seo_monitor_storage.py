@@ -80,6 +80,27 @@ class StoreTests(unittest.TestCase):
             123,
         )
 
+    def test_snapshot_set_is_loaded_from_latest_successful_run(self) -> None:
+        first_run = self.store.start_job("backlink_gap")
+        self.store.add_page_snapshot(first_run, "backlink_profile", {
+            "url": "https://example.com",
+            "domain": "example.com",
+            "present": True,
+        })
+        self.store.save_result(first_run, CheckResult(job_name="backlink_gap"))
+
+        failed_run = self.store.start_job("backlink_gap")
+        self.store.add_page_snapshot(failed_run, "backlink_profile", {
+            "url": "https://ignored.example",
+            "domain": "ignored.example",
+            "present": True,
+        })
+        self.store.fail_job(failed_run, "provider failure")
+
+        snapshots = self.store.page_snapshots_for_latest_success("backlink_profile", "backlink_gap")
+
+        self.assertEqual([snapshot.url for snapshot in snapshots], ["https://example.com"])
+
     def test_skipped_run_does_not_resolve_existing_alert(self) -> None:
         alert = AlertSpec(
             dedupe_key="rank:test",
