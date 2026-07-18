@@ -59,6 +59,18 @@ def _drop_assessment(
     }
 
 
+def _drop_severity(
+    priority: str,
+    confirmed: bool,
+    gsc_impressions: float,
+    minimum_gsc_impressions: float,
+) -> str:
+    """Reserve urgent rank alerts for drops backed by real Search Console demand."""
+    if priority == "P0" and confirmed and gsc_impressions >= minimum_gsc_impressions:
+        return "P1"
+    return "P2"
+
+
 def _search(settings: Settings, row: dict[str, str], depth: int) -> tuple[dict, float]:
     payload = {
         "keyword": row["keyword"],
@@ -208,7 +220,23 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
         )
         if drop:
             new_position = f">{depth}" if position is None else f"{position:.0f}"
-            severity = "P1" if row["priority"] == "P0" and drop["confirmed"] else "P2"
+            gsc_impressions = store.latest_gsc_query_impressions(row["keyword"])
+            minimum_gsc_impressions = float(
+                thresholds.get("rank_p1_minimum_gsc_impressions", 10)
+            )
+            severity = _drop_severity(
+                row["priority"],
+                drop["confirmed"],
+                gsc_impressions,
+                minimum_gsc_impressions,
+            )
+            action = (
+                "Confirmar la tendencia, URL posicionada, competidor ascendente, indexación y cambios recientes antes de modificar contenido."
+            )
+            if gsc_impressions < minimum_gsc_impressions:
+                action += (
+                    " Search Console no confirma demanda suficiente para tratarlo como urgente; mantener en observación y trabajar la consolidación semántica."
+                )
             result.alerts.append(AlertSpec(
                 dedupe_key=f"{key}:drop",
                 severity=severity,
@@ -218,9 +246,15 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
                     f"Voyager está en {new_position}, frente a una referencia estable de "
                     f"{drop['baseline']:.0f}, en {row['location_name']} ({row['device']})."
                 ),
-                action="Confirmar la tendencia, URL posicionada, competidor ascendente, indexación y cambios recientes antes de modificar contenido.",
+                action=action,
                 evidence_url=row["target_url"],
-                metadata={**drop, "position": position, "top_domain": top_domain},
+                metadata={
+                    **drop,
+                    "position": position,
+                    "top_domain": top_domain,
+                    "gsc_query_impressions_7d": gsc_impressions,
+                    "rank_p1_minimum_gsc_impressions": minimum_gsc_impressions,
+                },
             ))
         elif position is None and row["priority"] == "P0":
             result.alerts.append(AlertSpec(

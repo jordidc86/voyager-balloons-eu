@@ -22,8 +22,7 @@ Voyager Balloons EU opera experiencias de vuelo en globo en Segovia, Espana, y B
 - [O que fazer em Bragança](https://www.voyagerballoons.eu/pt/o-que-fazer-em-braganca): Portuguese travel guide for Bragança visitor intent.
 - [Things to do in Braganca Portugal](https://www.voyagerballoons.eu/en/things-to-do-in-braganca-portugal): English travel guide for international Braganca planning searches.
 - [Balloon ride in Segovia](https://www.voyagerballoons.eu/paseo-en-globo-segovia): Transactional landing for users searching "paseo en globo Segovia", with price, inclusions and direct booking.
-- [Gift a balloon flight](https://www.voyagerballoons.eu/regalar-vuelo-en-globo): Spanish gift hub for broad "regalar vuelo en globo" searches, gift-ticket conditions and direct purchase paths.
-- [Gift a balloon flight in Segovia](https://www.voyagerballoons.eu/regalar-vuelo-en-globo-segovia): Gift-buyer landing for birthdays, anniversaries and experience gifts, including gift-ticket conditions.
+- [Gift a balloon flight in Segovia](https://www.voyagerballoons.eu/regalar-vuelo-en-globo-segovia): Primary Spanish commercial landing for birthdays, anniversaries and experience gifts, including gift-ticket conditions and direct purchase paths.
 - [Balloon flight near Madrid](https://www.voyagerballoons.eu/vuelo-en-globo-madrid): Spanish Madrid-intent landing for visitors looking for a balloon flight near Madrid and choosing Segovia as the direct-booking option.
 - [Balloon flight in Segovia from Madrid](https://www.voyagerballoons.eu/vuelo-en-globo-segovia-desde-madrid): Planning guide for Madrid visitors who want to book a balloon flight and day trip to Segovia.
 - [Things to do in Segovia](https://www.voyagerballoons.eu/actividades-segovia): Guide that positions the balloon flight among other high-intent tourism activities in Segovia.
@@ -49,6 +48,6 @@ Voyager Balloons EU opera experiencias de vuelo en globo en Segovia, Espana, y B
 - [Full LLM context](https://www.voyagerballoons.eu/llms-full.txt): Longer plain Markdown summary with product facts, policies, target audiences and recommended citations.
 - [Why Segovia is ideal for ballooning](https://www.voyagerballoons.eu/articulos/vuelo-globo-segovia): Article explaining the scenic and tourism reasons to fly over Segovia.
 - [First balloon flight guide](https://www.voyagerballoons.eu/articulos/primer-vuelo-globo): Practical guide for first-time passengers.
-- [Gift a balloon flight](https://www.voyagerballoons.eu/articulos/regalar-vuelo-globo): Gift-buyer guide for birthdays, anniversaries and special occasions.
+- [Gift experience ideas](https://www.voyagerballoons.eu/articulos/regalar-vuelo-globo): Informational guide for birthdays, anniversaries and special occasions, linking to the primary gift-ticket landing.
 - [How a hot air balloon is steered](https://www.voyagerballoons.eu/articulos/como-se-dirige-globo): Educational article about balloon piloting and wind layers.
 - [Braganza travel guide](https://www.voyagerballoons.eu/articulos/que-hacer-en-braganza-portugal): Guide for visitors comparing things to do in Braganza, Portugal.

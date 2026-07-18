@@ -214,6 +214,31 @@ class Store:
                 job_run_id=run_id,
             ))
 
+    def latest_gsc_query_impressions(self, keyword: str) -> float:
+        """Return final 7-day GSC impressions for an exact query in the latest successful run."""
+        dimensions = json.dumps(
+            {"period": "current_7d", "query": keyword},
+            ensure_ascii=False,
+            sort_keys=True,
+        )
+        with self.sessions() as session:
+            run_id = session.scalar(
+                select(JobRun.id)
+                .where(JobRun.job_name == "gsc", JobRun.status == "success")
+                .order_by(JobRun.finished_at.desc())
+                .limit(1)
+            )
+            if run_id is None:
+                return 0.0
+            return float(session.scalar(
+                select(Metric.value).where(
+                    Metric.job_run_id == run_id,
+                    Metric.source == "gsc_query",
+                    Metric.name == "impressions",
+                    Metric.dimensions_json == dimensions,
+                )
+            ) or 0.0)
+
     def keyword_candidate_count(self, status: str = "active") -> int:
         with self.sessions() as session:
             return int(session.scalar(

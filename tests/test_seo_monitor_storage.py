@@ -109,6 +109,33 @@ class StoreTests(unittest.TestCase):
 
         self.assertEqual([snapshot.url for snapshot in snapshots], ["https://example.com"])
 
+    def test_latest_gsc_query_impressions_uses_the_latest_successful_run(self) -> None:
+        first_run = self.store.start_job("gsc")
+        first_result = CheckResult(job_name="gsc")
+        first_result.add_metric(
+            "impressions",
+            18,
+            source="gsc_query",
+            dimensions={"query": "regalar vuelo en globo segovia", "period": "current_7d"},
+        )
+        self.store.save_result(first_run, first_result)
+
+        second_run = self.store.start_job("gsc")
+        second_result = CheckResult(job_name="gsc")
+        second_result.add_metric(
+            "impressions",
+            7,
+            source="gsc_query",
+            dimensions={"query": "regalar vuelo en globo segovia", "period": "current_7d"},
+        )
+        self.store.save_result(second_run, second_result)
+
+        self.assertEqual(
+            self.store.latest_gsc_query_impressions("regalar vuelo en globo segovia"),
+            7,
+        )
+        self.assertEqual(self.store.latest_gsc_query_impressions("consulta ausente"), 0)
+
     def test_skipped_run_does_not_resolve_existing_alert(self) -> None:
         alert = AlertSpec(
             dedupe_key="rank:test",

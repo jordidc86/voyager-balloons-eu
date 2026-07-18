@@ -4,7 +4,7 @@ import unittest
 from unittest.mock import Mock, patch
 
 from seo_monitor.checks.ai_visibility import _is_due as ai_is_due
-from seo_monitor.checks.rank import _depth_for, _drop_assessment, run as run_rank
+from seo_monitor.checks.rank import _depth_for, _drop_assessment, _drop_severity, run as run_rank
 
 
 class SeoMonitorCadenceTests(unittest.TestCase):
@@ -63,6 +63,12 @@ class SeoMonitorCadenceTests(unittest.TestCase):
         self.assertIsNotNone(drop)
         self.assertTrue(drop["confirmed"])
         self.assertEqual(drop["baseline"], 10)
+
+    def test_rank_drop_needs_search_console_demand_to_be_urgent(self):
+        self.assertEqual(_drop_severity("P0", True, 0, 10), "P2")
+        self.assertEqual(_drop_severity("P0", True, 9, 10), "P2")
+        self.assertEqual(_drop_severity("P0", True, 10, 10), "P1")
+        self.assertEqual(_drop_severity("P1", True, 100, 10), "P2")
 
     @patch("seo_monitor.checks.rank._search", return_value=({"items": []}, 0.01))
     @patch("seo_monitor.checks.rank.load_keyword_inventory")

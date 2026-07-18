@@ -143,6 +143,7 @@
     "rank_drop_positions": 3,
     "rank_drop_history_window": 7,
     "rank_drop_minimum_history": 3,
+    "rank_p1_minimum_gsc_impressions": 10,
     "local_visibility_history_window": 7,
     "local_visibility_absence_confirmations": 3,
     "minimum_impressions_for_alert": 50,

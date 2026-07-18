@@ -8,6 +8,18 @@
   force = true
 
 [[redirects]]
+  from = "/regalar-vuelo-en-globo"
+  to = "/regalar-vuelo-en-globo-segovia"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/regalar-vuelo-en-globo/"
+  to = "/regalar-vuelo-en-globo-segovia"
+  status = 301
+  force = true
+
+[[redirects]]
   from = "/refund-policy/"
   to = "/legales#cancelacion"
   status = 301
@@ -286,7 +298,7 @@
 
 [[redirects]]
   from = "/regalar-vuelo-en-globo.html"
-  to = "/regalar-vuelo-en-globo"
+  to = "/regalar-vuelo-en-globo-segovia"
   status = 301
   force = true
 
