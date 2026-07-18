@@ -18,6 +18,14 @@ OPPORTUNITY_AUDITS = {
     "image-delivery-insight": "Entrega y compresión de imágenes",
 }
 
+FIELD_METRIC_LABELS = {
+    "EXPERIMENTAL_TIME_TO_FIRST_BYTE": "TTFB",
+    "FIRST_CONTENTFUL_PAINT_MS": "FCP",
+    "LARGEST_CONTENTFUL_PAINT_MS": "LCP",
+    "INTERACTION_TO_NEXT_PAINT": "INP",
+    "CUMULATIVE_LAYOUT_SHIFT_SCORE": "CLS",
+}
+
 
 def _origin(url: str) -> str:
     parts = urlsplit(url)
@@ -118,6 +126,33 @@ def _lab_performance_assessment(
     return None
 
 
+def _field_problem_metrics(field_metrics: dict) -> list[dict]:
+    problems = []
+    for api_name, metric in field_metrics.items():
+        category = str(metric.get("category") or "").upper()
+        if api_name not in FIELD_METRIC_LABELS or category == "FAST":
+            continue
+        problems.append({
+            "api_name": api_name,
+            "label": FIELD_METRIC_LABELS[api_name],
+            "category": category,
+            "percentile": metric.get("percentile"),
+        })
+    return problems
+
+
+def _format_field_problem(item: dict) -> str:
+    value = item.get("percentile")
+    if value is None:
+        formatted = "sin percentil"
+    elif item["label"] == "CLS":
+        formatted = f"{float(value) / 100:.3f}"
+    else:
+        formatted = f"{float(value) / 1000:.2f}s"
+    category = "lento" if item["category"] == "SLOW" else "necesita mejora"
+    return f"{item['label']} {formatted} ({category})"
+
+
 def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckResult:
     del run_id
     result = CheckResult(job_name="pagespeed")
@@ -186,6 +221,8 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
             field_scope, field_target = _field_scope(page["url"], field.get("id"))
             field_key = (strategy, field_target)
             field_names = {
+                "EXPERIMENTAL_TIME_TO_FIRST_BYTE": "field_ttfb_ms",
+                "FIRST_CONTENTFUL_PAINT_MS": "field_fcp_ms",
                 "LARGEST_CONTENTFUL_PAINT_MS": "field_lcp_ms",
                 "INTERACTION_TO_NEXT_PAINT": "field_inp_ms",
                 "CUMULATIVE_LAYOUT_SHIFT_SCORE": "field_cls_score",
@@ -243,29 +280,48 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
             if field.get("overall_category") == "SLOW" and field_key not in field_alerts_seen:
                 is_origin = field_scope == "origin"
                 target_label = urlsplit(field_target).netloc if is_origin else page["name"]
+                field_problems = _field_problem_metrics(field_metrics)
+                problem_summary = ", ".join(_format_field_problem(item) for item in field_problems)
+                ttfb_slow = any(
+                    item["api_name"] == "EXPERIMENTAL_TIME_TO_FIRST_BYTE" and item["category"] == "SLOW"
+                    for item in field_problems
+                )
+                if ttfb_slow:
+                    field_action = (
+                        "Priorizar servidor, caché fría y respuesta inicial compartida por toda la tienda; "
+                        "comparar caché HIT/MISS y observar la tendencia de CrUX durante 28 días."
+                    )
+                elif is_origin:
+                    field_action = (
+                        "Priorizar el recurso y la fase de renderizado degradados; "
+                        "observar la tendencia de CrUX durante 28 días."
+                    )
+                else:
+                    field_action = (
+                        "Priorizar la métrica de campo degradada y validar el cambio sobre usuarios reales, "
+                        "especialmente en móvil."
+                    )
                 result.alerts.append(AlertSpec(
                     dedupe_key=f"pagespeed:crux:{field_scope}:{strategy}:{field_target}",
                     severity="P1" if page.get("severity") == "P0" else "P2",
                     category="pagespeed",
                     title=f"Experiencia real lenta en {target_label}",
                     message=(
-                        "Los datos de campo de Chrome clasifican el origen completo como lento; "
-                        "no permiten atribuir el problema a una ficha concreta."
+                        "CrUX (ventana móvil de 28 días) clasifica el origen completo como lento; "
+                        "no permite atribuir el problema a una ficha concreta. "
+                        + (f"Métricas degradadas: {problem_summary}." if problem_summary else "")
                         if is_origin else
-                        "Los datos de campo de Chrome clasifican esta URL como lenta."
+                        "CrUX (ventana móvil de 28 días) clasifica esta URL como lenta. "
+                        + (f"Métricas degradadas: {problem_summary}." if problem_summary else "")
                     ),
-                    action=(
-                        "Priorizar TTFB, caché, tema, plugins y recursos compartidos por toda la tienda; "
-                        "usar Lighthouse por URL para localizar diferencias concretas."
-                        if is_origin else
-                        "Priorizar la métrica de campo degradada y validar el cambio sobre usuarios reales, especialmente en móvil."
-                    ),
+                    action=field_action,
                     evidence_url=f"https://pagespeed.web.dev/analysis?url={page['url']}",
                     metadata={
                         "overall_category": field.get("overall_category"),
                         "scope": field_scope,
                         "field_id": field.get("id"),
                         "metrics": field_metrics,
+                        "problem_metrics": field_problems,
                     },
                 ))
                 field_alerts_seen.add(field_key)

@@ -13,7 +13,9 @@ from seo_monitor.storage import Store
 from seo_monitor.checks import ai_visibility, backlink_gap, indexing, keyword_demand, local_visibility, rank
 from seo_monitor.checks.pagespeed import (
     _failed_category_audits,
+    _field_problem_metrics,
     _field_scope,
+    _format_field_problem,
     _lab_performance_assessment,
     _performance_opportunities,
 )
@@ -92,6 +94,17 @@ class VisibilityTests(unittest.TestCase):
             ),
             ("origin", "https://shop.voyagerballoons.eu"),
         )
+
+    def test_pagespeed_field_problems_identify_slow_ttfb(self) -> None:
+        problems = _field_problem_metrics({
+            "EXPERIMENTAL_TIME_TO_FIRST_BYTE": {"category": "SLOW", "percentile": 3128},
+            "LARGEST_CONTENTFUL_PAINT_MS": {"category": "AVERAGE", "percentile": 3517},
+            "INTERACTION_TO_NEXT_PAINT": {"category": "FAST", "percentile": 113},
+        })
+
+        self.assertEqual([item["label"] for item in problems], ["TTFB", "LCP"])
+        self.assertEqual(_format_field_problem(problems[0]), "TTFB 3.13s (lento)")
+        self.assertEqual(_format_field_problem(problems[1]), "LCP 3.52s (necesita mejora)")
 
     def test_pagespeed_opportunities_are_ranked_by_estimated_savings(self) -> None:
         opportunities = _performance_opportunities({
