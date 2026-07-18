@@ -118,6 +118,7 @@ def run(config: dict, store: Store, run_id: int) -> CheckResult:
             continue
         allowed_final_urls = {normalize_url(url) for url in page.get("allowed_final_urls", [])}
         final_url_allowed = normalize_url(snapshot.get("final_url")) in allowed_final_urls
+        expected_redirect = bool(snapshot["redirects"] and final_url_allowed)
         if snapshot["redirects"] and not final_url_allowed:
             result.alerts.append(AlertSpec(
                 dedupe_key=f"health:redirect:{key}", severity="P1", category="health",
@@ -158,12 +159,12 @@ def run(config: dict, store: Store, run_id: int) -> CheckResult:
                 ))
 
         slow_streak = 1
-        if snapshot["elapsed_ms"] > slow_ms:
+        if snapshot["elapsed_ms"] > slow_ms and not expected_redirect:
             for previous in history:
                 if (previous.elapsed_ms or 0) <= slow_ms:
                     break
                 slow_streak += 1
-        if snapshot["elapsed_ms"] > slow_ms and slow_streak >= slow_confirmations:
+        if not expected_redirect and snapshot["elapsed_ms"] > slow_ms and slow_streak >= slow_confirmations:
             result.alerts.append(AlertSpec(
                 dedupe_key=f"health:slow:{key}", severity="P2", category="health",
                 title=f"Respuesta lenta en {page['name']}",

@@ -83,6 +83,23 @@ class HealthCheckTests(unittest.TestCase):
         self.assertTrue(third.alerts[0].dedupe_key.startswith("health:slow:"))
         self.assertEqual(third.alerts[0].metadata["slow_streak"], 3)
 
+    def test_expected_empty_checkout_redirect_is_not_reported_as_slow(self) -> None:
+        self.config["strategic_pages"][0]["allowed_final_urls"] = [
+            "https://example.com/landing/",
+            "https://example.com/cart/",
+        ]
+        for _ in range(3):
+            run_id = self.store.start_job("health")
+            with patch.object(http_health, "inspect_page", return_value=self.snapshot(
+                final_url="https://example.com/cart/",
+                redirects=1,
+                elapsed_ms=3200,
+            )):
+                result = http_health.run(self.config, self.store, run_id)
+            self.store.save_result(run_id, result)
+
+        self.assertFalse(any(alert.dedupe_key.startswith("health:slow:") for alert in result.alerts))
+
     def test_noindex_and_missing_price_are_critical(self) -> None:
         run_id = self.store.start_job("health")
         with patch.object(http_health, "inspect_page", return_value=self.snapshot(robots="noindex", visible_text="No price")):
