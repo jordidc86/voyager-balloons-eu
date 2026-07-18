@@ -89,8 +89,37 @@ def _failed_category_audits(categories: dict, audits: dict, category: str) -> li
     return failures
 
 
+def _consecutive_below(history: list[float], current: float, threshold: float) -> int:
+    if current >= threshold:
+        return 0
+    streak = 1
+    for previous in history:
+        if previous >= threshold:
+            break
+        streak += 1
+    return streak
+
+
+def _lab_performance_assessment(
+    history: list[float],
+    current: float,
+    critical: float,
+    warning: float,
+    confirmations: int,
+) -> dict | None:
+    if current >= warning:
+        return None
+    critical_streak = _consecutive_below(history, current, critical)
+    warning_streak = _consecutive_below(history, current, warning)
+    if critical_streak >= confirmations:
+        return {"severity": "P1", "streak": critical_streak, "threshold": critical}
+    if warning_streak >= confirmations:
+        return {"severity": "P2", "streak": warning_streak, "threshold": warning}
+    return None
+
+
 def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckResult:
-    del store, run_id
+    del run_id
     result = CheckResult(job_name="pagespeed")
     if not settings.pagespeed_api_key:
         result.status = "skipped"
@@ -98,6 +127,7 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
         return result
 
     thresholds = config["thresholds"]
+    lab_confirmations = int(thresholds.get("pagespeed_lab_confirmations", 2))
     monitored_names = {
         "Home ES",
         "Landing Segovia",
@@ -139,6 +169,12 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
             performance_opportunities = _performance_opportunities(audits)
             failed_seo_audits = _failed_category_audits(categories, audits, "seo")
             dimensions = {"url": page["url"], "strategy": strategy}
+            performance_history = store.metric_history(
+                "score_performance",
+                "pagespeed",
+                dimensions,
+                limit=max(0, lab_confirmations - 1),
+            )
             for name, score in scores.items():
                 result.add_metric(f"score_{name}", score, source="pagespeed", dimensions=dimensions)
             result.add_metric("lcp_ms", lcp_ms, source="pagespeed", dimensions=dimensions)
@@ -163,19 +199,21 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
                 field_metrics_seen.add(field_key)
 
             performance = scores.get("performance", 0)
-            if performance < thresholds["performance_score_critical"]:
-                severity = "P1"
-            elif performance < thresholds["performance_score_warning"]:
-                severity = "P2"
-            else:
-                severity = None
-            if severity:
+            lab_assessment = _lab_performance_assessment(
+                performance_history,
+                performance,
+                float(thresholds["performance_score_critical"]),
+                float(thresholds["performance_score_warning"]),
+                lab_confirmations,
+            )
+            if lab_assessment:
                 top_opportunity = performance_opportunities[0]["label"] if performance_opportunities else None
                 result.alerts.append(AlertSpec(
-                    dedupe_key=f"pagespeed:performance:{strategy}:{page['url']}", severity=severity, category="pagespeed",
+                    dedupe_key=f"pagespeed:performance:{strategy}:{page['url']}", severity=lab_assessment["severity"], category="pagespeed",
                     title=f"Rendimiento {strategy} bajo en {page['name']}",
                     message=(
-                        f"Lighthouse Performance {performance}/100; LCP {lcp_ms / 1000:.2f}s; CLS {cls:.3f}."
+                        f"Lighthouse Performance {performance}/100; LCP {lcp_ms / 1000:.2f}s; CLS {cls:.3f}; "
+                        f"resultado degradado durante {lab_assessment['streak']} ejecuciones consecutivas."
                         + (f" Principal oportunidad detectada: {top_opportunity}." if top_opportunity else "")
                     ),
                     action="Revisar el elemento LCP, CSS/fuentes bloqueantes, imágenes y JavaScript; validar después con datos de campo.",
@@ -184,6 +222,7 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
                         "scores": scores,
                         "lcp_ms": lcp_ms,
                         "cls": cls,
+                        "confirmation_streak": lab_assessment["streak"],
                         "performance_opportunities": performance_opportunities,
                     },
                 ))

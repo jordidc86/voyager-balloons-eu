@@ -129,8 +129,10 @@
   "thresholds": {
     "health_timeout_seconds": 25,
     "slow_page_ms": 2500,
+    "slow_page_confirmations": 3,
     "performance_score_warning": 80,
     "performance_score_critical": 60,
+    "pagespeed_lab_confirmations": 2,
     "lcp_warning_ms": 2500,
     "lcp_critical_ms": 4000,
     "cls_warning": 0.1,

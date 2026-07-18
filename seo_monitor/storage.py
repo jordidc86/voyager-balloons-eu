@@ -172,6 +172,15 @@ class Store:
                 .order_by(PageSnapshot.observed_at.desc())
             )
 
+    def page_snapshot_history(self, source: str, url: str, limit: int = 3) -> list[PageSnapshot]:
+        with self.sessions() as session:
+            return list(session.scalars(
+                select(PageSnapshot)
+                .where(PageSnapshot.source == source, PageSnapshot.url == url)
+                .order_by(PageSnapshot.observed_at.desc())
+                .limit(limit)
+            ).all())
+
     def page_snapshots_for_latest_success(self, source: str, job_name: str) -> list[PageSnapshot]:
         """Return one complete snapshot set from the latest successful job run."""
         with self.sessions() as session:
@@ -361,6 +370,17 @@ class Store:
                 select(Alert).where(Alert.status == "open").order_by(Alert.severity, Alert.last_seen_at.desc())
             ).all())
 
+    def resolved_alerts_since(self, since: datetime, severities: set[str] | None = None) -> list[Alert]:
+        with self.sessions() as session:
+            query = select(Alert).where(
+                Alert.status == "resolved",
+                Alert.resolved_at.is_not(None),
+                Alert.resolved_at >= since,
+            )
+            if severities:
+                query = query.where(Alert.severity.in_(severities))
+            return list(session.scalars(query.order_by(Alert.resolved_at.desc())).all())
+
     def recent_runs(self, limit: int = 30) -> Iterable[JobRun]:
         with self.sessions() as session:
             return list(session.scalars(select(JobRun).order_by(JobRun.started_at.desc()).limit(limit)).all())
@@ -374,3 +394,23 @@ class Store:
             if sources:
                 query = query.where(Metric.source.in_(sources))
             return float(session.scalar(query) or 0.0)
+
+    def metric_history(
+        self,
+        name: str,
+        source: str,
+        dimensions: dict,
+        limit: int = 3,
+    ) -> list[float]:
+        dimensions_json = json.dumps(dimensions, ensure_ascii=False, sort_keys=True)
+        with self.sessions() as session:
+            return [float(value) for value in session.scalars(
+                select(Metric.value)
+                .where(
+                    Metric.name == name,
+                    Metric.source == source,
+                    Metric.dimensions_json == dimensions_json,
+                )
+                .order_by(Metric.observed_at.desc())
+                .limit(limit)
+            ).all()]

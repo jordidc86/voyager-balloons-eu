@@ -79,6 +79,14 @@ class StoreTests(unittest.TestCase):
             self.store.metric_sum_since("response_ms", datetime(2000, 1, 1, tzinfo=timezone.utc)),
             123,
         )
+        self.assertEqual(
+            self.store.metric_history(
+                "response_ms",
+                "health",
+                {"url": "https://example.com"},
+            ),
+            [123],
+        )
 
     def test_snapshot_set_is_loaded_from_latest_successful_run(self) -> None:
         first_run = self.store.start_job("backlink_gap")

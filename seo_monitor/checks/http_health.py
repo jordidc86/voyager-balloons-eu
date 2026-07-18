@@ -82,10 +82,15 @@ def run(config: dict, store: Store, run_id: int) -> CheckResult:
     result = CheckResult(job_name="health")
     timeout = float(config["thresholds"].get("health_timeout_seconds", 25))
     slow_ms = float(config["thresholds"].get("slow_page_ms", 2500))
+    slow_confirmations = int(config["thresholds"].get("slow_page_confirmations", 3))
     checked = []
 
     for page in config["strategic_pages"]:
-        previous = store.latest_page_snapshot("health", page["url"])
+        history = store.page_snapshot_history(
+            "health",
+            page["url"],
+            limit=max(0, slow_confirmations - 1),
+        )
         snapshot = inspect_page(page, timeout)
         checked.append(snapshot)
         store.add_page_snapshot(run_id, "health", {k: v for k, v in snapshot.items() if k != "visible_text"})
@@ -152,13 +157,22 @@ def run(config: dict, store: Store, run_id: int) -> CheckResult:
                     evidence_url=page["url"],
                 ))
 
-        if snapshot["elapsed_ms"] > slow_ms and previous and (previous.elapsed_ms or 0) > slow_ms:
+        slow_streak = 1
+        if snapshot["elapsed_ms"] > slow_ms:
+            for previous in history:
+                if (previous.elapsed_ms or 0) <= slow_ms:
+                    break
+                slow_streak += 1
+        if snapshot["elapsed_ms"] > slow_ms and slow_streak >= slow_confirmations:
             result.alerts.append(AlertSpec(
                 dedupe_key=f"health:slow:{key}", severity="P2", category="health",
                 title=f"Respuesta lenta en {page['name']}",
-                message=f"La comprobación HTTP tardó {snapshot['elapsed_ms']:.0f} ms; umbral {slow_ms:.0f} ms.",
+                message=(
+                    f"La comprobación HTTP tardó {snapshot['elapsed_ms']:.0f} ms; umbral {slow_ms:.0f} ms, "
+                    f"superado durante {slow_streak} mediciones consecutivas."
+                ),
                 action="Confirmar con PageSpeed/CrUX antes de optimizar; revisar TTFB, caché y recursos críticos.",
-                evidence_url=page["url"],
+                evidence_url=page["url"], metadata={"slow_streak": slow_streak, "elapsed_ms": snapshot["elapsed_ms"]},
             ))
 
     statuses = [item["status_code"] for item in checked]

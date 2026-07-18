@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from .storage import Store
 from .prioritization import prioritized_alerts
@@ -106,6 +106,7 @@ def _percent(value, scale: float = 1.0) -> str:
 def render_markdown(store: Store) -> str:
     now = datetime.now(timezone.utc)
     alerts = sorted(store.open_alerts(), key=lambda item: (SEVERITY_ORDER.get(item.severity, 9), item.category, item.title))
+    recently_resolved = store.resolved_alerts_since(now - timedelta(days=7), {"P0", "P1"})
     prioritized = prioritized_alerts(alerts)
     runs = list(store.recent_runs(20))
     latest_runs = {job_name: store.latest_run(job_name) for job_name in JOB_LABELS}
@@ -123,15 +124,31 @@ def render_markdown(store: Store) -> str:
         f"- P0: {sum(1 for item in alerts if item.severity == 'P0')}",
         f"- P1: {sum(1 for item in alerts if item.severity == 'P1')}",
         f"- P2/P3: {sum(1 for item in alerts if item.severity in {'P2', 'P3'})}",
+        f"- P0/P1 resueltas en los últimos 7 días: {len(recently_resolved)}",
         f"- Fuentes operativas: {operational_sources}/{len(JOB_LABELS)}",
         f"- Fuentes pendientes de credenciales o primera ejecución: {pending_sources}",
         f"- Fuentes con fallo: {failed_sources}",
         "",
+    ]
+    if recently_resolved:
+        lines.extend([
+            "## Incidencias urgentes cerradas",
+            "",
+            "Estas alertas ya no están activas; se muestran para cerrar el ciclo de los avisos recibidos.",
+            "",
+            *[
+                f"- {item.severity} · {item.title} · resuelta {_age(now, item.resolved_at)}"
+                for item in recently_resolved[:10]
+                if item.resolved_at is not None
+            ],
+            "",
+        ])
+    lines.extend([
         "## Cobertura del sistema",
         "",
         "| Fuente | Estado | Última ejecución | Resultado |",
         "| --- | --- | --- | --- |",
-    ]
+    ])
     for job_name, label in JOB_LABELS.items():
         run = latest_runs[job_name]
         if run is None:

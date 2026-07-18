@@ -15,7 +15,11 @@ class HealthCheckTests(unittest.TestCase):
         self.store = Store(f"sqlite:///{Path(self.tmp.name) / 'monitor.db'}")
         self.store.initialize()
         self.config = {
-            "thresholds": {"health_timeout_seconds": 5, "slow_page_ms": 1000},
+            "thresholds": {
+                "health_timeout_seconds": 5,
+                "slow_page_ms": 1000,
+                "slow_page_confirmations": 3,
+            },
             "strategic_pages": [{
                 "name": "Landing",
                 "url": "https://example.com/landing/",
@@ -53,7 +57,7 @@ class HealthCheckTests(unittest.TestCase):
             result = http_health.run(self.config, self.store, run_id)
         self.assertEqual(result.alerts, [])
 
-    def test_second_slow_sample_alerts(self) -> None:
+    def test_second_slow_sample_does_not_alert(self) -> None:
         first_run = self.store.start_job("health")
         with patch.object(http_health, "inspect_page", return_value=self.snapshot()):
             first = http_health.run(self.config, self.store, first_run)
@@ -62,8 +66,22 @@ class HealthCheckTests(unittest.TestCase):
         second_run = self.store.start_job("health")
         with patch.object(http_health, "inspect_page", return_value=self.snapshot(elapsed_ms=1400)):
             second = http_health.run(self.config, self.store, second_run)
-        self.assertEqual(len(second.alerts), 1)
-        self.assertTrue(second.alerts[0].dedupe_key.startswith("health:slow:"))
+        self.assertEqual(second.alerts, [])
+
+    def test_third_slow_sample_alerts(self) -> None:
+        for elapsed_ms in (1500, 1400):
+            run_id = self.store.start_job("health")
+            with patch.object(http_health, "inspect_page", return_value=self.snapshot(elapsed_ms=elapsed_ms)):
+                result = http_health.run(self.config, self.store, run_id)
+            self.store.save_result(run_id, result)
+
+        third_run = self.store.start_job("health")
+        with patch.object(http_health, "inspect_page", return_value=self.snapshot(elapsed_ms=1300)):
+            third = http_health.run(self.config, self.store, third_run)
+
+        self.assertEqual(len(third.alerts), 1)
+        self.assertTrue(third.alerts[0].dedupe_key.startswith("health:slow:"))
+        self.assertEqual(third.alerts[0].metadata["slow_streak"], 3)
 
     def test_noindex_and_missing_price_are_critical(self) -> None:
         run_id = self.store.start_job("health")

@@ -11,7 +11,12 @@ from seo_monitor.checks.local_visibility import _absence_streak, _drop_assessmen
 from seo_monitor.config import Settings, load_config
 from seo_monitor.storage import Store
 from seo_monitor.checks import ai_visibility, backlink_gap, indexing, keyword_demand, local_visibility, rank
-from seo_monitor.checks.pagespeed import _failed_category_audits, _field_scope, _performance_opportunities
+from seo_monitor.checks.pagespeed import (
+    _failed_category_audits,
+    _field_scope,
+    _lab_performance_assessment,
+    _performance_opportunities,
+)
 from seo_monitor.google_auth import authorized_session
 
 
@@ -131,6 +136,21 @@ class VisibilityTests(unittest.TestCase):
 
         self.assertEqual(failures[0]["id"], "crawlable-anchors")
         self.assertEqual(failures[0]["nodes"][0]["selector"], "a.ast-qty-placeholder")
+
+    def test_pagespeed_lab_warning_requires_consecutive_runs(self) -> None:
+        self.assertIsNone(_lab_performance_assessment([], 70, 60, 80, 2))
+        assessment = _lab_performance_assessment([76], 70, 60, 80, 2)
+        self.assertEqual(assessment["severity"], "P2")
+        self.assertEqual(assessment["streak"], 2)
+
+    def test_single_critical_pagespeed_sample_is_not_urgent(self) -> None:
+        assessment = _lab_performance_assessment([70], 55, 60, 80, 2)
+        self.assertEqual(assessment["severity"], "P2")
+        self.assertEqual(assessment["streak"], 2)
+        self.assertEqual(
+            _lab_performance_assessment([55], 50, 60, 80, 2)["severity"],
+            "P1",
+        )
 
     @patch("seo_monitor.checks.keyword_demand.requests.post")
     def test_keyword_overview_accepts_null_items(self, post) -> None:

@@ -154,6 +154,26 @@ class ReportingTests(unittest.TestCase):
 
         self.assertEqual(prioritize_alert(alert).destination, "Bragança")
 
+    def test_weekly_report_closes_the_loop_on_recent_urgent_alerts(self) -> None:
+        alert = AlertSpec(
+            dedupe_key="rank:temporary-drop",
+            severity="P1",
+            category="rank",
+            title="Caída temporal",
+            message="La posición cayó.",
+            action="Confirmar tendencia.",
+        )
+        first_run = self.store.start_job("rank")
+        self.store.save_result(first_run, CheckResult(job_name="rank", alerts=[alert]))
+        recovery_run = self.store.start_job("rank")
+        self.store.save_result(recovery_run, CheckResult(job_name="rank"))
+
+        report = render_markdown(self.store)
+
+        self.assertIn("P0/P1 resueltas en los últimos 7 días: 1", report)
+        self.assertIn("Incidencias urgentes cerradas", report)
+        self.assertIn("Caída temporal", report)
+
 
 if __name__ == "__main__":
     unittest.main()
