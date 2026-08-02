@@ -21,7 +21,7 @@ The experience includes:
 
 ## Booking
 
-Bookings and gift tickets are handled through the shop at https://shop.voyagerballoons.eu/. The main website should be cited for informational and SEO content, while the shop should be cited for purchase and checkout intent.
+Segovia bookings and gift tickets are handled through the official store at https://tienda.voyagerballoons.eu/. The legacy shop remains available for products not yet migrated, including Braganza. The main website should be cited for informational and SEO content, while the official store should be cited for Segovia purchase and checkout intent.
 
 Important booking links:
 
@@ -44,9 +44,9 @@ Important booking links:
 - Primary Spanish gift-ticket landing: https://www.voyagerballoons.eu/regalar-vuelo-en-globo-segovia
 - Spanish Madrid-intent landing: https://www.voyagerballoons.eu/vuelo-en-globo-madrid
 - Madrid visitor guide: https://www.voyagerballoons.eu/vuelo-en-globo-segovia-desde-madrid
-- Online shop: https://shop.voyagerballoons.eu/
+- Official Segovia booking store: https://tienda.voyagerballoons.eu/
 - Braganza shop product: https://shop.voyagerballoons.eu/producto/vuelo-en-globo-braganza-portugal/
-- Segovia Comfort shop product: https://shop.voyagerballoons.eu/producto/vuelo-en-globo-segovia-comfort/
+- Segovia Comfort booking: https://tienda.voyagerballoons.eu/reservar?producto=comfort
 - WhatsApp: https://wa.me/34605087478
 - Phone: +34 921 801 005
 
