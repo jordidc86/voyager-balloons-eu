@@ -1,12 +1,14 @@
 {
   "brand": "Voyager Balloons",
   "primary_domain": "www.voyagerballoons.eu",
-  "target_domains": ["www.voyagerballoons.eu", "shop.voyagerballoons.eu"],
+  "target_domains": ["www.voyagerballoons.eu", "tienda.voyagerballoons.eu", "shop.voyagerballoons.eu"],
   "tracking": {
     "main_url": "https://www.voyagerballoons.eu/",
     "main_script_url": "https://www.voyagerballoons.eu/js/google-ads-tracking.js",
+    "booking_url": "https://tienda.voyagerballoons.eu/",
     "shop_url": "https://shop.voyagerballoons.eu/",
     "main_domain": "voyagerballoons.eu",
+    "booking_domain": "tienda.voyagerballoons.eu",
     "shop_domain": "shop.voyagerballoons.eu",
     "google_tag_id": "GT-55NTF5CN",
     "google_ads_id": "AW-11564692382",

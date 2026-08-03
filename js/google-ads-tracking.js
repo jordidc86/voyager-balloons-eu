@@ -23,6 +23,7 @@
       domains: [
         'voyagerballoons.eu',
         'www.voyagerballoons.eu',
+        'tienda.voyagerballoons.eu',
         'shop.voyagerballoons.eu'
       ],
       accept_incoming: true,
@@ -80,7 +81,9 @@
   });
 
   document.addEventListener('click', function (event) {
-    var link = event.target.closest && event.target.closest('a[href*="shop.voyagerballoons.eu"]');
+    var link = event.target.closest && event.target.closest(
+      'a[href*="tienda.voyagerballoons.eu"], a[href*="shop.voyagerballoons.eu"]'
+    );
     if (!link || loaded) return;
 
     event.preventDefault();

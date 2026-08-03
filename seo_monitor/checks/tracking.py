@@ -34,6 +34,7 @@ def _audit(main_html: str, tracking_js: str, shop_html: str, tracking_config: di
     tag_id = tracking_config["google_tag_id"]
     ads_id = tracking_config["google_ads_id"]
     main_domain = tracking_config["main_domain"]
+    booking_domain = tracking_config["booking_domain"]
     shop_domain = tracking_config["shop_domain"]
     script_url = tracking_config["main_script_url"]
     script_path = urlsplit(script_url).path
@@ -57,7 +58,10 @@ def _audit(main_html: str, tracking_js: str, shop_html: str, tracking_config: di
         },
         {
             "key": "main-linker",
-            "ok": all(token in tracking_js for token in (main_domain, shop_domain, "accept_incoming", "decorate_forms")),
+            "ok": all(
+                token in tracking_js
+                for token in (main_domain, booking_domain, shop_domain, "accept_incoming", "decorate_forms")
+            ),
             "severity": "P1",
             "message": "La configuración cross-domain de la web principal está incompleta.",
         },
@@ -96,9 +100,14 @@ def _audit(main_html: str, tracking_js: str, shop_html: str, tracking_config: di
         },
         {
             "key": "shop-links",
-            "ok": shop_domain in main_html,
+            "ok": booking_domain in main_html,
             "severity": "P0",
-            "message": "La web principal ya no contiene enlaces hacia la tienda.",
+            "message": "La web principal no contiene ningún botón que lleve a la tienda nueva.",
+            "action": (
+                "Comprobar los botones de reserva de la web principal y restaurar sus enlaces a "
+                f"{booking_domain}."
+            ),
+            "evidence_url": tracking_config["main_url"],
         },
     ]
 
@@ -130,10 +139,22 @@ def run(config: dict, store: Store, run_id: int) -> CheckResult:
                 dedupe_key=f"tracking:{finding['key']}",
                 severity=finding["severity"],
                 category="tracking",
-                title="Riesgo en la medición de reservas",
+                title=(
+                    "Los botones de reserva no llevan a la tienda nueva"
+                    if finding["key"] == "shop-links"
+                    else "Riesgo en la medición de reservas"
+                ),
                 message=finding["message"],
-                action="Restaurar la etiqueta y validar de nuevo la navegación web → tienda, add_to_cart y purchase antes de interpretar GA4.",
-                evidence_url=tracking_config["main_url"] if finding["key"].startswith("main") else tracking_config["shop_url"],
+                action=finding.get(
+                    "action",
+                    "Comprobar la medición del paso web → tienda y de los eventos de compra antes de interpretar GA4.",
+                ),
+                evidence_url=finding.get(
+                    "evidence_url",
+                    tracking_config["main_url"]
+                    if finding["key"].startswith("main")
+                    else tracking_config["shop_url"],
+                ),
                 metadata={"check": finding["key"]},
             ))
     if failures:
