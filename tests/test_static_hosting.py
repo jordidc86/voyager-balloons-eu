@@ -41,6 +41,22 @@ class StaticHostingConfigTests(unittest.TestCase):
         config = json.loads((ROOT / "railway.json").read_text(encoding="utf-8"))
         self.assertNotIn("deploy", config)
 
+    def test_public_pages_use_the_official_whatsapp_api_number(self):
+        public_files = [
+            *ROOT.glob("*.html"),
+            *ROOT.glob("*.txt"),
+            *ROOT.glob("*.xml"),
+            *(ROOT / "articulos").rglob("*.html"),
+            *(ROOT / "en").rglob("*.html"),
+            *(ROOT / "pt").rglob("*.html"),
+        ]
+        public_content = "\n".join(path.read_text(encoding="utf-8") for path in public_files)
+
+        self.assertNotIn("34605087478", public_content)
+        self.assertNotIn("+34 605 087 478", public_content)
+        self.assertIn("https://wa.me/34614007056", public_content)
+        self.assertIn("+34 614 00 70 56", public_content)
+
 
 if __name__ == "__main__":
     unittest.main()
