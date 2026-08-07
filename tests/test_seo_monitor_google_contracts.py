@@ -4,7 +4,7 @@ import unittest
 from datetime import date
 
 from seo_monitor.checks.ga4 import _commerce_diagnostics, _dimension_report, _funnel_window, _report
-from seo_monitor.checks.gsc import _discover_keyword_candidates, _query, _totals
+from seo_monitor.checks.gsc import _discover_keyword_candidates, _page_click_declines, _query, _totals
 
 
 class FakeResponse:
@@ -40,6 +40,22 @@ class GoogleContractTests(unittest.TestCase):
 
     def test_search_console_totals_handle_empty_data(self) -> None:
         self.assertEqual(_totals([]), {"clicks": 0.0, "impressions": 0.0, "ctr": 0.0, "position": 0.0})
+
+    def test_gsc_page_decline_ignores_tiny_click_samples(self) -> None:
+        previous = [{"keys": ["https://example.com/page"], "clicks": 3, "impressions": 50}]
+        current = [{"keys": ["https://example.com/page"], "clicks": 0, "impressions": 45}]
+
+        self.assertEqual(_page_click_declines(previous, current, 30, 5, 5), [])
+
+    def test_gsc_page_decline_keeps_material_losses(self) -> None:
+        previous = [{"keys": ["https://example.com/page"], "clicks": 8, "impressions": 100}]
+        current = [{"keys": ["https://example.com/page"], "clicks": 2, "impressions": 90}]
+
+        declines = _page_click_declines(previous, current, 30, 5, 5)
+
+        self.assertEqual(len(declines), 1)
+        self.assertEqual(declines[0]["drop_percent"], 75.0)
+        self.assertEqual(declines[0]["previous_clicks"], 8.0)
 
     def test_gsc_discovers_commercial_query_and_chooses_best_landing(self) -> None:
         rows = [

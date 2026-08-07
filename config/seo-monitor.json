@@ -139,6 +139,8 @@
     "lcp_critical_ms": 4000,
     "cls_warning": 0.1,
     "organic_click_drop_percent": 30,
+    "gsc_page_minimum_previous_clicks": 5,
+    "gsc_page_minimum_click_loss": 5,
     "organic_conversion_drop_percent": 30,
     "ga4_funnel_minimum_complete_days": 2,
     "ga4_funnel_minimum_shop_sessions": 50,

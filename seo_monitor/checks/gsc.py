@@ -37,6 +37,37 @@ def _rows_by_key(rows: list[dict]) -> dict[str, dict]:
     return {str(row.get("keys", [""])[0]): row for row in rows}
 
 
+def _page_click_declines(
+    previous_rows: list[dict],
+    current_rows: list[dict],
+    drop_threshold: float,
+    minimum_previous_clicks: float,
+    minimum_click_loss: float,
+) -> list[dict]:
+    current_by_page = _rows_by_key(current_rows)
+    declines = []
+    for page, previous_row in _rows_by_key(previous_rows).items():
+        previous_clicks = float(previous_row.get("clicks", 0))
+        if previous_clicks < minimum_previous_clicks:
+            continue
+        row = current_by_page.get(page, {})
+        current_clicks = float(row.get("clicks", 0))
+        click_loss = previous_clicks - current_clicks
+        if click_loss < minimum_click_loss:
+            continue
+        drop = click_loss / previous_clicks * 100
+        if drop >= drop_threshold:
+            declines.append({
+                "page": page,
+                "drop_percent": round(drop, 1),
+                "previous_clicks": previous_clicks,
+                "current_clicks": current_clicks,
+                "current_impressions": float(row.get("impressions", 0)),
+            })
+    declines.sort(key=lambda item: item["previous_clicks"] - item["current_clicks"], reverse=True)
+    return declines
+
+
 def _candidate_route(query: str, page: str) -> dict[str, str]:
     text = query.casefold()
     path = urlsplit(page).path.casefold()
@@ -233,26 +264,14 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
                 metadata={"current": current, "previous": previous},
             ))
 
-    previous_pages = _rows_by_key(previous_page_rows)
-    current_pages = _rows_by_key(page_rows)
-    page_declines = []
-    for page, previous_row in previous_pages.items():
-        if float(previous_row.get("clicks", 0)) < 3:
-            continue
-        row = current_pages.get(page, {})
-        previous_clicks = float(previous_row.get("clicks", 0))
-        current_clicks = float(row.get("clicks", 0))
-        drop = (previous_clicks - current_clicks) / previous_clicks * 100
-        if drop >= threshold:
-            page_declines.append({
-                "page": page,
-                "drop_percent": round(drop, 1),
-                "previous_clicks": previous_clicks,
-                "current_clicks": current_clicks,
-                "current_impressions": float(row.get("impressions", 0)),
-            })
+    page_declines = _page_click_declines(
+        previous_page_rows,
+        page_rows,
+        threshold,
+        float(config["thresholds"].get("gsc_page_minimum_previous_clicks", 5)),
+        float(config["thresholds"].get("gsc_page_minimum_click_loss", 5)),
+    )
     if page_declines:
-        page_declines.sort(key=lambda item: item["previous_clicks"] - item["current_clicks"], reverse=True)
         result.alerts.append(AlertSpec(
             dedupe_key="gsc:page-click-declines",
             severity="P1",
