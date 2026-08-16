@@ -20,30 +20,35 @@
         "name": "Home inglesa",
         "url": "https://www.voyagerballoons.eu/en/",
         "source_file": "en/index.html",
+        "source_url": "https://raw.githubusercontent.com/jordidc86/voyager-balloons-eu/main/en/index.html",
         "severity": "P1"
       },
       {
         "name": "Sitemap principal",
         "url": "https://www.voyagerballoons.eu/sitemap.xml",
         "source_file": "sitemap.xml",
+        "source_url": "https://raw.githubusercontent.com/jordidc86/voyager-balloons-eu/main/sitemap.xml",
         "severity": "P1"
       },
       {
         "name": "Índice de sitemaps",
         "url": "https://www.voyagerballoons.eu/sitemap_index.xml",
         "source_file": "sitemap_index.xml",
+        "source_url": "https://raw.githubusercontent.com/jordidc86/voyager-balloons-eu/main/sitemap_index.xml",
         "severity": "P1"
       },
       {
         "name": "Contexto resumido para IA",
         "url": "https://www.voyagerballoons.eu/llms.txt",
         "source_file": "llms.txt",
+        "source_url": "https://raw.githubusercontent.com/jordidc86/voyager-balloons-eu/main/llms.txt",
         "severity": "P2"
       },
       {
         "name": "Contexto completo para IA",
         "url": "https://www.voyagerballoons.eu/llms-full.txt",
         "source_file": "llms-full.txt",
+        "source_url": "https://raw.githubusercontent.com/jordidc86/voyager-balloons-eu/main/llms-full.txt",
         "severity": "P2"
       }
     ]

@@ -29,6 +29,21 @@ def expected_hash(source_file: str, root: Path | None = None) -> str:
     return hashlib.sha256(source_path(source_file, root).read_bytes()).hexdigest()
 
 
+def expected_hash_for_probe(probe: dict, timeout: float, root: Path | None = None) -> str:
+    source_url = probe.get("source_url")
+    if not source_url:
+        return expected_hash(probe["source_file"], root)
+
+    response = requests.get(
+        source_url,
+        timeout=timeout,
+        allow_redirects=True,
+        headers={"User-Agent": USER_AGENT, "Cache-Control": "no-cache"},
+    )
+    response.raise_for_status()
+    return hashlib.sha256(response.content).hexdigest()
+
+
 def inspect_remote(probe: dict, timeout: float) -> dict:
     started = time.perf_counter()
     try:
@@ -76,13 +91,24 @@ def run(config: dict, store: Store, run_id: int) -> CheckResult:
     mismatches = 0
     confirmed_mismatches = 0
     unavailable = 0
+    source_unavailable = 0
 
     for probe in probes:
         previous = store.latest_page_snapshot("deployment", probe["url"])
         snapshot = inspect_remote(probe, timeout)
-        expected = expected_hash(probe["source_file"])
-        snapshot["expected_content_hash"] = expected
         snapshot["source_file"] = probe["source_file"]
+        snapshot["source_url"] = probe.get("source_url")
+        try:
+            expected = expected_hash_for_probe(probe, timeout)
+            snapshot["expected_content_hash"] = expected
+            snapshot["expected_source_error"] = None
+        except Exception as exc:
+            source_unavailable += 1
+            snapshot["expected_content_hash"] = None
+            snapshot["expected_source_error"] = str(exc)
+            checked.append(snapshot)
+            store.add_page_snapshot(run_id, "deployment", snapshot)
+            continue
         checked.append(snapshot)
         store.add_page_snapshot(run_id, "deployment", snapshot)
 
@@ -154,6 +180,7 @@ def run(config: dict, store: Store, run_id: int) -> CheckResult:
         "mismatches": mismatches,
         "confirmed_mismatches": confirmed_mismatches,
         "unavailable": unavailable,
+        "source_unavailable": source_unavailable,
         "alerts": len(result.alerts),
     }
     result.add_metric("deployment_probes_checked", len(checked))

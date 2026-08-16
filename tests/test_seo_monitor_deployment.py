@@ -3,7 +3,7 @@ from __future__ import annotations
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from seo_monitor.checks import deployment
 from seo_monitor.storage import Store
@@ -55,6 +55,20 @@ class DeploymentCheckTests(unittest.TestCase):
         result = self.run_check(expected)
         self.assertEqual(result.alerts, [])
         self.assertEqual(result.summary["current_matches"], 1)
+
+    def test_source_url_takes_precedence_over_packaged_file(self) -> None:
+        probe = {
+            "source_file": "index.html",
+            "source_url": "https://raw.example.com/main/index.html",
+        }
+        response = Mock()
+        response.content = b"canonical source"
+        response.raise_for_status.return_value = None
+
+        with patch.object(deployment.requests, "get", return_value=response):
+            actual = deployment.expected_hash_for_probe(probe, 5, self.root)
+
+        self.assertEqual(actual, deployment.hashlib.sha256(b"canonical source").hexdigest())
 
     def test_first_mismatch_waits_for_confirmation(self) -> None:
         result = self.run_check("stale")
