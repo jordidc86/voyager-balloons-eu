@@ -14,11 +14,24 @@ ENDPOINT = "https://api.dataforseo.com/v3/dataforseo_labs/google/keyword_overvie
 
 
 def _market(row: dict[str, str]) -> tuple[str, str, int]:
-    is_portugal = "braganca" in row.get("cluster", "")
-    language_code = row.get("language_code") or ("pt" if is_portugal else "es")
-    if is_portugal:
-        return "Portugal", language_code, 2620
-    return "Spain", language_code, 2724
+    """Return a supported DataForSEO Labs country/language combination.
+
+    The Labs keyword database currently exposes Spanish for Spain and
+    Portuguese for Portugal.  The language of the keyword or landing page can
+    still be English or Spanish; it must not be copied into the API locale
+    because unsupported country/language pairs are rejected.
+    """
+    location_code = str(row.get("location_code") or "")
+    location_name = str(row.get("location_name") or "").casefold()
+    cluster = str(row.get("cluster") or "").casefold()
+
+    if location_code in {"2620", "9051350"} or "portugal" in location_name:
+        return "Portugal", "pt", 2620
+    if location_code in {"2724", "1005493", "1005528"} or "spain" in location_name:
+        return "Spain", "es", 2724
+    if "braganca" in cluster:
+        return "Portugal", "pt", 2620
+    return "Spain", "es", 2724
 
 
 def _overview(
@@ -162,13 +175,19 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
             metadata={"opportunities": opportunities[:20]},
         ))
     if failures:
+        partial_failure = groups_checked > 0
         result.alerts.append(AlertSpec(
             dedupe_key="keyword_demand:provider-failures",
-            severity="P1",
+            severity="P2" if partial_failure else "P1",
             category="keyword_demand",
-            title="Datos de demanda incompletos",
+            title="Datos de demanda parcialmente incompletos" if partial_failure else "Datos de demanda no disponibles",
             message=f"No se pudieron consultar {len(failures)} mercados.",
-            action="Revisar saldo, idiomas admitidos y respuesta de DataForSEO Labs antes del siguiente ciclo.",
+            action=(
+                "Revisar las combinaciones de mercado e idioma en el informe semanal; "
+                "las mediciones válidas permanecen disponibles."
+                if partial_failure
+                else "Revisar saldo, credenciales, idiomas admitidos y respuesta de DataForSEO Labs antes del siguiente ciclo."
+            ),
             metadata={"failures": failures},
         ))
 

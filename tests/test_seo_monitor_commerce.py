@@ -50,6 +50,35 @@ class CommerceTests(unittest.TestCase):
         self.assertEqual(result.summary["successful_flows"], 0)
         self.assertEqual(result.summary["alerts"], 1)
 
+    @patch("seo_monitor.checks.commerce.time.sleep")
+    @patch("seo_monitor.checks.commerce.test_product")
+    def test_transient_failure_recovers_before_alerting(self, test_product, sleep) -> None:
+        product = {"name": "Classic", "url": "https://example.test", "expected_text": "Classic"}
+        alert = AlertSpec(
+            dedupe_key="commerce:checkout:classic",
+            severity="P0",
+            category="commerce",
+            title="Broken",
+            message="Broken",
+            action="Fix",
+        )
+        test_product.side_effect = [
+            ({"product": "Classic", "flow_ok": False}, [alert]),
+            ({"product": "Classic", "flow_ok": True}, []),
+        ]
+
+        result = commerce.run(
+            {"thresholds": {"commerce_retry_delay_seconds": 0}, "commerce_products": [product]},
+            store=None,
+            run_id=1,
+        )
+
+        self.assertEqual(result.summary["alerts"], 0)
+        self.assertEqual(result.summary["successful_flows"], 1)
+        self.assertEqual(result.summary["outcomes"][0]["attempts"], 2)
+        self.assertTrue(result.summary["outcomes"][0]["recovered_after_retry"])
+        sleep.assert_not_called()
+
 
 if __name__ == "__main__":
     unittest.main()

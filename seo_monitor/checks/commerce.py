@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import time
+from dataclasses import replace
 from urllib.parse import urlsplit
 
 import requests
@@ -124,14 +125,38 @@ def test_product(product: dict, timeout: float) -> tuple[dict, list[AlertSpec]]:
 def run(config: dict, store: Store, run_id: int) -> CheckResult:
     del store, run_id
     result = CheckResult(job_name="commerce")
-    timeout = float(config["thresholds"].get("health_timeout_seconds", 25))
+    thresholds = config.get("thresholds", {})
+    timeout = float(thresholds.get("health_timeout_seconds", 25))
+    confirmation_attempts = max(2, int(thresholds.get("commerce_confirmation_attempts", 2)))
+    retry_delay = max(0.0, float(thresholds.get("commerce_retry_delay_seconds", 3)))
     outcomes = []
     for product in config.get("commerce_products", []):
-        try:
-            outcome, alerts = test_product(product, timeout)
-        except Exception as exc:
-            outcome = {"product": product["name"], "error": str(exc)}
-            alerts = [_alert(product, "exception", f"La prueba sintética terminó con error: {exc}")]
+        attempt_outcomes = []
+        alerts: list[AlertSpec] = []
+        for attempt in range(1, confirmation_attempts + 1):
+            try:
+                outcome, alerts = test_product(product, timeout)
+            except Exception as exc:
+                outcome = {"product": product["name"], "error": str(exc), "flow_ok": False}
+                alerts = [_alert(product, "exception", f"La prueba sintética terminó con error: {exc}")]
+            attempt_outcomes.append(outcome)
+            if not alerts:
+                break
+            if attempt < confirmation_attempts and retry_delay:
+                time.sleep(retry_delay)
+
+        outcome = dict(attempt_outcomes[-1])
+        outcome["attempts"] = len(attempt_outcomes)
+        outcome["recovered_after_retry"] = len(attempt_outcomes) > 1 and not alerts
+        if alerts:
+            alerts = [
+                replace(alert, metadata={
+                    **alert.metadata,
+                    "confirmation_attempts": len(attempt_outcomes),
+                    "confirmed_consecutive_failure": len(attempt_outcomes) >= confirmation_attempts,
+                })
+                for alert in alerts
+            ]
         outcomes.append(outcome)
         result.alerts.extend(alerts)
         result.add_metric("flow_ok", int(not alerts), source="commerce", dimensions={"product": product["name"]})

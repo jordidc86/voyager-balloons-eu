@@ -135,6 +135,9 @@
   ],
   "thresholds": {
     "health_timeout_seconds": 25,
+    "commerce_confirmation_attempts": 2,
+    "commerce_retry_delay_seconds": 3,
+    "commerce_alert_recheck_seconds": 900,
     "slow_page_ms": 2500,
     "slow_page_confirmations": 3,
     "performance_score_warning": 80,

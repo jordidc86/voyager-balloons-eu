@@ -28,6 +28,20 @@ class WorkerTests(unittest.TestCase):
         self.assertFalse(_due(recent, 604800))
         self.assertTrue(_due(old, 604800))
 
+    def test_successful_commerce_alert_rechecks_after_fifteen_minutes(self) -> None:
+        recent = SimpleNamespace(
+            status="success",
+            started_at=datetime.now(timezone.utc) - timedelta(minutes=10),
+            summary_json='{"alerts": 1}',
+        )
+        due = SimpleNamespace(
+            status="success",
+            started_at=datetime.now(timezone.utc) - timedelta(minutes=16),
+            summary_json='{"alerts": 1}',
+        )
+        self.assertFalse(_due(recent, 21600, alert_retry_seconds=900))
+        self.assertTrue(_due(due, 21600, alert_retry_seconds=900))
+
     @patch("seo_monitor.worker.ping_heartbeat")
     @patch("seo_monitor.worker.execute", side_effect=RuntimeError("boom"))
     @patch("seo_monitor.worker.send_digest", return_value="Informe")

@@ -532,20 +532,56 @@ class VisibilityTests(unittest.TestCase):
             run_id = store.start_job("keyword_demand")
             result = keyword_demand.run(config, store, run_id, settings)
 
-        self.assertEqual(overview.call_args.args[2:4], ("en", 2724))
+        self.assertEqual(overview.call_args.args[2:4], ("es", 2724))
         self.assertEqual(result.summary["keywords_with_data"], 1)
         self.assertEqual(result.summary["opportunities"], 1)
         self.assertEqual(result.summary["provider_cost_usd"], 0.012)
 
-    def test_keyword_demand_uses_each_language_in_the_portugal_market(self) -> None:
+    def test_keyword_demand_uses_supported_native_language_for_each_market(self) -> None:
         self.assertEqual(
-            keyword_demand._market({"cluster": "braganca_en", "language_code": "en"}),
-            ("Portugal", "en", 2620),
+            keyword_demand._market({"cluster": "braganca_en", "language_code": "en", "location_name": "Portugal"}),
+            ("Portugal", "pt", 2620),
         )
         self.assertEqual(
-            keyword_demand._market({"cluster": "braganca", "language_code": "es"}),
-            ("Portugal", "es", 2620),
+            keyword_demand._market({"cluster": "braganca", "language_code": "es", "location_name": "Spain"}),
+            ("Spain", "es", 2724),
         )
+
+    @patch("seo_monitor.checks.keyword_demand._overview")
+    @patch("seo_monitor.checks.keyword_demand.load_keyword_inventory")
+    def test_partial_keyword_demand_failure_is_not_urgent(self, load_keywords, overview) -> None:
+        load_keywords.return_value = [
+            {
+                "keyword": "vuelo en globo segovia",
+                "location_name": "Spain",
+                "location_code": "2724",
+                "language_code": "es",
+                "device": "mobile",
+                "priority": "P0",
+                "target_url": "https://www.voyagerballoons.eu/vuelo-en-globo-segovia",
+                "cluster": "segovia",
+            },
+            {
+                "keyword": "passeio de balao braganca",
+                "location_name": "Portugal",
+                "location_code": "2620",
+                "language_code": "pt",
+                "device": "mobile",
+                "priority": "P0",
+                "target_url": "https://www.voyagerballoons.eu/pt/passeio-de-balao-braganca",
+                "cluster": "braganca",
+            },
+        ]
+        overview.side_effect = [([], 0.01), RuntimeError("provider error")]
+        settings = replace(Settings.from_env(), dataforseo_login="login", dataforseo_password="password")
+        config = load_config(settings)
+        with tempfile.TemporaryDirectory() as tmp:
+            store = Store(f"sqlite:///{Path(tmp) / 'monitor.db'}")
+            store.initialize()
+            result = keyword_demand.run(config, store, store.start_job("keyword_demand"), settings)
+
+        alert = next(item for item in result.alerts if item.dedupe_key == "keyword_demand:provider-failures")
+        self.assertEqual(alert.severity, "P2")
 
     @patch("seo_monitor.checks.rank._search")
     @patch("seo_monitor.checks.rank.load_keyword_inventory")

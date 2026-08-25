@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import logging
 import time
 from datetime import datetime, timedelta, timezone
@@ -13,7 +14,7 @@ from .storage import Store
 LOGGER = logging.getLogger("voyager-seo-monitor")
 
 
-def _due(last_run, interval_seconds: int) -> bool:
+def _due(last_run, interval_seconds: int, alert_retry_seconds: int | None = None) -> bool:
     if last_run is None:
         return True
     observed = last_run.started_at
@@ -24,6 +25,13 @@ def _due(last_run, interval_seconds: int) -> bool:
         effective_interval = min(interval_seconds, 3600)
     elif last_run.status == "skipped":
         effective_interval = min(interval_seconds, 21600)
+    elif alert_retry_seconds:
+        try:
+            alert_count = int(json.loads(last_run.summary_json or "{}").get("alerts", 0) or 0)
+        except (TypeError, ValueError, json.JSONDecodeError):
+            alert_count = 0
+        if alert_count:
+            effective_interval = min(interval_seconds, alert_retry_seconds)
     return (datetime.now(timezone.utc) - observed).total_seconds() >= effective_interval
 
 
@@ -37,7 +45,16 @@ def run_due_once(settings: Settings, store: Store) -> dict[str, int]:
     failed = 0
     skipped_due = 0
     for job_name in JOBS:
-        if not _due(store.latest_run(job_name), int(schedules[job_name])):
+        alert_retry_seconds = None
+        if job_name == "commerce":
+            alert_retry_seconds = int(
+                config.get("thresholds", {}).get("commerce_alert_recheck_seconds", 900)
+            )
+        if not _due(
+            store.latest_run(job_name),
+            int(schedules[job_name]),
+            alert_retry_seconds=alert_retry_seconds,
+        ):
             skipped_due += 1
             continue
         try:
