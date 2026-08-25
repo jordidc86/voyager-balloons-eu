@@ -16,3 +16,4 @@ data/seo-monitor/
 __pycache__/
 *.pyc
 .venv-seo-monitor/
+.venv-seo-90/
