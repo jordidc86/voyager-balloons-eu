@@ -68,6 +68,11 @@ def _page_click_declines(
     return declines
 
 
+def _page_decline_severity(current: dict[str, float], previous: dict[str, float]) -> str:
+    """A local page decline is urgent only when the whole organic channel declines."""
+    return "P1" if current.get("clicks", 0) < previous.get("clicks", 0) else "P2"
+
+
 def _candidate_route(query: str, page: str) -> dict[str, str]:
     text = query.casefold()
     path = urlsplit(page).path.casefold()
@@ -272,15 +277,28 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
         float(config["thresholds"].get("gsc_page_minimum_click_loss", 5)),
     )
     if page_declines:
+        severity = _page_decline_severity(current, previous)
+        site_clicks_declined = severity == "P1"
         result.alerts.append(AlertSpec(
             dedupe_key="gsc:page-click-declines",
-            severity="P1",
+            severity=severity,
             category="gsc",
             title="Páginas con pérdida relevante de clics orgánicos",
-            message=f"Se detectan {len(page_declines)} páginas con una caída superior al {threshold:.0f}% frente al periodo comparable.",
-            action="Priorizar las páginas con mayor pérdida absoluta; separar estacionalidad, caída de posición, CTR, indexación y cambios de SERP.",
+            message=(
+                f"Se detectan {len(page_declines)} páginas con una caída superior al {threshold:.0f}% frente al periodo comparable. "
+                + (
+                    "La caída también afecta al total orgánico del sitio."
+                    if site_clicks_declined
+                    else "El total orgánico del sitio no cae, por lo que se mantiene como observación no urgente."
+                )
+            ),
+            action=(
+                "Priorizar las páginas con mayor pérdida absoluta; separar estacionalidad, caída de posición, CTR, indexación y cambios de SERP."
+                if site_clicks_declined
+                else "Observar otro periodo y revisar únicamente si la pérdida se repite o el total del sitio también empieza a caer."
+            ),
             evidence_url="https://search.google.com/search-console/performance/search-analytics?resource_id=sc-domain:voyagerballoons.eu",
-            metadata={"pages": page_declines[:15]},
+            metadata={"pages": page_declines[:15], "site_clicks_declined": site_clicks_declined},
         ))
 
     opportunities = []

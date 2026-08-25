@@ -711,6 +711,40 @@ class VisibilityTests(unittest.TestCase):
         self.assertEqual(result.summary["provider_cost_usd"], 0.03)
         self.assertEqual(post.call_count, 3)
 
+    @patch("seo_monitor.checks.rank._search")
+    @patch("seo_monitor.checks.rank.load_keyword_inventory")
+    def test_partial_rank_provider_failure_is_not_urgent(self, load_keywords, search) -> None:
+        rows = [
+            {
+                "keyword": keyword,
+                "location_name": "Madrid Spain",
+                "location_code": "1005493",
+                "language_code": "en",
+                "device": "mobile",
+                "priority": "P0",
+                "target_url": "https://www.voyagerballoons.eu/en/hot-air-balloon-segovia",
+                "cluster": "segovia_en",
+            }
+            for keyword in ("hot air balloon segovia", "segovia balloon ride")
+        ]
+        load_keywords.return_value = rows
+        search.side_effect = [
+            ({"items": [], "check_url": "https://example.test/serp"}, 0.002),
+            RuntimeError("Internal SE Server Error."),
+        ]
+        settings = replace(Settings.from_env(), dataforseo_login="login", dataforseo_password="password")
+        config = load_config(settings)
+
+        with tempfile.TemporaryDirectory() as tmp:
+            store = Store(f"sqlite:///{Path(tmp) / 'monitor.db'}")
+            store.initialize()
+            result = rank.run(config, store, store.start_job("rank"), settings)
+
+        alert = next(item for item in result.alerts if item.dedupe_key == "rank:provider-failures")
+        self.assertEqual(alert.severity, "P2")
+        self.assertEqual(result.summary["keywords_checked"], 1)
+        self.assertEqual(result.summary["failures"], 1)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -63,6 +63,9 @@
     {"name": "Braganca PT", "url": "https://www.voyagerballoons.eu/pt/passeio-de-balao-braganca", "canonical": "https://www.voyagerballoons.eu/pt/passeio-de-balao-braganca", "required_text": ["195"], "severity": "P0"},
     {"name": "Segovia EN", "url": "https://www.voyagerballoons.eu/en/hot-air-balloon-segovia", "canonical": "https://www.voyagerballoons.eu/en/hot-air-balloon-segovia", "severity": "P1"},
     {"name": "Braganca EN", "url": "https://www.voyagerballoons.eu/en/hot-air-balloon-braganca-portugal", "canonical": "https://www.voyagerballoons.eu/en/hot-air-balloon-braganca-portugal", "required_text": ["195"], "severity": "P0"},
+    {"name": "Booking store home", "url": "https://tienda.voyagerballoons.eu/", "required_text": ["Voyager", "Segovia"], "severity": "P0"},
+    {"name": "Booking store reserve", "url": "https://tienda.voyagerballoons.eu/reservar?producto=classic", "required_text": ["Reserva", "Segovia"], "severity": "P0"},
+    {"name": "Booking store gift", "url": "https://tienda.voyagerballoons.eu/regalar", "required_text": ["regalo"], "severity": "P0"},
     {"name": "Shop home", "url": "https://shop.voyagerballoons.eu/", "severity": "P0"},
     {"name": "Producto Comfort", "url": "https://shop.voyagerballoons.eu/producto/vuelo-en-globo-segovia-comfort/", "required_text": ["169"], "severity": "P0"},
     {"name": "Producto Braganca", "url": "https://shop.voyagerballoons.eu/producto/vuelo-en-globo-braganza-portugal/", "required_text": ["195"], "severity": "P0"},
@@ -132,6 +135,10 @@
     {"name": "Privado Segovia", "url": "https://shop.voyagerballoons.eu/producto/vuelo-en-globo-privado-en-segovia/", "expected_text": "privado", "expected_price": "1.200"},
     {"name": "Comfort Segovia", "url": "https://shop.voyagerballoons.eu/producto/vuelo-en-globo-segovia-comfort/", "expected_text": "Comfort", "expected_price": "169"},
     {"name": "Braganca", "url": "https://shop.voyagerballoons.eu/producto/vuelo-en-globo-braganza-portugal/", "expected_text": "Braganza", "expected_price": "195"}
+  ],
+  "booking_store_products": [
+    {"name": "Booking Classic", "base_url": "https://tienda.voyagerballoons.eu", "url": "https://tienda.voyagerballoons.eu/reservar?producto=classic", "product_code": "classic", "expected_text": "Classic"},
+    {"name": "Booking Comfort", "base_url": "https://tienda.voyagerballoons.eu", "url": "https://tienda.voyagerballoons.eu/reservar?producto=comfort", "product_code": "comfort", "expected_text": "Comfort"}
   ],
   "thresholds": {
     "health_timeout_seconds": 25,

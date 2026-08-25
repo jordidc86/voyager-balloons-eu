@@ -59,7 +59,15 @@ def main() -> int:
     subparsers.add_parser("verify-connected")
     args = parser.parse_args()
 
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+    # Railway classifies every stderr line as an error independently of the
+    # Python log level.  The default StreamHandler writes INFO messages to
+    # stderr, which made successful cron runs look like production failures.
+    # The command exit code remains the authoritative failure signal.
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s %(levelname)s %(message)s",
+        stream=sys.stdout,
+    )
     settings = Settings.from_env()
     store = Store(settings.database_url)
     store.initialize()

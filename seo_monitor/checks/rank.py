@@ -129,11 +129,17 @@ def _is_due(previous, interval_days: int, now: datetime | None = None) -> bool:
     return (now or datetime.now(timezone.utc)) - observed_at >= timedelta(days=interval_days)
 
 
-def _depth_for(row: dict[str, str], previous, thresholds: dict) -> int | None:
+def _depth_for(
+    row: dict[str, str],
+    previous,
+    thresholds: dict,
+    *,
+    now: datetime | None = None,
+) -> int | None:
     if row.get("priority") == "P0":
         return int(thresholds.get("rank_critical_depth", 20))
     interval_days = int(thresholds.get("rank_secondary_interval_days", 7))
-    if _is_due(previous, interval_days):
+    if _is_due(previous, interval_days, now=now):
         return int(thresholds.get("rank_secondary_depth", 100))
     return None
 
@@ -278,11 +284,22 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
             ))
 
     if failures:
+        partial_failure = checked > 0
         result.alerts.append(AlertSpec(
-            dedupe_key="rank:provider-failures", severity="P1", category="rank",
-            title="Fallos parciales en el seguimiento de posiciones",
+            dedupe_key="rank:provider-failures",
+            severity="P2" if partial_failure else "P1",
+            category="rank",
+            title=(
+                "Seguimiento de posiciones parcialmente incompleto"
+                if partial_failure
+                else "Seguimiento de posiciones no disponible"
+            ),
             message=f"No se pudieron consultar {len(failures)} de {len(keywords)} palabras clave.",
-            action="Revisar saldo, credenciales, ubicaciones admitidas y respuesta de DataForSEO antes de reintentar.",
+            action=(
+                "Conservar las mediciones válidas y reintentar únicamente las consultas fallidas en el siguiente ciclo."
+                if partial_failure
+                else "Revisar saldo, credenciales, ubicaciones admitidas y respuesta de DataForSEO antes de reintentar."
+            ),
             metadata={"failures": failures[:20]},
         ))
     result.summary = {

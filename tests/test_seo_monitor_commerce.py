@@ -79,6 +79,25 @@ class CommerceTests(unittest.TestCase):
         self.assertTrue(result.summary["outcomes"][0]["recovered_after_retry"])
         sleep.assert_not_called()
 
+    @patch("seo_monitor.checks.commerce.test_booking_store_product")
+    def test_current_booking_store_is_included_in_commerce_summary(self, booking_test) -> None:
+        product = {
+            "name": "Booking Classic",
+            "url": "https://tienda.voyagerballoons.eu/reservar?producto=classic",
+            "product_code": "classic",
+        }
+        booking_test.return_value = ({"product": product["name"], "flow_ok": True}, [])
+
+        result = commerce.run(
+            {"thresholds": {}, "commerce_products": [], "booking_store_products": [product]},
+            store=None,
+            run_id=1,
+        )
+
+        booking_test.assert_called()
+        self.assertEqual(result.summary["products_tested"], 1)
+        self.assertEqual(result.summary["successful_flows"], 1)
+
 
 if __name__ == "__main__":
     unittest.main()

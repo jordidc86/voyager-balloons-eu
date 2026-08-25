@@ -32,11 +32,11 @@ class SeoMonitorCadenceTests(unittest.TestCase):
 
     def test_recent_secondary_rank_is_deferred(self):
         row = {"priority": "P1"}
-        self.assertIsNone(_depth_for(row, self.previous(0), self.thresholds))
+        self.assertIsNone(_depth_for(row, self.previous(0), self.thresholds, now=self.now))
 
     def test_old_secondary_rank_gets_full_refresh(self):
         row = {"priority": "P1"}
-        self.assertEqual(_depth_for(row, self.previous(8), self.thresholds), 100)
+        self.assertEqual(_depth_for(row, self.previous(8), self.thresholds, now=self.now), 100)
 
     def test_ai_secondary_observation_uses_28_day_cadence(self):
         self.assertFalse(ai_is_due(self.previous(27), 28, now=self.now))

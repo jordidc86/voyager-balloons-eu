@@ -57,6 +57,38 @@ class StaticHostingConfigTests(unittest.TestCase):
         self.assertIn("https://wa.me/34614007056", public_content)
         self.assertIn("+34 614 00 70 56", public_content)
 
+    def test_segovia_sales_pages_use_the_new_store(self):
+        segovia_pages = [
+            ROOT / "index.html",
+            ROOT / "vuelo-en-globo-segovia.html",
+            ROOT / "vuelo-en-globo-segovia-comfort.html",
+            ROOT / "vuelo-en-globo-segovia-desde-madrid.html",
+            ROOT / "regalar-vuelo-en-globo-segovia.html",
+            ROOT / "en" / "index.html",
+            ROOT / "en" / "hot-air-balloon-segovia.html",
+            ROOT / "en" / "comfort-hot-air-balloon-segovia.html",
+            ROOT / "en" / "hot-air-balloon-segovia-from-madrid.html",
+            ROOT / "en" / "gift-hot-air-balloon-segovia.html",
+        ]
+        content_by_path = {
+            path: path.read_text(encoding="utf-8")
+            for path in segovia_pages
+        }
+
+        for path, content in content_by_path.items():
+            with self.subTest(path=path.relative_to(ROOT)):
+                self.assertNotIn("https://shop.voyagerballoons.eu/?add-to-cart=", content)
+                self.assertIn("https://tienda.voyagerballoons.eu/", content)
+
+        self.assertIn(
+            "https://tienda.voyagerballoons.eu/regalar",
+            content_by_path[ROOT / "regalar-vuelo-en-globo-segovia.html"],
+        )
+        self.assertIn(
+            "https://tienda.voyagerballoons.eu/regalar",
+            content_by_path[ROOT / "en" / "gift-hot-air-balloon-segovia.html"],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

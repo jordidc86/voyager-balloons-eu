@@ -4,7 +4,13 @@ import unittest
 from datetime import date
 
 from seo_monitor.checks.ga4 import _commerce_diagnostics, _dimension_report, _funnel_window, _report
-from seo_monitor.checks.gsc import _discover_keyword_candidates, _page_click_declines, _query, _totals
+from seo_monitor.checks.gsc import (
+    _discover_keyword_candidates,
+    _page_click_declines,
+    _page_decline_severity,
+    _query,
+    _totals,
+)
 
 
 class FakeResponse:
@@ -56,6 +62,12 @@ class GoogleContractTests(unittest.TestCase):
         self.assertEqual(len(declines), 1)
         self.assertEqual(declines[0]["drop_percent"], 75.0)
         self.assertEqual(declines[0]["previous_clicks"], 8.0)
+
+    def test_page_decline_is_not_urgent_when_total_organic_clicks_grow(self) -> None:
+        self.assertEqual(_page_decline_severity({"clicks": 45}, {"clicks": 32}), "P2")
+
+    def test_page_decline_is_urgent_when_total_organic_clicks_also_fall(self) -> None:
+        self.assertEqual(_page_decline_severity({"clicks": 20}, {"clicks": 32}), "P1")
 
     def test_gsc_discovers_commercial_query_and_chooses_best_landing(self) -> None:
         rows = [

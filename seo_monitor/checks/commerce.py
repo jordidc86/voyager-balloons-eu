@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import time
 from dataclasses import replace
+from datetime import date, timedelta
 from urllib.parse import urlsplit
 
 import requests
@@ -33,13 +34,18 @@ def _cart_contains_product(soup: BeautifulSoup, product_id: str, product: dict) 
 
 
 def _alert(product: dict, stage: str, message: str, metadata: dict | None = None) -> AlertSpec:
+    action = (
+        "Revisar inmediatamente la tienda actual, su conexión con el dashboard y la cotización. No iniciar checkout ni campañas hasta verificarlo."
+        if product.get("base_url")
+        else "Revisar inmediatamente WooCommerce, snippets, caché, sesión y último cambio. No enviar campañas a este producto hasta verificarlo."
+    )
     return AlertSpec(
         dedupe_key=f"commerce:{stage}:{product['name'].lower().replace(' ', '-')}",
         severity="P0",
         category="commerce",
         title=f"Flujo de compra roto ({stage}): {product['name']}",
         message=message,
-        action="Revisar inmediatamente WooCommerce, snippets, caché, sesión y último cambio. No enviar campañas a este producto hasta verificarlo.",
+        action=action,
         evidence_url=product["url"],
         metadata=metadata or {},
     )
@@ -122,6 +128,129 @@ def test_product(product: dict, timeout: float) -> tuple[dict, list[AlertSpec]]:
     }, alerts
 
 
+def test_booking_store_product(product: dict, timeout: float) -> tuple[dict, list[AlertSpec]]:
+    """Validate the current storefront through quote creation, never checkout creation."""
+    session = requests.Session()
+    session.headers.update({"User-Agent": USER_AGENT, "Accept-Language": "es,en;q=0.8"})
+    started = time.perf_counter()
+    page = session.get(product["url"], timeout=timeout, allow_redirects=True)
+    if page.status_code >= 400:
+        return {"product": product["name"], "stage": "product", "status": page.status_code, "flow_ok": False}, [
+            _alert(product, "product", f"La tienda actual devuelve HTTP {page.status_code}.")
+        ]
+    expected_text = str(product.get("expected_text") or "").casefold()
+    if expected_text and expected_text not in page.text.casefold():
+        return {"product": product["name"], "stage": "product-copy", "status": page.status_code, "flow_ok": False}, [
+            _alert(product, "product-copy", "La página carga, pero no contiene el contenido esperado del producto.")
+        ]
+
+    today = date.today()
+    next_month = (today.replace(day=28) + timedelta(days=4)).replace(day=1)
+    month_after_next = (next_month.replace(day=28) + timedelta(days=4)).replace(day=1)
+    ranges = [
+        (today, next_month - timedelta(days=1)),
+        (next_month, month_after_next - timedelta(days=1)),
+    ]
+    rows = []
+    source = None
+    departures = None
+    for range_start, range_end in ranges:
+        departures = session.get(
+            f"{product['base_url'].rstrip('/')}/api/storefront/departures",
+            params={
+                "from": range_start.isoformat(),
+                "to": range_end.isoformat(),
+                "product": product["product_code"],
+                "partySize": "1",
+            },
+            timeout=timeout,
+        )
+        try:
+            departures_payload = departures.json()
+        except ValueError:
+            departures_payload = {}
+        batch = departures_payload.get("departures") if isinstance(departures_payload, dict) else None
+        source = departures_payload.get("source") if isinstance(departures_payload, dict) else None
+        if departures.status_code >= 400 or source != "dashboard" or not isinstance(batch, list):
+            rows = []
+            break
+        rows.extend(batch)
+        if any(
+            row.get("available") is not False
+            and row.get("id")
+            and isinstance(row.get("unitPrice"), (int, float))
+            and float(row["unitPrice"]) > 0
+            for row in rows
+        ):
+            break
+    candidate = next(
+        (
+            row for row in (rows or [])
+            if row.get("available") is not False
+            and row.get("id")
+            and isinstance(row.get("unitPrice"), (int, float))
+            and float(row["unitPrice"]) > 0
+        ),
+        None,
+    )
+    departures_status = departures.status_code if departures is not None else 503
+    if departures_status >= 400 or source != "dashboard" or not candidate:
+        return {
+            "product": product["name"],
+            "stage": "availability",
+            "status": departures_status,
+            "source": source,
+            "departures": len(rows or []),
+            "flow_ok": False,
+        }, [_alert(
+            product,
+            "availability",
+            "La tienda actual no devuelve disponibilidad real utilizable desde el dashboard.",
+            {"status": departures_status, "source": source, "departures": len(rows or [])},
+        )]
+
+    quote = session.post(
+        f"{product['base_url'].rstrip('/')}/api/storefront/quote",
+        json={"departureId": candidate["id"], "product": product["product_code"], "partySize": 1},
+        timeout=timeout,
+    )
+    try:
+        quote_payload = quote.json()
+    except ValueError:
+        quote_payload = {}
+    quote_ok = (
+        quote.status_code < 400
+        and quote_payload.get("available") is True
+        and bool(quote_payload.get("quoteId"))
+        and quote_payload.get("currency") == "EUR"
+        and isinstance(quote_payload.get("unitPrice"), (int, float))
+        and float(quote_payload["unitPrice"]) > 0
+    )
+    alerts = [] if quote_ok else [_alert(
+        product,
+        "quote",
+        "La disponibilidad existe, pero la tienda no genera una cotización válida y coherente.",
+        {
+            "status": quote.status_code,
+            "available": quote_payload.get("available"),
+            "currency": quote_payload.get("currency"),
+            "has_quote_id": bool(quote_payload.get("quoteId")),
+        },
+    )]
+    return {
+        "product": product["name"],
+        "product_status": page.status_code,
+        "availability_status": departures_status,
+        "availability_source": source,
+        "departures": len(rows or []),
+        "quote_status": quote.status_code,
+        "quote_available": quote_payload.get("available"),
+        "unit_price": quote_payload.get("unitPrice"),
+        "flow_ok": not alerts,
+        "elapsed_ms": round((time.perf_counter() - started) * 1000, 1),
+    }, alerts
+
+
 def run(config: dict, store: Store, run_id: int) -> CheckResult:
     del store, run_id
     result = CheckResult(job_name="commerce")
@@ -130,12 +259,19 @@ def run(config: dict, store: Store, run_id: int) -> CheckResult:
     confirmation_attempts = max(2, int(thresholds.get("commerce_confirmation_attempts", 2)))
     retry_delay = max(0.0, float(thresholds.get("commerce_retry_delay_seconds", 3)))
     outcomes = []
-    for product in config.get("commerce_products", []):
+    flow_specs = [
+        (product, test_product)
+        for product in config.get("commerce_products", [])
+    ] + [
+        (product, test_booking_store_product)
+        for product in config.get("booking_store_products", [])
+    ]
+    for product, tester in flow_specs:
         attempt_outcomes = []
         alerts: list[AlertSpec] = []
         for attempt in range(1, confirmation_attempts + 1):
             try:
-                outcome, alerts = test_product(product, timeout)
+                outcome, alerts = tester(product, timeout)
             except Exception as exc:
                 outcome = {"product": product["name"], "error": str(exc), "flow_ok": False}
                 alerts = [_alert(product, "exception", f"La prueba sintética terminó con error: {exc}")]

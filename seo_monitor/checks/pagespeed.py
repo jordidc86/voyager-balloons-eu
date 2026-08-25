@@ -250,9 +250,9 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
         "Braganza ES",
         "Braganca PT",
         "Segovia EN",
-        "Shop home",
-        "Producto Comfort",
-        "Producto Braganca",
+        "Booking store home",
+        "Booking store reserve",
+        "Booking store gift",
     }
     pages = [page for page in config["strategic_pages"] if page["name"] in monitored_names]
     failures = []
