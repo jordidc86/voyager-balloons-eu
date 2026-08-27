@@ -124,7 +124,7 @@ def prioritize_alert(alert) -> PrioritizedAction:
     )
     if any(term in text for term in commercial_terms):
         score += 4
-    if "shop.voyagerballoons.eu" in text:
+    if "tienda.voyagerballoons.eu" in text:
         score += 3
     score = max(0, min(100, score))
 

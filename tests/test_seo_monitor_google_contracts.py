@@ -115,7 +115,7 @@ class GoogleContractTests(unittest.TestCase):
     def test_gsc_discovery_rejects_technical_and_parameterized_pages(self) -> None:
         rows = [
             {
-                "keys": ["balloon ride segovia", "https://shop.voyagerballoons.eu/cart/"],
+                "keys": ["balloon ride segovia", "https://tienda.voyagerballoons.eu/reservar"],
                 "clicks": 3,
                 "impressions": 100,
                 "position": 4,
@@ -161,15 +161,15 @@ class GoogleContractTests(unittest.TestCase):
     def test_ga4_commerce_diagnostics_detect_missing_funnel_events(self) -> None:
         diagnostics = _commerce_diagnostics(
             [{
-                "eventName": "purchase", "hostName": "shop.voyagerballoons.eu",
+                "eventName": "purchase", "hostName": "tienda.voyagerballoons.eu",
                 "eventCount": 2, "keyEvents": 2, "totalRevenue": 480,
             }],
             [
-                {"sessionDefaultChannelGroup": "Organic Search", "hostName": "shop.voyagerballoons.eu", "sessions": 120},
-                {"sessionDefaultChannelGroup": "Direct", "hostName": "shop.voyagerballoons.eu", "sessions": 30},
+                {"sessionDefaultChannelGroup": "Organic Search", "hostName": "tienda.voyagerballoons.eu", "sessions": 120},
+                {"sessionDefaultChannelGroup": "Direct", "hostName": "tienda.voyagerballoons.eu", "sessions": 30},
                 {"sessionDefaultChannelGroup": "Direct", "hostName": "localhost", "sessions": 12},
             ],
-            "shop.voyagerballoons.eu",
+            "tienda.voyagerballoons.eu",
         )
 
         self.assertTrue(diagnostics["funnel_missing"])
@@ -185,10 +185,10 @@ class GoogleContractTests(unittest.TestCase):
             [],
             [{
                 "sessionDefaultChannelGroup": "Organic Search",
-                "hostName": "shop.voyagerballoons.eu",
+                "hostName": "tienda.voyagerballoons.eu",
                 "sessions": 150,
             }],
-            "shop.voyagerballoons.eu",
+            "tienda.voyagerballoons.eu",
             minimum_shop_sessions=50,
             evaluation_ready=False,
         )

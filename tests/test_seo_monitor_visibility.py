@@ -92,10 +92,10 @@ class VisibilityTests(unittest.TestCase):
     def test_pagespeed_origin_field_data_is_not_treated_as_page_specific(self) -> None:
         self.assertEqual(
             _field_scope(
-                "https://shop.voyagerballoons.eu/producto/comfort/",
-                "https://shop.voyagerballoons.eu",
+                "https://tienda.voyagerballoons.eu/reservar?producto=comfort",
+                "https://tienda.voyagerballoons.eu",
             ),
-            ("origin", "https://shop.voyagerballoons.eu"),
+            ("origin", "https://tienda.voyagerballoons.eu"),
         )
 
     def test_pagespeed_field_problems_identify_slow_ttfb(self) -> None:

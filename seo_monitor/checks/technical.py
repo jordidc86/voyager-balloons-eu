@@ -46,7 +46,7 @@ def run(config: dict, store: Store, run_id: int) -> CheckResult:
         linked_from = item.get("linked_from", [])
         result.alerts.append(AlertSpec(
             dedupe_key=f"technical:broken:{item['url']}",
-            severity="P0" if "shop.voyagerballoons.eu" in item["url"] else "P1",
+            severity="P0" if "tienda.voyagerballoons.eu" in item["url"] else "P1",
             category="technical",
             title="Destino interno roto",
             message=f"{item['url']} devuelve {item.get('status') or item.get('error')}. Enlazado desde {len(linked_from)} página(s).",

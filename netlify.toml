@@ -152,8 +152,26 @@
   force = true
 
 [[redirects]]
+  from = "/producto/vuelo-en-globo-al-amanecer-en-segovia/"
+  to = "https://tienda.voyagerballoons.eu/reservar?producto=classic"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/producto/vuelo-en-globo-segovia-comfort/"
+  to = "https://tienda.voyagerballoons.eu/reservar?producto=comfort"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/producto/vuelo-en-globo-braganza-portugal/"
+  to = "https://www.aosabordovento.net/voo-de-balao-braganca"
+  status = 301
+  force = true
+
+[[redirects]]
   from = "/producto/*"
-  to = "https://shop.voyagerballoons.eu/producto/:splat"
+  to = "https://tienda.voyagerballoons.eu/"
   status = 301
   force = true
 
@@ -202,7 +220,7 @@
 
 [[redirects]]
   from = "/en/my-account/"
-  to = "https://shop.voyagerballoons.eu/"
+  to = "https://tienda.voyagerballoons.eu/"
   status = 301
   force = true
 
@@ -364,13 +382,13 @@
 
 [[redirects]]
   from = "/shop"
-  to = "https://shop.voyagerballoons.eu/"
+  to = "https://tienda.voyagerballoons.eu/"
   status = 301
   force = true
 
 [[redirects]]
   from = "/shop/*"
-  to = "https://shop.voyagerballoons.eu/:splat"
+  to = "https://tienda.voyagerballoons.eu/"
   status = 301
   force = true
 

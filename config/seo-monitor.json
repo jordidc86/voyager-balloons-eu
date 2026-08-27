@@ -1,15 +1,13 @@
 {
   "brand": "Voyager Balloons",
   "primary_domain": "www.voyagerballoons.eu",
-  "target_domains": ["www.voyagerballoons.eu", "tienda.voyagerballoons.eu", "shop.voyagerballoons.eu"],
+  "target_domains": ["www.voyagerballoons.eu", "tienda.voyagerballoons.eu", "www.aosabordovento.net"],
   "tracking": {
     "main_url": "https://www.voyagerballoons.eu/",
     "main_script_url": "https://www.voyagerballoons.eu/js/google-ads-tracking.js",
     "booking_url": "https://tienda.voyagerballoons.eu/",
-    "shop_url": "https://shop.voyagerballoons.eu/",
     "main_domain": "voyagerballoons.eu",
     "booking_domain": "tienda.voyagerballoons.eu",
-    "shop_domain": "shop.voyagerballoons.eu",
     "google_tag_id": "GT-55NTF5CN",
     "google_ads_id": "AW-11564692382",
     "funnel_tracking_start_date": "2026-07-17"
@@ -66,11 +64,7 @@
     {"name": "Booking store home", "url": "https://tienda.voyagerballoons.eu/", "required_text": ["Voyager", "Segovia"], "severity": "P0"},
     {"name": "Booking store reserve", "url": "https://tienda.voyagerballoons.eu/reservar?producto=classic", "required_text": ["Reserva", "Segovia"], "severity": "P0"},
     {"name": "Booking store gift", "url": "https://tienda.voyagerballoons.eu/regalar", "required_text": ["regalo"], "severity": "P0"},
-    {"name": "Shop home", "url": "https://shop.voyagerballoons.eu/", "severity": "P0"},
-    {"name": "Producto Comfort", "url": "https://shop.voyagerballoons.eu/producto/vuelo-en-globo-segovia-comfort/", "required_text": ["169"], "severity": "P0"},
-    {"name": "Producto Braganca", "url": "https://shop.voyagerballoons.eu/producto/vuelo-en-globo-braganza-portugal/", "required_text": ["195"], "severity": "P0"},
-    {"name": "Carrito", "url": "https://shop.voyagerballoons.eu/cart/", "allow_noindex": true, "severity": "P0"},
-    {"name": "Checkout", "url": "https://shop.voyagerballoons.eu/checkout/", "allowed_final_urls": ["https://shop.voyagerballoons.eu/checkout/", "https://shop.voyagerballoons.eu/cart/"], "allow_noindex": true, "severity": "P0"}
+    {"name": "Ao Sabor do Vento Braganca", "url": "https://www.aosabordovento.net/voo-de-balao-braganca", "canonical": "https://www.aosabordovento.net/voo-de-balao-braganca", "required_text": ["195"], "severity": "P0"}
   ],
   "competitors": [
     {"name": "Siempre en las Nubes", "domain": "siempreenlasnubes.com", "url": "https://www.siempreenlasnubes.com/rutas-para-volar-en-globo/globo-rutas-segovia/"},
@@ -129,13 +123,7 @@
       {"id": "en-braganca", "prompt": "What is the best official company for booking a hot air balloon ride in Braganca, Portugal?", "language_code": "en", "market": "Braganca", "country": "PT", "city": "Bragança", "priority": "P1"}
     ]
   },
-  "commerce_products": [
-    {"name": "Classic Segovia", "url": "https://shop.voyagerballoons.eu/producto/vuelo-en-globo-al-amanecer-en-segovia/", "expected_text": "amanecer", "expected_price": "120"},
-    {"name": "Oferta Segovia", "url": "https://shop.voyagerballoons.eu/producto/oferta-vuelo-en-globo-en-segovia/", "expected_text": "OFERTA", "expected_price": "170"},
-    {"name": "Privado Segovia", "url": "https://shop.voyagerballoons.eu/producto/vuelo-en-globo-privado-en-segovia/", "expected_text": "privado", "expected_price": "1.200"},
-    {"name": "Comfort Segovia", "url": "https://shop.voyagerballoons.eu/producto/vuelo-en-globo-segovia-comfort/", "expected_text": "Comfort", "expected_price": "169"},
-    {"name": "Braganca", "url": "https://shop.voyagerballoons.eu/producto/vuelo-en-globo-braganza-portugal/", "expected_text": "Braganza", "expected_price": "195"}
-  ],
+  "commerce_products": [],
   "booking_store_products": [
     {"name": "Booking Classic", "base_url": "https://tienda.voyagerballoons.eu", "url": "https://tienda.voyagerballoons.eu/reservar?producto=classic", "product_code": "classic", "expected_text": "Classic"},
     {"name": "Booking Comfort", "base_url": "https://tienda.voyagerballoons.eu", "url": "https://tienda.voyagerballoons.eu/reservar?producto=comfort", "product_code": "comfort", "expected_text": "Comfort"}

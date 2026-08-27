@@ -27,7 +27,7 @@ class StaticHostingConfigTests(unittest.TestCase):
     def test_wildcards_preserve_the_splat(self):
         config = MODULE.render_config(self.redirects)
         self.assertIn(r"location ~ ^/producto/(.*)$", config)
-        self.assertIn("return 301 https://shop.voyagerballoons.eu/producto/$1;", config)
+        self.assertIn("return 301 https://tienda.voyagerballoons.eu/;", config)
 
     def test_clean_urls_custom_404_and_canonical_host_are_enabled(self):
         config = MODULE.render_config(self.redirects)
@@ -88,6 +88,32 @@ class StaticHostingConfigTests(unittest.TestCase):
             "https://tienda.voyagerballoons.eu/regalar",
             content_by_path[ROOT / "en" / "gift-hot-air-balloon-segovia.html"],
         )
+
+    def test_braganca_pages_use_the_current_portugal_site(self):
+        pages = [
+            ROOT / "vuelo-en-globo-braganza-portugal.html",
+            ROOT / "pt" / "passeio-de-balao-braganca.html",
+            ROOT / "en" / "hot-air-balloon-braganca-portugal.html",
+        ]
+
+        for path in pages:
+            content = path.read_text(encoding="utf-8")
+            with self.subTest(path=path.relative_to(ROOT)):
+                self.assertIn("https://www.aosabordovento.net/voo-de-balao-braganca", content)
+                self.assertNotIn("shop.voyagerballoons.eu", content)
+
+    def test_public_content_does_not_link_to_wordpress_backup(self):
+        public_files = [
+            *ROOT.glob("*.html"),
+            *ROOT.glob("*.txt"),
+            *ROOT.glob("*.xml"),
+            *(ROOT / "articulos").rglob("*.html"),
+            *(ROOT / "en").rglob("*.html"),
+            *(ROOT / "pt").rglob("*.html"),
+        ]
+        public_content = "\n".join(path.read_text(encoding="utf-8") for path in public_files)
+
+        self.assertNotIn("shop.voyagerballoons.eu", public_content)
 
 
 if __name__ == "__main__":

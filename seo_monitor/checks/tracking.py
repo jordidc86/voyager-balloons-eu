@@ -1,27 +1,10 @@
 from __future__ import annotations
 
-from html.parser import HTMLParser
 import requests
 from urllib.parse import urlsplit
 
 from ..storage import Store
 from ..types import AlertSpec, CheckResult
-
-
-class _ScriptParser(HTMLParser):
-    def __init__(self) -> None:
-        super().__init__()
-        self.scripts: list[dict[str, str]] = []
-
-    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
-        if tag == "script":
-            self.scripts.append({name: value or "" for name, value in attrs})
-
-
-def _script_attributes(html: str) -> list[dict[str, str]]:
-    parser = _ScriptParser()
-    parser.feed(html)
-    return parser.scripts
 
 
 def _fetch(url: str) -> str:
@@ -30,19 +13,13 @@ def _fetch(url: str) -> str:
     return response.text
 
 
-def _audit(main_html: str, tracking_js: str, shop_html: str, tracking_config: dict) -> list[dict]:
+def _audit(main_html: str, tracking_js: str, tracking_config: dict) -> list[dict]:
     tag_id = tracking_config["google_tag_id"]
     ads_id = tracking_config["google_ads_id"]
     main_domain = tracking_config["main_domain"]
     booking_domain = tracking_config["booking_domain"]
-    shop_domain = tracking_config["shop_domain"]
     script_url = tracking_config["main_script_url"]
     script_path = urlsplit(script_url).path
-    shop_scripts = _script_attributes(shop_html)
-    woo_provider = next(
-        (script for script in shop_scripts if script.get("id") == "googlesitekit-events-provider-woocommerce-js"),
-        None,
-    )
     return [
         {
             "key": "main-script",
@@ -60,46 +37,13 @@ def _audit(main_html: str, tracking_js: str, shop_html: str, tracking_config: di
             "key": "main-linker",
             "ok": all(
                 token in tracking_js
-                for token in (main_domain, booking_domain, shop_domain, "accept_incoming", "decorate_forms")
+                for token in (main_domain, booking_domain, "accept_incoming", "decorate_forms")
             ),
             "severity": "P1",
             "message": "La configuración cross-domain de la web principal está incompleta.",
         },
         {
-            "key": "shop-tag",
-            "ok": tag_id in shop_html and ads_id in shop_html,
-            "severity": "P1",
-            "message": "La tienda no contiene las mismas etiquetas de Google que la web principal.",
-        },
-        {
-            "key": "shop-linker",
-            "ok": all(token in shop_html for token in (main_domain, shop_domain, "accept_incoming", "decorate_forms")),
-            "severity": "P1",
-            "message": "La tienda ha perdido parte de su configuración cross-domain.",
-        },
-        {
-            "key": "woocommerce-events",
-            "ok": "eventsToTrack" in shop_html and "add_to_cart" in shop_html and "purchase" in shop_html,
-            "severity": "P1",
-            "message": "Site Kit/WooCommerce ya no declara los eventos add_to_cart y purchase.",
-        },
-        {
-            "key": "woocommerce-listener-immediate",
-            "ok": bool(woo_provider) and woo_provider.get("type") != "rocketlazyloadscript",
-            "severity": "P1",
-            "message": "WP Rocket vuelve a retrasar el listener de Site Kit que registra los productos añadidos al carrito.",
-        },
-        {
-            "key": "woocommerce-begin-checkout",
-            "ok": all(
-                token in shop_html
-                for token in ("voyager_begin_checkout", 'gtagEvent("begin_checkout"')
-            ),
-            "severity": "P1",
-            "message": "La tienda ya no contiene la medición propia del inicio del checkout.",
-        },
-        {
-            "key": "shop-links",
+            "key": "booking-links",
             "ok": booking_domain in main_html,
             "severity": "P0",
             "message": "La web principal no contiene ningún botón que lleve a la tienda nueva.",
@@ -119,7 +63,6 @@ def run(config: dict, store: Store, run_id: int) -> CheckResult:
     urls = {
         "main": tracking_config["main_url"],
         "script": tracking_config["main_script_url"],
-        "shop": tracking_config["shop_url"],
     }
     payloads = {}
     failures = []
@@ -131,7 +74,7 @@ def run(config: dict, store: Store, run_id: int) -> CheckResult:
 
     findings = []
     if not failures:
-        findings = _audit(payloads["main"], payloads["script"], payloads["shop"], tracking_config)
+        findings = _audit(payloads["main"], payloads["script"], tracking_config)
         for finding in findings:
             if finding["ok"]:
                 continue
@@ -141,7 +84,7 @@ def run(config: dict, store: Store, run_id: int) -> CheckResult:
                 category="tracking",
                 title=(
                     "Los botones de reserva no llevan a la tienda nueva"
-                    if finding["key"] == "shop-links"
+                    if finding["key"] == "booking-links"
                     else "Riesgo en la medición de reservas"
                 ),
                 message=finding["message"],
@@ -151,9 +94,7 @@ def run(config: dict, store: Store, run_id: int) -> CheckResult:
                 ),
                 evidence_url=finding.get(
                     "evidence_url",
-                    tracking_config["main_url"]
-                    if finding["key"].startswith("main")
-                    else tracking_config["shop_url"],
+                    tracking_config["main_url"],
                 ),
                 metadata={"check": finding["key"]},
             ))

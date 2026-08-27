@@ -217,7 +217,7 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
     historical_diagnostics = _commerce_diagnostics(
         commerce_rows,
         channel_host_rows,
-        "shop.voyagerballoons.eu",
+        config["tracking"]["booking_domain"],
         evaluation_ready=False,
     )
     funnel_start, funnel_complete_days, funnel_days_ready = _funnel_window(config, current_end, commerce_start)
@@ -254,7 +254,7 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
     diagnostics = _commerce_diagnostics(
         funnel_rows,
         funnel_channel_host_rows,
-        "shop.voyagerballoons.eu",
+        config["tracking"]["booking_domain"],
         minimum_shop_sessions=minimum_funnel_sessions,
         evaluation_ready=funnel_days_ready,
     )

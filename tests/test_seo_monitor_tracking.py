@@ -12,81 +12,53 @@ class TrackingTests(unittest.TestCase):
             "main_url": "https://www.voyagerballoons.eu/",
             "booking_domain": "tienda.voyagerballoons.eu",
             "main_domain": "voyagerballoons.eu",
-            "shop_domain": "shop.voyagerballoons.eu",
             "google_tag_id": "GT-55NTF5CN",
             "google_ads_id": "AW-11564692382",
         }
 
     def test_complete_tracking_contract_passes(self) -> None:
         main = '<script src="/js/google-ads-tracking.js"></script><a href="https://tienda.voyagerballoons.eu/">Tienda</a>'
-        linker = "voyagerballoons.eu tienda.voyagerballoons.eu shop.voyagerballoons.eu accept_incoming decorate_forms"
-        script = f'GT-55NTF5CN AW-11564692382 {linker}'
-        shop = (
-            f'GT-55NTF5CN AW-11564692382 {linker} eventsToTrack add_to_cart purchase '
-            'voyager_begin_checkout siteKit.gtagEvent("begin_checkout", {}) '
-            '<script id="googlesitekit-events-provider-woocommerce-js" src="provider.js"></script>'
+        script = (
+            "GT-55NTF5CN AW-11564692382 voyagerballoons.eu "
+            "tienda.voyagerballoons.eu accept_incoming decorate_forms"
         )
-        findings = _audit(main, script, shop, self.config)
+
+        findings = _audit(main, script, self.config)
+
         self.assertTrue(all(item["ok"] for item in findings))
 
-    def test_missing_purchase_event_fails(self) -> None:
-        main = f'{self.config["main_script_url"]} shop.voyagerballoons.eu'
-        linker = "voyagerballoons.eu tienda.voyagerballoons.eu shop.voyagerballoons.eu accept_incoming decorate_forms"
-        script = f'GT-55NTF5CN AW-11564692382 {linker}'
-        shop = (
-            f'GT-55NTF5CN AW-11564692382 {linker} eventsToTrack add_to_cart '
-            'voyager_begin_checkout siteKit.gtagEvent("begin_checkout", {}) '
-            '<script id="googlesitekit-events-provider-woocommerce-js" src="provider.js"></script>'
+    def test_missing_main_script_fails(self) -> None:
+        script = (
+            "GT-55NTF5CN AW-11564692382 voyagerballoons.eu "
+            "tienda.voyagerballoons.eu accept_incoming decorate_forms"
         )
-        findings = _audit(main, script, shop, self.config)
-        purchase_check = next(item for item in findings if item["key"] == "woocommerce-events")
-        self.assertFalse(purchase_check["ok"])
+        findings = _audit('<a href="https://tienda.voyagerballoons.eu/">Tienda</a>', script, self.config)
 
-    def test_delayed_woocommerce_listener_fails(self) -> None:
-        main = f'{self.config["main_script_url"]} shop.voyagerballoons.eu'
-        linker = "voyagerballoons.eu tienda.voyagerballoons.eu shop.voyagerballoons.eu accept_incoming decorate_forms"
-        script = f'GT-55NTF5CN AW-11564692382 {linker}'
-        shop = (
-            f'GT-55NTF5CN AW-11564692382 {linker} eventsToTrack add_to_cart purchase '
-            'voyager_begin_checkout siteKit.gtagEvent("begin_checkout", {}) '
-            '<script type="rocketlazyloadscript" id="googlesitekit-events-provider-woocommerce-js" '
-            'data-rocket-src="provider.js"></script>'
-        )
-        findings = _audit(main, script, shop, self.config)
-        listener_check = next(item for item in findings if item["key"] == "woocommerce-listener-immediate")
-        self.assertFalse(listener_check["ok"])
+        check = next(item for item in findings if item["key"] == "main-script")
 
-    def test_missing_begin_checkout_snippet_fails(self) -> None:
-        main = f'{self.config["main_script_url"]} shop.voyagerballoons.eu'
-        linker = "voyagerballoons.eu tienda.voyagerballoons.eu shop.voyagerballoons.eu accept_incoming decorate_forms"
-        script = f'GT-55NTF5CN AW-11564692382 {linker}'
-        shop = (
-            f'GT-55NTF5CN AW-11564692382 {linker} eventsToTrack add_to_cart purchase '
-            '<script id="googlesitekit-events-provider-woocommerce-js" src="provider.js"></script>'
-        )
-        findings = _audit(main, script, shop, self.config)
-        checkout_check = next(item for item in findings if item["key"] == "woocommerce-begin-checkout")
-        self.assertFalse(checkout_check["ok"])
+        self.assertFalse(check["ok"])
 
-    def test_booking_link_check_uses_new_store_and_ignores_legacy_shop(self) -> None:
-        main = (
-            f'{self.config["main_script_url"]} '
-            '<a href="https://tienda.voyagerballoons.eu/reservar?producto=classic">Reservar</a>'
-        )
-        linker = "voyagerballoons.eu tienda.voyagerballoons.eu shop.voyagerballoons.eu accept_incoming decorate_forms"
-        script = f'GT-55NTF5CN AW-11564692382 {linker}'
-        shop = (
-            f'GT-55NTF5CN AW-11564692382 voyagerballoons.eu shop.voyagerballoons.eu '
-            'accept_incoming decorate_forms eventsToTrack add_to_cart purchase '
-            'voyager_begin_checkout siteKit.gtagEvent("begin_checkout", {}) '
-            '<script id="googlesitekit-events-provider-woocommerce-js" src="provider.js"></script>'
+    def test_missing_cross_domain_configuration_fails(self) -> None:
+        main = '<script src="/js/google-ads-tracking.js"></script><a href="https://tienda.voyagerballoons.eu/">Tienda</a>'
+        script = "GT-55NTF5CN AW-11564692382 voyagerballoons.eu"
+
+        findings = _audit(main, script, self.config)
+        check = next(item for item in findings if item["key"] == "main-linker")
+
+        self.assertFalse(check["ok"])
+
+    def test_booking_link_check_uses_current_store(self) -> None:
+        main = '<script src="/js/google-ads-tracking.js"></script>'
+        script = (
+            "GT-55NTF5CN AW-11564692382 voyagerballoons.eu "
+            "tienda.voyagerballoons.eu accept_incoming decorate_forms"
         )
 
-        findings = _audit(main, script, shop, self.config)
-        link_check = next(item for item in findings if item["key"] == "shop-links")
+        findings = _audit(main, script, self.config)
+        check = next(item for item in findings if item["key"] == "booking-links")
 
-        self.assertTrue(link_check["ok"])
-        self.assertEqual(link_check["evidence_url"], "https://www.voyagerballoons.eu/")
+        self.assertFalse(check["ok"])
+        self.assertEqual(check["evidence_url"], "https://www.voyagerballoons.eu/")
 
 
 if __name__ == "__main__":

@@ -23,17 +23,16 @@ from bs4 import BeautifulSoup
 
 SITEMAPS = (
     "https://www.voyagerballoons.eu/sitemap_index.xml",
-    "https://shop.voyagerballoons.eu/wp-sitemap.xml",
+    "https://www.aosabordovento.net/sitemap.xml",
 )
 ALLOWED_HOSTS = {
     "voyagerballoons.eu",
     "www.voyagerballoons.eu",
-    "shop.voyagerballoons.eu",
+    "tienda.voyagerballoons.eu",
+    "aosabordovento.net",
+    "www.aosabordovento.net",
 }
 SKIP_PATH_PARTS = (
-    "/wp-admin/",
-    "/wp-json/",
-    "/wp-login.php",
     "/feed/",
 )
 SKIP_QUERY_KEYS = {
