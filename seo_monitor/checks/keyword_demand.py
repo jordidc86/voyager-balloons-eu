@@ -14,22 +14,8 @@ ENDPOINT = "https://api.dataforseo.com/v3/dataforseo_labs/google/keyword_overvie
 
 
 def _market(row: dict[str, str]) -> tuple[str, str, int]:
-    """Return a supported DataForSEO Labs country/language combination.
-
-    The Labs keyword database currently exposes Spanish for Spain and
-    Portuguese for Portugal.  The language of the keyword or landing page can
-    still be English or Spanish; it must not be copied into the API locale
-    because unsupported country/language pairs are rejected.
-    """
-    location_code = str(row.get("location_code") or "")
-    location_name = str(row.get("location_name") or "").casefold()
-    cluster = str(row.get("cluster") or "").casefold()
-
-    if location_code in {"2620", "9051350"} or "portugal" in location_name:
-        return "Portugal", "pt", 2620
-    if location_code in {"2724", "1005493", "1005528"} or "spain" in location_name:
-        return "Spain", "es", 2724
-    if "braganca" in cluster:
+    is_portugal = "braganca" in row.get("cluster", "")
+    if is_portugal:
         return "Portugal", "pt", 2620
     return "Spain", "es", 2724
 
@@ -118,7 +104,12 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
         volume = int(keyword_info.get("search_volume") or 0)
         cpc = float(keyword_info.get("cpc") or 0)
         difficulty = properties.get("keyword_difficulty")
-        previous = store.previous_keyword_ranking(row["keyword"], row["location_name"], row["device"])
+        previous = store.previous_keyword_ranking(
+            row["keyword"],
+            row["location_name"],
+            row["device"],
+            target_url=row["target_url"],
+        )
         position = previous.position if previous else None
         payload = {
             **row,
@@ -156,8 +147,13 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
                 "intent": intent_info.get("main_intent"),
                 "difficulty": difficulty,
                 "position": position,
+                "position_location": row["location_name"],
+                "position_device": row["device"],
+                "position_observed_at": previous.observed_at.isoformat() if previous else None,
                 "target_url": row["target_url"],
                 "priority": row["priority"],
+                "brand_id": row.get("brand_id") or "voyager",
+                "role": row.get("role") or "primary",
             })
 
     opportunities.sort(
@@ -167,27 +163,21 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
     if opportunities:
         result.alerts.append(AlertSpec(
             dedupe_key="keyword_demand:high-opportunities",
-            severity="P2",
+            severity="P3",
             category="keyword_demand",
             title="Palabras clave con demanda fuera del top 10",
-            message=f"Hay {len(opportunities)} consultas con demanda relevante en las que Voyager aún no está consolidado en top 10.",
-            action="Priorizar las páginas por intención comercial, CPC y volumen; comprobar primero canibalización, URL posicionada y enlaces internos.",
+            message=f"Hay {len(opportunities)} consultas con demanda relevante en las que la marca objetivo aún no está consolidada en top 10.",
+            action="Mantenerlas en el backlog de crecimiento y priorizarlas por intención comercial, CPC, volumen y mercado de la marca.",
             metadata={"opportunities": opportunities[:20]},
         ))
     if failures:
-        partial_failure = groups_checked > 0
         result.alerts.append(AlertSpec(
             dedupe_key="keyword_demand:provider-failures",
-            severity="P2" if partial_failure else "P1",
+            severity="P1",
             category="keyword_demand",
-            title="Datos de demanda parcialmente incompletos" if partial_failure else "Datos de demanda no disponibles",
+            title="Datos de demanda incompletos",
             message=f"No se pudieron consultar {len(failures)} mercados.",
-            action=(
-                "Revisar las combinaciones de mercado e idioma en el informe semanal; "
-                "las mediciones válidas permanecen disponibles."
-                if partial_failure
-                else "Revisar saldo, credenciales, idiomas admitidos y respuesta de DataForSEO Labs antes del siguiente ciclo."
-            ),
+            action="Revisar saldo, idiomas admitidos y respuesta de DataForSEO Labs antes del siguiente ciclo.",
             metadata={"failures": failures},
         ))
 

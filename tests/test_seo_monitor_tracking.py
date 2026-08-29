@@ -9,56 +9,47 @@ class TrackingTests(unittest.TestCase):
     def setUp(self) -> None:
         self.config = {
             "main_script_url": "https://www.voyagerballoons.eu/js/google-ads-tracking.js",
-            "main_url": "https://www.voyagerballoons.eu/",
-            "booking_domain": "tienda.voyagerballoons.eu",
             "main_domain": "voyagerballoons.eu",
+            "store_domain": "tienda.voyagerballoons.eu",
             "google_tag_id": "GT-55NTF5CN",
             "google_ads_id": "AW-11564692382",
         }
+        self.main = (
+            '<script src="/js/google-ads-tracking.js"></script>'
+            '<a href="https://tienda.voyagerballoons.eu/">Reservar</a>'
+        )
+        self.linker = "voyagerballoons.eu tienda.voyagerballoons.eu accept_incoming decorate_forms"
+        self.script = (
+            f"GT-55NTF5CN AW-11564692382 {self.linker} "
+            "vb_landing_path vb_referrer_host utm_source"
+        )
+        self.store = (
+            f"GT-55NTF5CN AW-11564692382 {self.linker} voyager-google-tag-bootstrap "
+            "voyager-tracking-contract add_to_cart begin_checkout"
+        )
 
     def test_complete_tracking_contract_passes(self) -> None:
-        main = '<script src="/js/google-ads-tracking.js"></script><a href="https://tienda.voyagerballoons.eu/">Tienda</a>'
-        script = (
-            "GT-55NTF5CN AW-11564692382 voyagerballoons.eu "
-            "tienda.voyagerballoons.eu accept_incoming decorate_forms"
-        )
-
-        findings = _audit(main, script, self.config)
-
+        findings = _audit(self.main, self.script, self.store, self.config)
+        self.assertEqual(len(findings), 8)
         self.assertTrue(all(item["ok"] for item in findings))
 
-    def test_missing_main_script_fails(self) -> None:
-        script = (
-            "GT-55NTF5CN AW-11564692382 voyagerballoons.eu "
-            "tienda.voyagerballoons.eu accept_incoming decorate_forms"
-        )
-        findings = _audit('<a href="https://tienda.voyagerballoons.eu/">Tienda</a>', script, self.config)
-
-        check = next(item for item in findings if item["key"] == "main-script")
-
+    def test_missing_journey_attribution_fails(self) -> None:
+        findings = _audit(self.main, self.linker, self.store, self.config)
+        check = next(item for item in findings if item["key"] == "journey-attribution")
         self.assertFalse(check["ok"])
 
-    def test_missing_cross_domain_configuration_fails(self) -> None:
-        main = '<script src="/js/google-ads-tracking.js"></script><a href="https://tienda.voyagerballoons.eu/">Tienda</a>'
-        script = "GT-55NTF5CN AW-11564692382 voyagerballoons.eu"
-
-        findings = _audit(main, script, self.config)
-        check = next(item for item in findings if item["key"] == "main-linker")
-
+    def test_missing_store_funnel_contract_fails_without_requiring_purchase(self) -> None:
+        store = self.store.replace("add_to_cart", "").replace("begin_checkout", "")
+        findings = _audit(self.main, self.script, store, self.config)
+        check = next(item for item in findings if item["key"] == "store-funnel-contract")
         self.assertFalse(check["ok"])
+        self.assertNotIn("purchase", check["message"])
 
-    def test_booking_link_check_uses_current_store(self) -> None:
-        main = '<script src="/js/google-ads-tracking.js"></script>'
-        script = (
-            "GT-55NTF5CN AW-11564692382 voyagerballoons.eu "
-            "tienda.voyagerballoons.eu accept_incoming decorate_forms"
-        )
-
-        findings = _audit(main, script, self.config)
-        check = next(item for item in findings if item["key"] == "booking-links")
-
+    def test_legacy_shop_does_not_satisfy_active_store_link(self) -> None:
+        main = self.main.replace("tienda.voyagerballoons.eu", "shop.voyagerballoons.eu")
+        findings = _audit(main, self.script, self.store, self.config)
+        check = next(item for item in findings if item["key"] == "store-links")
         self.assertFalse(check["ok"])
-        self.assertEqual(check["evidence_url"], "https://www.voyagerballoons.eu/")
 
 
 if __name__ == "__main__":

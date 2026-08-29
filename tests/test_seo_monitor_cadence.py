@@ -65,10 +65,10 @@ class SeoMonitorCadenceTests(unittest.TestCase):
         self.assertEqual(drop["baseline"], 10)
 
     def test_rank_drop_needs_search_console_demand_to_be_urgent(self):
-        self.assertEqual(_drop_severity("P0", True, 0, 10), "P2")
-        self.assertEqual(_drop_severity("P0", True, 9, 10), "P2")
-        self.assertEqual(_drop_severity("P0", True, 10, 10), "P1")
-        self.assertEqual(_drop_severity("P1", True, 100, 10), "P2")
+        self.assertEqual(_drop_severity("P0", True, 0, 10, 5, 15), "P3")
+        self.assertEqual(_drop_severity("P0", True, 9, 10, 5, 15), "P3")
+        self.assertEqual(_drop_severity("P0", True, 10, 10, 5, 15), "P1")
+        self.assertEqual(_drop_severity("P1", True, 100, 10, 5, 15), "P2")
 
     @patch("seo_monitor.checks.rank._search", return_value=({"items": []}, 0.01))
     @patch("seo_monitor.checks.rank.load_keyword_inventory")
@@ -85,6 +85,7 @@ class SeoMonitorCadenceTests(unittest.TestCase):
         store = Mock()
         store.previous_keyword_ranking.return_value = None
         store.keyword_ranking_history.return_value = []
+        store.latest_gsc_query_impressions.return_value = 0
         settings = SimpleNamespace(dataforseo_login="login", dataforseo_password="password")
         config = {
             "target_domains": ["www.voyagerballoons.eu"],

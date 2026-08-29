@@ -154,6 +154,24 @@ class StoreTests(unittest.TestCase):
         self.assertEqual(len(self.store.open_alerts()), 1)
         self.assertEqual(self.store.open_alerts()[0].dedupe_key, "rank:test")
 
+    def test_partial_job_only_resolves_alerts_in_observed_prefixes(self) -> None:
+        first_run = self.store.start_job("rank")
+        self.store.save_result(first_run, CheckResult(job_name="rank", alerts=[
+            AlertSpec("rank:checked:drop", "P2", "rank", "Checked", "Drop", "Review"),
+            AlertSpec("rank:deferred:drop", "P2", "rank", "Deferred", "Drop", "Review"),
+        ]))
+
+        second_run = self.store.start_job("rank")
+        self.store.save_result(second_run, CheckResult(
+            job_name="rank",
+            resolution_prefixes=["rank:checked"],
+        ))
+
+        self.assertEqual(
+            [alert.dedupe_key for alert in self.store.open_alerts()],
+            ["rank:deferred:drop"],
+        )
+
     def test_stale_running_job_is_failed_and_can_be_retried(self) -> None:
         run_id = self.store.start_job("pagespeed")
         with self.store.sessions.begin() as session:
@@ -206,6 +224,8 @@ class StoreTests(unittest.TestCase):
         self.store.save_result(ai_run, CheckResult(job_name="ai_visibility"))
         previous_ai = self.store.previous_ai_visibility("es-segovia-operadores", "chat_gpt")
         self.assertIsNotNone(previous_ai)
+        history = self.store.ai_visibility_history("es-segovia-operadores", "chat_gpt", limit=3)
+        self.assertEqual(len(history), 1)
         self.assertEqual(previous_ai.voyager_mentioned, 1)
         self.assertEqual(previous_ai.voyager_cited, 1)
 

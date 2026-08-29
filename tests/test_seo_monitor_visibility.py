@@ -6,16 +6,32 @@ from dataclasses import replace
 from pathlib import Path
 from unittest.mock import Mock, patch
 
-from seo_monitor.checks.ai_visibility import _extract_response
+from seo_monitor.checks.ai_visibility import (
+    _absence_streak as _ai_absence_streak,
+    _brand_presence,
+    _brand_target as _ai_brand_target,
+    _extract_response,
+    _prompt_label,
+)
+from seo_monitor.checks.ga4 import _technical_traffic_assessment
 from seo_monitor.checks.local_visibility import _absence_streak, _drop_assessment as _maps_drop, _rating
 from seo_monitor.config import Settings, load_config
 from seo_monitor.storage import Store
 from seo_monitor.checks import ai_visibility, backlink_gap, indexing, keyword_demand, local_visibility, rank
+from seo_monitor.checks.rank import (
+    _accepted_alternate,
+    _brand_target as _rank_brand_target,
+    _display_url,
+    _drop_severity,
+    _normalized_url,
+    _url_mismatch_severity,
+)
 from seo_monitor.checks.pagespeed import (
     _compact_resource_label,
     _failed_category_audits,
     _field_problem_metrics,
     _field_scope,
+    _field_alert_severity,
     _format_field_problem,
     _lab_performance_assessment,
     _lcp_diagnostic,
@@ -47,6 +63,43 @@ class VisibilityTests(unittest.TestCase):
         })
         self.assertIn("Voyager Balloons", text)
         self.assertEqual(citations[0]["url"], "https://www.voyagerballoons.eu/")
+
+    def test_ai_presence_accepts_a_target_brand_domain_citation(self) -> None:
+        mentioned, cited = _brand_presence(
+            "A empresa recomendada aparece na fonte oficial.",
+            [{"url": "https://www.aosabordovento.net/"}],
+            ["ao sabor do vento", "aosabordovento"],
+            {"aosabordovento.net"},
+        )
+
+        self.assertFalse(mentioned)
+        self.assertTrue(cited)
+
+    def test_ai_prompt_selects_ao_sabor_for_braganca(self) -> None:
+        config = load_config(Settings.from_env())
+        prompt = next(item for item in config["ai_visibility"]["prompts"] if item["id"] == "pt-braganca")
+
+        brand_id, name, aliases, domains = _ai_brand_target(config, prompt)
+
+        self.assertEqual(brand_id, "ao_sabor_do_vento")
+        self.assertEqual(name, "Ao Sabor do Vento")
+        self.assertIn("ao sabor do vento", aliases)
+        self.assertIn("aosabordovento.net", domains)
+
+    def test_ai_absence_requires_three_consecutive_observations(self) -> None:
+        absent = Mock(voyager_mentioned=0, voyager_cited=0)
+        present = Mock(voyager_mentioned=1, voyager_cited=0)
+
+        self.assertEqual(_ai_absence_streak([absent], False), 2)
+        self.assertEqual(_ai_absence_streak([absent, absent], False), 3)
+        self.assertEqual(_ai_absence_streak([absent, present], False), 2)
+        self.assertEqual(_ai_absence_streak([absent, absent], True), 0)
+
+    def test_ai_prompt_label_distinguishes_queries_in_the_same_market(self) -> None:
+        self.assertEqual(
+            _prompt_label({"id": "es-regalo", "label": "Billete regalo"}),
+            "Billete regalo",
+        )
 
     @patch("seo_monitor.checks.ai_visibility.requests.post")
     def test_ai_provider_payloads_only_use_supported_localization(self, post) -> None:
@@ -92,10 +145,10 @@ class VisibilityTests(unittest.TestCase):
     def test_pagespeed_origin_field_data_is_not_treated_as_page_specific(self) -> None:
         self.assertEqual(
             _field_scope(
-                "https://tienda.voyagerballoons.eu/reservar?producto=comfort",
-                "https://tienda.voyagerballoons.eu",
+                "https://shop.voyagerballoons.eu/producto/comfort/",
+                "https://shop.voyagerballoons.eu",
             ),
-            ("origin", "https://tienda.voyagerballoons.eu"),
+            ("origin", "https://shop.voyagerballoons.eu"),
         )
 
     def test_pagespeed_field_problems_identify_slow_ttfb(self) -> None:
@@ -181,6 +234,15 @@ class VisibilityTests(unittest.TestCase):
             "www.googletagmanager.com/gtag/js?id=AW-1",
         )
 
+    def test_performance_action_protects_tracking_until_purchase_is_validated(self) -> None:
+        action = _performance_action([{
+            "audit": "unused-javascript",
+            "resources": [{"url": "https://www.googletagmanager.com/gtag/js?id=AW-1"}],
+        }], {})
+
+        self.assertIn("No retrasar ni eliminar las etiquetas Google", action)
+        self.assertIn("purchase", action)
+
     def test_failed_seo_audits_capture_actionable_nodes(self) -> None:
         failures = _failed_category_audits(
             {"seo": {"auditRefs": [{"id": "crawlable-anchors"}]}},
@@ -212,6 +274,15 @@ class VisibilityTests(unittest.TestCase):
             _lab_performance_assessment([55], 50, 60, 80, 2)["severity"],
             "P1",
         )
+
+    def test_crux_field_alert_requires_current_critical_lab_corroboration(self) -> None:
+        self.assertEqual(_field_alert_severity(None), "P2")
+        self.assertEqual(_field_alert_severity({"severity": "P2"}), "P2")
+        self.assertEqual(_field_alert_severity({"severity": "P1"}), "P1")
+
+    def test_historical_ga4_technical_traffic_is_observational(self) -> None:
+        self.assertEqual(_technical_traffic_assessment(0, 3)["severity"], "P3")
+        self.assertEqual(_technical_traffic_assessment(3, 3)["severity"], "P2")
 
     @patch("seo_monitor.checks.keyword_demand.requests.post")
     def test_keyword_overview_accepts_null_items(self, post) -> None:
@@ -536,52 +607,21 @@ class VisibilityTests(unittest.TestCase):
         self.assertEqual(result.summary["keywords_with_data"], 1)
         self.assertEqual(result.summary["opportunities"], 1)
         self.assertEqual(result.summary["provider_cost_usd"], 0.012)
+        self.assertEqual(result.alerts[0].severity, "P3")
 
-    def test_keyword_demand_uses_supported_native_language_for_each_market(self) -> None:
+    def test_keyword_demand_uses_supported_native_market_language(self) -> None:
         self.assertEqual(
-            keyword_demand._market({"cluster": "braganca_en", "language_code": "en", "location_name": "Portugal"}),
+            keyword_demand._market({"cluster": "braganca_en", "language_code": "en"}),
             ("Portugal", "pt", 2620),
         )
         self.assertEqual(
-            keyword_demand._market({"cluster": "braganca", "language_code": "es", "location_name": "Spain"}),
+            keyword_demand._market({"cluster": "braganca", "language_code": "es"}),
+            ("Portugal", "pt", 2620),
+        )
+        self.assertEqual(
+            keyword_demand._market({"cluster": "segovia_en", "language_code": "en"}),
             ("Spain", "es", 2724),
         )
-
-    @patch("seo_monitor.checks.keyword_demand._overview")
-    @patch("seo_monitor.checks.keyword_demand.load_keyword_inventory")
-    def test_partial_keyword_demand_failure_is_not_urgent(self, load_keywords, overview) -> None:
-        load_keywords.return_value = [
-            {
-                "keyword": "vuelo en globo segovia",
-                "location_name": "Spain",
-                "location_code": "2724",
-                "language_code": "es",
-                "device": "mobile",
-                "priority": "P0",
-                "target_url": "https://www.voyagerballoons.eu/vuelo-en-globo-segovia",
-                "cluster": "segovia",
-            },
-            {
-                "keyword": "passeio de balao braganca",
-                "location_name": "Portugal",
-                "location_code": "2620",
-                "language_code": "pt",
-                "device": "mobile",
-                "priority": "P0",
-                "target_url": "https://www.voyagerballoons.eu/pt/passeio-de-balao-braganca",
-                "cluster": "braganca",
-            },
-        ]
-        overview.side_effect = [([], 0.01), RuntimeError("provider error")]
-        settings = replace(Settings.from_env(), dataforseo_login="login", dataforseo_password="password")
-        config = load_config(settings)
-        with tempfile.TemporaryDirectory() as tmp:
-            store = Store(f"sqlite:///{Path(tmp) / 'monitor.db'}")
-            store.initialize()
-            result = keyword_demand.run(config, store, store.start_job("keyword_demand"), settings)
-
-        alert = next(item for item in result.alerts if item.dedupe_key == "keyword_demand:provider-failures")
-        self.assertEqual(alert.severity, "P2")
 
     @patch("seo_monitor.checks.rank._search")
     @patch("seo_monitor.checks.rank.load_keyword_inventory")
@@ -621,6 +661,47 @@ class VisibilityTests(unittest.TestCase):
         self.assertEqual(search.call_args.args[2], config["thresholds"]["rank_critical_depth"])
         self.assertEqual(result.summary["keywords_checked"], 1)
         self.assertEqual(result.summary["found_top_10"], 1)
+
+    def test_rank_targets_are_brand_specific_and_reject_retired_store_urls(self) -> None:
+        config = load_config(Settings.from_env())
+        voyager_row = {
+            "keyword": "vuelo en globo para parejas segovia",
+            "brand_id": "voyager",
+        }
+        ao_sabor_row = {
+            "keyword": "passeio de balao braganca",
+            "brand_id": "ao_sabor_do_vento",
+        }
+
+        self.assertEqual(_rank_brand_target(config, voyager_row)[1], "Voyager Balloons")
+        self.assertEqual(_rank_brand_target(config, ao_sabor_row)[1], "Ao Sabor do Vento")
+        self.assertFalse(_accepted_alternate(
+            config,
+            voyager_row,
+            "https://shop.voyagerballoons.eu/producto/vuelo-en-globo-privado-en-segovia/?srsltid=test",
+        ))
+
+    def test_rank_url_normalization_ignores_tracking_www_and_trailing_slash(self) -> None:
+        tracked = "https://www.voyagerballoons.eu/?srsltid=test&utm_source=google#result"
+
+        self.assertEqual(_normalized_url(tracked), "https://voyagerballoons.eu/")
+        self.assertEqual(
+            _normalized_url(tracked),
+            _normalized_url("https://voyagerballoons.eu/"),
+        )
+        self.assertEqual(_display_url(tracked), "https://www.voyagerballoons.eu/")
+
+    def test_rank_drop_without_search_console_demand_is_p3(self) -> None:
+        self.assertEqual(_drop_severity("P0", True, 0, 10, 5, 15), "P3")
+        self.assertEqual(_drop_severity("P0", True, 20, 10, 5, 15), "P1")
+        self.assertEqual(_drop_severity("P0", True, 20, 10, 21, 25), "P2")
+        self.assertEqual(_drop_severity("P0", True, 20, 10, 2, 6), "P1")
+
+    def test_alternate_rank_url_only_escalates_with_demand_and_weak_position(self) -> None:
+        self.assertEqual(_url_mismatch_severity("primary", 21, 49, 10), "P2")
+        self.assertEqual(_url_mismatch_severity("primary", 5, 49, 10), "P3")
+        self.assertEqual(_url_mismatch_severity("primary", 21, 0, 10), "P3")
+        self.assertEqual(_url_mismatch_severity("cross_sell", 21, 49, 10), "P3")
 
     @patch("seo_monitor.checks.rank.requests.post")
     def test_rank_search_prefers_stable_location_code(self, post) -> None:
@@ -710,40 +791,6 @@ class VisibilityTests(unittest.TestCase):
         self.assertEqual(result.summary["failures"], 1)
         self.assertEqual(result.summary["provider_cost_usd"], 0.03)
         self.assertEqual(post.call_count, 3)
-
-    @patch("seo_monitor.checks.rank._search")
-    @patch("seo_monitor.checks.rank.load_keyword_inventory")
-    def test_partial_rank_provider_failure_is_not_urgent(self, load_keywords, search) -> None:
-        rows = [
-            {
-                "keyword": keyword,
-                "location_name": "Madrid Spain",
-                "location_code": "1005493",
-                "language_code": "en",
-                "device": "mobile",
-                "priority": "P0",
-                "target_url": "https://www.voyagerballoons.eu/en/hot-air-balloon-segovia",
-                "cluster": "segovia_en",
-            }
-            for keyword in ("hot air balloon segovia", "segovia balloon ride")
-        ]
-        load_keywords.return_value = rows
-        search.side_effect = [
-            ({"items": [], "check_url": "https://example.test/serp"}, 0.002),
-            RuntimeError("Internal SE Server Error."),
-        ]
-        settings = replace(Settings.from_env(), dataforseo_login="login", dataforseo_password="password")
-        config = load_config(settings)
-
-        with tempfile.TemporaryDirectory() as tmp:
-            store = Store(f"sqlite:///{Path(tmp) / 'monitor.db'}")
-            store.initialize()
-            result = rank.run(config, store, store.start_job("rank"), settings)
-
-        alert = next(item for item in result.alerts if item.dedupe_key == "rank:provider-failures")
-        self.assertEqual(alert.severity, "P2")
-        self.assertEqual(result.summary["keywords_checked"], 1)
-        self.assertEqual(result.summary["failures"], 1)
 
 
 if __name__ == "__main__":

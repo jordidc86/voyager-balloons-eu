@@ -5,8 +5,10 @@ from datetime import date
 
 from seo_monitor.checks.ga4 import _commerce_diagnostics, _dimension_report, _funnel_window, _report
 from seo_monitor.checks.gsc import (
+    _aggregate_page_rows,
     _discover_keyword_candidates,
-    _page_click_declines,
+    _find_commercial_query_declines,
+    _find_page_declines,
     _page_decline_severity,
     _query,
     _totals,
@@ -47,27 +49,105 @@ class GoogleContractTests(unittest.TestCase):
     def test_search_console_totals_handle_empty_data(self) -> None:
         self.assertEqual(_totals([]), {"clicks": 0.0, "impressions": 0.0, "ctr": 0.0, "position": 0.0})
 
-    def test_gsc_page_decline_ignores_tiny_click_samples(self) -> None:
-        previous = [{"keys": ["https://example.com/page"], "clicks": 3, "impressions": 50}]
-        current = [{"keys": ["https://example.com/page"], "clicks": 0, "impressions": 45}]
+    def test_gsc_groups_legacy_host_with_canonical_homepage(self) -> None:
+        rows = [
+            {
+                "keys": ["https://www.voyagerballoons.eu/"],
+                "clicks": 106,
+                "impressions": 3747,
+                "position": 9,
+            },
+            {
+                "keys": ["https://voyagerballoons.eu/"],
+                "clicks": 45,
+                "impressions": 2048,
+                "position": 10,
+            },
+        ]
 
-        self.assertEqual(_page_click_declines(previous, current, 30, 5, 5), [])
+        grouped = _aggregate_page_rows(rows, {"primary_domain": "www.voyagerballoons.eu"})
 
-    def test_gsc_page_decline_keeps_material_losses(self) -> None:
-        previous = [{"keys": ["https://example.com/page"], "clicks": 8, "impressions": 100}]
-        current = [{"keys": ["https://example.com/page"], "clicks": 2, "impressions": 90}]
+        homepage = grouped["https://www.voyagerballoons.eu/"]
+        self.assertEqual(homepage["clicks"], 151)
+        self.assertEqual(homepage["impressions"], 5795)
+        self.assertEqual(len(homepage["member_urls"]), 2)
 
-        declines = _page_click_declines(previous, current, 30, 5, 5)
+    def test_gsc_does_not_alert_when_host_migration_explains_percentage_drop(self) -> None:
+        config = {
+            "primary_domain": "www.voyagerballoons.eu",
+            "thresholds": {
+                "organic_click_drop_percent": 30,
+                "organic_page_p2_minimum_click_loss": 3,
+                "minimum_impressions_for_alert": 50,
+            },
+        }
+        previous_rows = [
+            {"keys": ["https://www.voyagerballoons.eu/"], "clicks": 106, "impressions": 3747},
+            {"keys": ["https://voyagerballoons.eu/"], "clicks": 45, "impressions": 2048},
+        ]
+        current_rows = [
+            {"keys": ["https://www.voyagerballoons.eu/"], "clicks": 107, "impressions": 4648},
+            {"keys": ["https://voyagerballoons.eu/"], "clicks": 0, "impressions": 1},
+        ]
+
+        self.assertEqual(_find_page_declines(current_rows, previous_rows, config), [])
+
+    def test_gsc_maps_known_legacy_page_to_current_landing(self) -> None:
+        config = {
+            "primary_domain": "www.voyagerballoons.eu",
+            "gsc_page_groups": {
+                "https://www.voyagerballoons.eu/vuelo-en-globo-segovia": [
+                    "https://voyagerballoons.eu/producto/oferta-vuelo-en-globo-en-segovia/"
+                ],
+            },
+            "thresholds": {
+                "organic_click_drop_percent": 30,
+                "organic_page_p2_minimum_click_loss": 3,
+                "minimum_impressions_for_alert": 50,
+            },
+        }
+        previous_rows = [{
+            "keys": ["https://voyagerballoons.eu/producto/oferta-vuelo-en-globo-en-segovia/"],
+            "clicks": 10,
+            "impressions": 300,
+        }]
+        current_rows = [{
+            "keys": ["https://www.voyagerballoons.eu/vuelo-en-globo-segovia"],
+            "clicks": 3,
+            "impressions": 250,
+        }]
+
+        declines = _find_page_declines(current_rows, previous_rows, config)
 
         self.assertEqual(len(declines), 1)
-        self.assertEqual(declines[0]["drop_percent"], 75.0)
-        self.assertEqual(declines[0]["previous_clicks"], 8.0)
+        self.assertEqual(declines[0]["page"], "https://www.voyagerballoons.eu/vuelo-en-globo-segovia")
+        self.assertEqual(declines[0]["click_loss"], 7)
+        self.assertEqual(len(declines[0]["member_urls"]), 2)
 
-    def test_page_decline_is_not_urgent_when_total_organic_clicks_grow(self) -> None:
-        self.assertEqual(_page_decline_severity({"clicks": 45}, {"clicks": 32}), "P2")
+    def test_gsc_watches_only_configured_commercial_query_declines(self) -> None:
+        config = {
+            "gsc_query_watchlist": ["viaje en globo segovia"],
+            "thresholds": {
+                "organic_click_drop_percent": 30,
+                "organic_query_minimum_previous_clicks": 2,
+                "minimum_impressions_for_alert": 50,
+            },
+        }
+        previous_rows = [
+            {"keys": ["viaje en globo segovia"], "clicks": 5, "impressions": 462, "ctr": 0.011, "position": 7.6},
+            {"keys": ["voyager balloons segovia"], "clicks": 25, "impressions": 300, "ctr": 0.08, "position": 1},
+        ]
+        current_rows = [
+            {"keys": ["viaje en globo segovia"], "clicks": 0, "impressions": 476, "ctr": 0, "position": 8.8},
+            {"keys": ["voyager balloons segovia"], "clicks": 16, "impressions": 320, "ctr": 0.05, "position": 1},
+        ]
 
-    def test_page_decline_is_urgent_when_total_organic_clicks_also_fall(self) -> None:
-        self.assertEqual(_page_decline_severity({"clicks": 20}, {"clicks": 32}), "P1")
+        declines = _find_commercial_query_declines(current_rows, previous_rows, config)
+
+        self.assertEqual(len(declines), 1)
+        self.assertEqual(declines[0]["query"], "viaje en globo segovia")
+        self.assertEqual(declines[0]["click_loss"], 5)
+        self.assertEqual(declines[0]["current_position"], 8.8)
 
     def test_gsc_discovers_commercial_query_and_chooses_best_landing(self) -> None:
         rows = [
@@ -115,7 +195,7 @@ class GoogleContractTests(unittest.TestCase):
     def test_gsc_discovery_rejects_technical_and_parameterized_pages(self) -> None:
         rows = [
             {
-                "keys": ["balloon ride segovia", "https://tienda.voyagerballoons.eu/reservar"],
+                "keys": ["balloon ride segovia", "https://shop.voyagerballoons.eu/cart/"],
                 "clicks": 3,
                 "impressions": 100,
                 "position": 4,
@@ -158,18 +238,28 @@ class GoogleContractTests(unittest.TestCase):
         session = FakeSession({"metricHeaders": [{"name": "sessions"}], "rows": []})
         self.assertEqual(_report(session, "123456", date(2026, 7, 1), date(2026, 7, 7)), {})
 
+    def test_small_absolute_page_decline_is_observational(self) -> None:
+        thresholds = {
+            "organic_page_p1_minimum_click_loss": 40,
+            "organic_page_p2_minimum_click_loss": 20,
+        }
+
+        self.assertEqual(_page_decline_severity(15, thresholds), "P3")
+        self.assertEqual(_page_decline_severity(20, thresholds), "P2")
+        self.assertEqual(_page_decline_severity(40, thresholds), "P1")
+
     def test_ga4_commerce_diagnostics_detect_missing_funnel_events(self) -> None:
         diagnostics = _commerce_diagnostics(
             [{
-                "eventName": "purchase", "hostName": "tienda.voyagerballoons.eu",
+                "eventName": "purchase", "hostName": "shop.voyagerballoons.eu",
                 "eventCount": 2, "keyEvents": 2, "totalRevenue": 480,
             }],
             [
-                {"sessionDefaultChannelGroup": "Organic Search", "hostName": "tienda.voyagerballoons.eu", "sessions": 120},
-                {"sessionDefaultChannelGroup": "Direct", "hostName": "tienda.voyagerballoons.eu", "sessions": 30},
+                {"sessionDefaultChannelGroup": "Organic Search", "hostName": "shop.voyagerballoons.eu", "sessions": 120},
+                {"sessionDefaultChannelGroup": "Direct", "hostName": "shop.voyagerballoons.eu", "sessions": 30},
                 {"sessionDefaultChannelGroup": "Direct", "hostName": "localhost", "sessions": 12},
             ],
-            "tienda.voyagerballoons.eu",
+            "shop.voyagerballoons.eu",
         )
 
         self.assertTrue(diagnostics["funnel_missing"])
@@ -185,10 +275,10 @@ class GoogleContractTests(unittest.TestCase):
             [],
             [{
                 "sessionDefaultChannelGroup": "Organic Search",
-                "hostName": "tienda.voyagerballoons.eu",
+                "hostName": "shop.voyagerballoons.eu",
                 "sessions": 150,
             }],
-            "tienda.voyagerballoons.eu",
+            "shop.voyagerballoons.eu",
             minimum_shop_sessions=50,
             evaluation_ready=False,
         )
@@ -197,6 +287,61 @@ class GoogleContractTests(unittest.TestCase):
         self.assertFalse(diagnostics["funnel_missing"])
         self.assertFalse(diagnostics["add_to_cart_missing"])
         self.assertFalse(diagnostics["begin_checkout_missing"])
+        self.assertFalse(diagnostics["purchase_missing"])
+
+    def test_ga4_detects_missing_purchase_after_repeated_checkouts(self) -> None:
+        diagnostics = _commerce_diagnostics(
+            [
+                {
+                    "eventName": "add_to_cart",
+                    "hostName": "shop.voyagerballoons.eu",
+                    "eventCount": 27,
+                    "keyEvents": 0,
+                    "totalRevenue": 0,
+                },
+                {
+                    "eventName": "begin_checkout",
+                    "hostName": "shop.voyagerballoons.eu",
+                    "eventCount": 6,
+                    "keyEvents": 0,
+                    "totalRevenue": 0,
+                },
+            ],
+            [{
+                "sessionDefaultChannelGroup": "Organic Search",
+                "hostName": "shop.voyagerballoons.eu",
+                "sessions": 120,
+            }],
+            "shop.voyagerballoons.eu",
+            minimum_shop_sessions=50,
+            minimum_checkout_events_for_purchase_alert=3,
+        )
+
+        self.assertTrue(diagnostics["evaluation_ready"])
+        self.assertTrue(diagnostics["purchase_missing"])
+        self.assertEqual(diagnostics["begin_checkout"], 6)
+        self.assertEqual(diagnostics["purchases"], 0)
+
+    def test_ga4_does_not_escalate_a_single_checkout_without_purchase(self) -> None:
+        diagnostics = _commerce_diagnostics(
+            [{
+                "eventName": "begin_checkout",
+                "hostName": "shop.voyagerballoons.eu",
+                "eventCount": 1,
+                "keyEvents": 0,
+                "totalRevenue": 0,
+            }],
+            [{
+                "sessionDefaultChannelGroup": "Organic Search",
+                "hostName": "shop.voyagerballoons.eu",
+                "sessions": 120,
+            }],
+            "shop.voyagerballoons.eu",
+            minimum_shop_sessions=50,
+            minimum_checkout_events_for_purchase_alert=3,
+        )
+
+        self.assertFalse(diagnostics["purchase_missing"])
 
     def test_ga4_funnel_window_starts_after_tracking_fix(self) -> None:
         config = {

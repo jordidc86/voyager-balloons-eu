@@ -81,10 +81,9 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
         result.status = "skipped"
         result.summary = {"reason": "DATAFORSEO_LOGIN/PASSWORD no configurados"}
         return result
+    result.resolution_prefixes = ["local_visibility:provider-failures"]
 
     local_config = config.get("local_visibility", {})
-    target_cid = str(local_config.get("cid") or "")
-    target_name = str(local_config.get("business_name") or "").casefold()
     checks = local_config.get("checks", [])
     found = 0
     top_three = 0
@@ -110,6 +109,20 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
             continue
 
         items = [item for item in api_result.get("items", []) if item.get("type") == "maps_search"]
+        brand_id = check.get("brand_id") or "voyager"
+        brand = config.get("brands", {}).get(brand_id, {})
+        target_cid = str(
+            brand.get("local_cid")
+            or (local_config.get("cid") if brand_id == "voyager" else "")
+            or ""
+        )
+        target_name = str(
+            brand.get("local_name")
+            or brand.get("name")
+            or (local_config.get("business_name") if brand_id == "voyager" else "")
+            or ""
+        ).casefold()
+        brand_name = str(brand.get("name") or target_name or "Voyager Balloons")
         matching = next(
             (
                 item for item in items
@@ -141,6 +154,8 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
                 }
                 for item in items[:10]
             ],
+            "brand_id": brand_id,
+            "brand_name": brand_name,
         }
         store.add_local_ranking(run_id, payload)
         found += int(position is not None)
@@ -149,10 +164,11 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
             "maps_position",
             position or 21,
             source="local_visibility",
-            dimensions={"keyword": check["keyword"], "location": check["location_label"]},
+            dimensions={"keyword": check["keyword"], "location": check["location_label"], "brand_id": brand_id},
         )
 
-        key = f"local_visibility:{check['location_label']}:{check['keyword']}"
+        legacy_key = f"local_visibility:{check['location_label']}:{check['keyword']}"
+        key = f"local_visibility:{brand_id}:{check['location_label']}:{check['keyword']}"
         drop = _drop_assessment(
             history,
             position,
@@ -171,7 +187,12 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
                 ),
                 action="Confirmar la tendencia y revisar reseñas, categoría, servicios y competidores del mapa antes de editar la ficha.",
                 evidence_url=api_result.get("check_url"),
-                metadata={**drop, "top_results": payload["top_results"]},
+                metadata={
+                    **drop,
+                    "brand_id": brand_id,
+                    "brand_name": brand_name,
+                    "top_results": payload["top_results"],
+                },
             ))
         absence_streak = _absence_streak(history, position)
         if (
@@ -190,8 +211,16 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
                 ),
                 action="Comparar las fichas visibles, comprobar elegibilidad del área de servicio y preparar mejoras verificables de categoría, servicios, fotos y reseñas.",
                 evidence_url=api_result.get("check_url"),
-                metadata={"absence_streak": absence_streak, "top_results": payload["top_results"]},
+                metadata={
+                    "brand_id": brand_id,
+                    "brand_name": brand_name,
+                    "absence_streak": absence_streak,
+                    "top_results": payload["top_results"],
+                },
             ))
+
+        # Resolve pre-brand alert keys after a successful observation of this check.
+        result.resolution_prefixes.extend([legacy_key, key])
 
     if failures:
         result.alerts.append(AlertSpec(

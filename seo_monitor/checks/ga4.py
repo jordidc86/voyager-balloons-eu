@@ -106,6 +106,7 @@ def _commerce_diagnostics(
     shop_domain: str,
     minimum_shop_sessions: float = 100,
     evaluation_ready: bool = True,
+    minimum_checkout_events_for_purchase_alert: float = 3,
 ) -> dict:
     event_totals: dict[str, dict[str, float]] = {}
     for row in commerce_rows:
@@ -130,6 +131,12 @@ def _commerce_diagnostics(
     add_to_cart = event_totals.get("add_to_cart", {}).get("eventCount", 0)
     begin_checkout = event_totals.get("begin_checkout", {}).get("eventCount", 0)
     enough_shop_traffic = shop_sessions >= minimum_shop_sessions
+    purchase_missing = (
+        evaluation_ready
+        and enough_shop_traffic
+        and begin_checkout >= minimum_checkout_events_for_purchase_alert
+        and purchases.get("eventCount", 0) == 0
+    )
     return {
         "shop_sessions": shop_sessions,
         "shop_direct_sessions": direct_sessions,
@@ -140,10 +147,12 @@ def _commerce_diagnostics(
         "purchases": purchases.get("eventCount", 0),
         "purchase_revenue": purchases.get("totalRevenue", 0),
         "minimum_shop_sessions": minimum_shop_sessions,
+        "minimum_checkout_events_for_purchase_alert": minimum_checkout_events_for_purchase_alert,
         "evaluation_ready": evaluation_ready and enough_shop_traffic,
         "add_to_cart_missing": evaluation_ready and enough_shop_traffic and add_to_cart == 0,
         "begin_checkout_missing": evaluation_ready and enough_shop_traffic and begin_checkout == 0,
         "funnel_missing": evaluation_ready and enough_shop_traffic and (add_to_cart == 0 or begin_checkout == 0),
+        "purchase_missing": purchase_missing,
     }
 
 
@@ -156,6 +165,15 @@ def _funnel_window(config: dict, current_end: date, default_start: date) -> tupl
     complete_days = max(0, (current_end - start).days + 1)
     minimum_days = int(config.get("thresholds", {}).get("ga4_funnel_minimum_complete_days", 2))
     return start, complete_days, complete_days >= minimum_days
+
+
+def _technical_traffic_assessment(recent_sessions: float, warning_threshold: float) -> dict:
+    historical_only = recent_sessions < warning_threshold
+    return {
+        "severity": "P3" if historical_only else "P2",
+        "historical_only": historical_only,
+        "title": "Tráfico técnico histórico en GA4" if historical_only else "Tráfico técnico sigue entrando en GA4",
+    }
 
 
 def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckResult:
@@ -214,10 +232,13 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
         ["sessionDefaultChannelGroup", "hostName"],
         ["sessions", "keyEvents", "totalRevenue"],
     )
+    tracking_config = config.get("tracking", {})
+    store_domain = str(tracking_config.get("store_domain") or "tienda.voyagerballoons.eu")
+    legacy_shop_domain = str(tracking_config.get("legacy_shop_domain") or "shop.voyagerballoons.eu")
     historical_diagnostics = _commerce_diagnostics(
         commerce_rows,
         channel_host_rows,
-        config["tracking"]["booking_domain"],
+        legacy_shop_domain,
         evaluation_ready=False,
     )
     funnel_start, funnel_complete_days, funnel_days_ready = _funnel_window(config, current_end, commerce_start)
@@ -251,12 +272,16 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
     minimum_funnel_sessions = float(
         config.get("thresholds", {}).get("ga4_funnel_minimum_shop_sessions", 50)
     )
+    minimum_checkout_events = float(
+        config.get("thresholds", {}).get("ga4_purchase_alert_minimum_checkouts", 3)
+    )
     diagnostics = _commerce_diagnostics(
         funnel_rows,
         funnel_channel_host_rows,
-        config["tracking"]["booking_domain"],
+        store_domain,
         minimum_shop_sessions=minimum_funnel_sessions,
         evaluation_ready=funnel_days_ready,
+        minimum_checkout_events_for_purchase_alert=minimum_checkout_events,
     )
     diagnostics["complete_days"] = funnel_complete_days
     diagnostics["minimum_complete_days"] = int(
@@ -325,10 +350,10 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
             message=(
                 f"La tienda registra {diagnostics['shop_sessions']:.0f} sesiones en 28 días, "
                 f"pero add_to_cart={diagnostics['add_to_cart']:.0f}. "
-                f"Purchase sí registra {diagnostics['purchases']:.0f} eventos, por lo que la venta funciona "
-                "y el fallo está en la instrumentación del embudo."
+                f"Purchase registra {diagnostics['purchases']:.0f} eventos. La comprobación corresponde "
+                "a la tienda transaccional nueva y no mezcla ya el histórico de WordPress."
             ),
-            action="Validar el evento de WooCommerce al añadir un producto y corregir add_to_cart sin alterar el purchase que ya funciona.",
+            action="Validar add_to_cart en la tienda nueva sin alterar el evento purchase.",
             evidence_url="https://analytics.google.com/",
             metadata=diagnostics,
         ))
@@ -346,16 +371,54 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
             evidence_url="https://analytics.google.com/",
             metadata=diagnostics,
         ))
+    if diagnostics["purchase_missing"]:
+        result.alerts.append(AlertSpec(
+            dedupe_key="ga4:purchase-events-missing",
+            severity="P1",
+            category="ga4",
+            title="GA4 no registra compras tras inicios de checkout",
+            message=(
+                f"En el periodo posterior a la reparación se registran "
+                f"{diagnostics['begin_checkout']:.0f} begin_checkout y "
+                f"{diagnostics['add_to_cart']:.0f} add_to_cart, pero 0 purchase y 0 € de ingresos."
+            ),
+            action=(
+                "Comparar primero los pedidos reales del Dashboard en el mismo periodo. "
+                "Si existen pedidos, reparar purchase con transaction_id, value y currency EUR y validar la vuelta de Redsys; "
+                "si no existen, tratarlo como abandono de checkout y revisar el flujo comercial."
+            ),
+            evidence_url="https://analytics.google.com/",
+            metadata=diagnostics,
+        ))
     if historical_diagnostics["technical_sessions"] >= 10:
+        recent_technical_sessions = diagnostics["technical_sessions"]
+        warning_threshold = float(
+            config.get("thresholds", {}).get("ga4_technical_sessions_post_fix_warning", 3)
+        )
+        assessment = _technical_traffic_assessment(recent_technical_sessions, warning_threshold)
+        historical_only = assessment["historical_only"]
+        technical_metadata = {
+            **historical_diagnostics,
+            "post_fix_technical_sessions": recent_technical_sessions,
+            "post_fix_warning_threshold": warning_threshold,
+            "historical_only": historical_only,
+        }
         result.alerts.append(AlertSpec(
             dedupe_key="ga4:technical-host-traffic",
-            severity="P2",
+            severity=assessment["severity"],
             category="ga4",
-            title="Tráfico técnico contamina la propiedad GA4",
-            message=f"Se detectan {historical_diagnostics['technical_sessions']:.0f} sesiones de localhost/127.0.0.1 en 28 días.",
-            action="Desactivar la etiqueta en desarrollo o aplicar un filtro de tráfico interno verificado, sin excluir tráfico real de web y tienda.",
+            title=assessment["title"],
+            message=(
+                f"Se detectan {historical_diagnostics['technical_sessions']:.0f} sesiones de localhost/127.0.0.1 "
+                f"en 28 días; {recent_technical_sessions:.0f} corresponden al periodo posterior a la reparación."
+            ),
+            action=(
+                "Mantener en observación hasta que la ventana de 28 días elimine el tráfico histórico."
+                if historical_only else
+                "Identificar el entorno que sigue enviando datos y aplicar una exclusión verificada sin filtrar tráfico real."
+            ),
             evidence_url="https://analytics.google.com/",
-            metadata=historical_diagnostics,
+            metadata=technical_metadata,
         ))
 
     result.summary = {

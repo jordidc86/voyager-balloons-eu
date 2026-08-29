@@ -26,6 +26,7 @@ class CheckResult:
     summary: dict[str, Any] = field(default_factory=dict)
     alerts: list[AlertSpec] = field(default_factory=list)
     metrics: list[dict[str, Any]] = field(default_factory=list)
+    resolution_prefixes: list[str] | None = None
 
     def add_metric(
         self,

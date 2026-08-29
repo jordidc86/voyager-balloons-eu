@@ -90,6 +90,8 @@ def load_keyword_inventory(settings: Settings, store=None, dynamic_limit: int = 
             "cluster": candidate.cluster,
             "target_url": candidate.target_url,
             "priority": candidate.priority,
+            "brand_id": "voyager",
+            "role": "primary",
         })
         seen.add(normalized)
     return inventory

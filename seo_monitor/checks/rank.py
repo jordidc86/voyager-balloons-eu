@@ -33,7 +33,33 @@ def _normalized_url(url: str | None) -> str | None:
         return None
     parts = urlsplit(url)
     path = parts.path.rstrip("/") or "/"
+    host = parts.netloc.lower().removeprefix("www.")
+    return f"{parts.scheme.lower()}://{host}{path}"
+
+
+def _display_url(url: str | None) -> str | None:
+    """Keep a readable URL while dropping provider tracking parameters and fragments."""
+    if not url:
+        return None
+    parts = urlsplit(url)
+    path = parts.path.rstrip("/") or "/"
     return f"{parts.scheme.lower()}://{parts.netloc.lower()}{path}"
+
+
+def _brand_target(config: dict, row: dict[str, str]) -> tuple[str, str, set[str]]:
+    brand_id = row.get("brand_id") or "voyager"
+    brand = config.get("brands", {}).get(brand_id, {})
+    name = str(brand.get("name") or config.get("brand") or "Voyager Balloons")
+    domains = brand.get("domains") or config["target_domains"]
+    return brand_id, name, {str(domain).casefold().removeprefix("www.") for domain in domains}
+
+
+def _accepted_alternate(config: dict, row: dict[str, str], ranking_url: str | None) -> bool:
+    if not ranking_url:
+        return False
+    accepted = config.get("rank_accepted_alternates", {}).get(row["keyword"], [])
+    normalized = _normalized_url(ranking_url)
+    return normalized in {_normalized_url(url) for url in accepted}
 
 
 def _drop_assessment(
@@ -64,10 +90,39 @@ def _drop_severity(
     confirmed: bool,
     gsc_impressions: float,
     minimum_gsc_impressions: float,
+    baseline: float,
+    current: float,
 ) -> str:
     """Reserve urgent rank alerts for drops backed by real Search Console demand."""
-    if priority == "P0" and confirmed and gsc_impressions >= minimum_gsc_impressions:
+    lost_high_visibility = (
+        (baseline <= 10 < current)
+        or (baseline <= 3 and current > 5)
+    )
+    if (
+        priority == "P0"
+        and confirmed
+        and gsc_impressions >= minimum_gsc_impressions
+        and lost_high_visibility
+    ):
         return "P1"
+    if gsc_impressions < minimum_gsc_impressions:
+        return "P3"
+    return "P2"
+
+
+def _url_mismatch_severity(
+    role: str | None,
+    position: float | None,
+    gsc_impressions: float,
+    minimum_gsc_impressions: float,
+) -> str:
+    """Escalate only alternate URLs that combine demand with weak visibility."""
+    if role == "cross_sell":
+        return "P3"
+    if position is None or position <= 10:
+        return "P3"
+    if gsc_impressions < minimum_gsc_impressions:
+        return "P3"
     return "P2"
 
 
@@ -133,7 +188,6 @@ def _depth_for(
     row: dict[str, str],
     previous,
     thresholds: dict,
-    *,
     now: datetime | None = None,
 ) -> int | None:
     if row.get("priority") == "P0":
@@ -151,7 +205,6 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
         result.summary = {"reason": "DATAFORSEO_LOGIN/PASSWORD no configurados"}
         return result
 
-    target_domains = {domain.removeprefix("www.") for domain in config["target_domains"]}
     thresholds = config["thresholds"]
     threshold = float(thresholds.get("rank_drop_positions", 3))
     keywords = load_keyword_inventory(
@@ -166,6 +219,7 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
     budget_limited = False
     checked = 0
     deferred = 0
+    result.resolution_prefixes = ["rank:provider-failures"]
 
     for row in keywords:
         history = store.keyword_ranking_history(
@@ -173,6 +227,7 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
             row["location_name"],
             row["device"],
             limit=int(thresholds.get("rank_drop_history_window", 7)),
+            target_url=row["target_url"],
         )
         previous = history[0] if history else None
         depth = _depth_for(row, previous, thresholds)
@@ -190,6 +245,8 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
             failures.append({"keyword": row["keyword"], "error": str(exc)})
             continue
         checked += 1
+
+        brand_id, brand_name, target_domains = _brand_target(config, row)
 
         organic = [item for item in serp["items"] if item.get("type") == "organic"]
         matching = next((item for item in organic if _domain(item.get("url")) in target_domains), None)
@@ -216,7 +273,9 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
             dimensions={"keyword": row["keyword"], "location": row["location_name"], "device": row["device"], "cluster": row["cluster"]},
         )
 
-        key = f"rank:{row['language_code']}:{row['location_name']}:{row['device']}:{row['keyword']}"
+        legacy_key = f"rank:{row['language_code']}:{row['location_name']}:{row['device']}:{row['keyword']}"
+        key = f"rank:{brand_id}:{row['language_code']}:{row['location_name']}:{row['device']}:{row['keyword']}"
+        result.resolution_prefixes.extend([legacy_key, key])
         drop = _drop_assessment(
             history,
             position,
@@ -235,6 +294,8 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
                 drop["confirmed"],
                 gsc_impressions,
                 minimum_gsc_impressions,
+                drop["baseline"],
+                drop["current"],
             )
             action = (
                 "Confirmar la tendencia, URL posicionada, competidor ascendente, indexación y cambios recientes antes de modificar contenido."
@@ -249,7 +310,7 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
                 category="rank",
                 title=f"Pérdida de posición: {row['keyword']}",
                 message=(
-                    f"Voyager está en {new_position}, frente a una referencia estable de "
+                    f"{brand_name} está en {new_position}, frente a una referencia estable de "
                     f"{drop['baseline']:.0f}, en {row['location_name']} ({row['device']})."
                 ),
                 action=action,
@@ -257,49 +318,91 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
                 metadata={
                     **drop,
                     "position": position,
+                    "ranking_url": ranking_url,
+                    "target_url": row["target_url"],
                     "top_domain": top_domain,
                     "gsc_query_impressions_7d": gsc_impressions,
                     "rank_p1_minimum_gsc_impressions": minimum_gsc_impressions,
                 },
             ))
         elif position is None and row["priority"] == "P0":
+            gsc_impressions = store.latest_gsc_query_impressions(row["keyword"])
+            minimum_gsc_impressions = float(
+                thresholds.get("rank_p1_minimum_gsc_impressions", 10)
+            )
             result.alerts.append(AlertSpec(
-                dedupe_key=f"{key}:absent", severity="P2", category="rank",
+                dedupe_key=f"{key}:absent",
+                severity="P2" if gsc_impressions >= minimum_gsc_impressions else "P3",
+                category="rank",
                 title=f"Sin visibilidad top {depth}: {row['keyword']}",
-                message=f"No se encuentra Voyager entre los {depth} primeros resultados en {row['location_name']} ({row['device']}).",
+                message=f"No se encuentra {brand_name} entre los {depth} primeros resultados en {row['location_name']} ({row['device']}).",
                 action="Auditar intención, indexación, autoridad y contenido de la landing objetivo; convertirlo en acción del backlog SEO.",
-                evidence_url=row["target_url"], metadata={"top_domain": top_domain},
+                evidence_url=row["target_url"],
+                metadata={
+                    "brand_id": brand_id,
+                    "brand_name": brand_name,
+                    "top_domain": top_domain,
+                    "gsc_query_impressions_7d": gsc_impressions,
+                },
             ))
 
-        if ranking_url and _normalized_url(ranking_url) != _normalized_url(row["target_url"]):
+        accepted_alternate = _accepted_alternate(config, row, ranking_url)
+        result.add_metric(
+            "accepted_alternate_url",
+            int(accepted_alternate),
+            source="rank",
+            dimensions={"keyword": row["keyword"], "brand_id": brand_id},
+        )
+        if (
+            ranking_url
+            and not drop
+            and not accepted_alternate
+            and _normalized_url(ranking_url) != _normalized_url(row["target_url"])
+        ):
+            displayed_ranking_url = _display_url(ranking_url)
+            displayed_target_url = _display_url(row["target_url"])
+            gsc_impressions = store.latest_gsc_query_impressions(row["keyword"])
+            minimum_gsc_impressions = float(
+                thresholds.get("rank_p1_minimum_gsc_impressions", 10)
+            )
             result.alerts.append(AlertSpec(
                 dedupe_key=f"{key}:url-mismatch",
-                severity="P2",
+                severity=_url_mismatch_severity(
+                    row.get("role"),
+                    position,
+                    gsc_impressions,
+                    minimum_gsc_impressions,
+                ),
                 category="rank",
-                title=f"Google posiciona otra URL: {row['keyword']}",
-                message=f"Google muestra {ranking_url} en lugar de la landing objetivo {row['target_url']}.",
-                action="Revisar canibalización, títulos, enlaces internos y relevancia de ambas URLs; no redirigir ni cambiar canonical sin validar la intención.",
+                title=f"Google elige otra landing: {row['keyword']}",
+                message=(
+                    f"Google muestra {displayed_ranking_url} para {brand_name} en lugar de la landing objetivo "
+                    f"{displayed_target_url}. Los parámetros de seguimiento se han ignorado en la comparación."
+                ),
+                action=(
+                    "Revisar intención, títulos, enlaces internos y relevancia de ambas páginas. "
+                    "Tratar la home frente a una landing como desajuste de destino, no como duplicación por parámetros; "
+                    "no redirigir ni cambiar canonical sin validar la intención."
+                ),
                 evidence_url=row["target_url"],
-                metadata={"ranking_url": ranking_url, "target_url": row["target_url"], "position": position},
+                metadata={
+                    "brand_id": brand_id,
+                    "brand_name": brand_name,
+                    "role": row.get("role") or "primary",
+                    "ranking_url": displayed_ranking_url,
+                    "provider_ranking_url": ranking_url,
+                    "target_url": displayed_target_url,
+                    "position": position,
+                    "gsc_query_impressions_7d": gsc_impressions,
+                },
             ))
 
     if failures:
-        partial_failure = checked > 0
         result.alerts.append(AlertSpec(
-            dedupe_key="rank:provider-failures",
-            severity="P2" if partial_failure else "P1",
-            category="rank",
-            title=(
-                "Seguimiento de posiciones parcialmente incompleto"
-                if partial_failure
-                else "Seguimiento de posiciones no disponible"
-            ),
+            dedupe_key="rank:provider-failures", severity="P1", category="rank",
+            title="Fallos parciales en el seguimiento de posiciones",
             message=f"No se pudieron consultar {len(failures)} de {len(keywords)} palabras clave.",
-            action=(
-                "Conservar las mediciones válidas y reintentar únicamente las consultas fallidas en el siguiente ciclo."
-                if partial_failure
-                else "Revisar saldo, credenciales, ubicaciones admitidas y respuesta de DataForSEO antes de reintentar."
-            ),
+            action="Revisar saldo, credenciales, ubicaciones admitidas y respuesta de DataForSEO antes de reintentar.",
             metadata={"failures": failures[:20]},
         ))
     result.summary = {

@@ -24,6 +24,44 @@ def _domain(url: str | None) -> str:
     return urlsplit(url).netloc.casefold().removeprefix("www.")
 
 
+def _brand_target(config: dict, prompt: dict) -> tuple[str, str, list[str], set[str]]:
+    brand_id = prompt.get("brand_id") or "voyager"
+    brand = config.get("brands", {}).get(brand_id, {})
+    name = str(brand.get("name") or config.get("brand") or "Voyager Balloons")
+    aliases = [str(alias).casefold() for alias in brand.get("aliases", [name])]
+    domains = brand.get("domains") or config["target_domains"]
+    return brand_id, name, aliases, {
+        str(domain).casefold().removeprefix("www.") for domain in domains
+    }
+
+
+def _brand_presence(
+    response_text: str,
+    citations: list[dict],
+    aliases: list[str],
+    domains: set[str],
+) -> tuple[bool, bool]:
+    normalized = response_text.casefold()
+    mentioned = any(alias in normalized for alias in aliases)
+    cited = any(_domain(item.get("url")) in domains for item in citations)
+    return mentioned, cited
+
+
+def _absence_streak(history: list, current_present: bool) -> int:
+    if current_present:
+        return 0
+    streak = 1
+    for observation in history:
+        if observation.voyager_mentioned or observation.voyager_cited:
+            break
+        streak += 1
+    return streak
+
+
+def _prompt_label(prompt: dict) -> str:
+    return str(prompt.get("label") or prompt.get("id") or "consulta controlada")
+
+
 def _extract_response(api_result: dict) -> tuple[str, list[dict]]:
     texts: list[str] = []
     citations: list[dict] = []
@@ -94,7 +132,6 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
     ai_config = config.get("ai_visibility", {})
     providers = ai_config.get("providers", [])
     prompts = ai_config.get("prompts", [])
-    target_domains = {domain.removeprefix("www.") for domain in config["target_domains"]}
     competitors = config.get("competitors", [])
     observations = 0
     mentions = 0
@@ -104,13 +141,20 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
     budget_limited = False
     deferred = 0
     secondary_interval_days = int(config["thresholds"].get("ai_secondary_interval_days", 28))
+    absence_confirmations = int(config["thresholds"].get("ai_absence_confirmations", 3))
+    result.resolution_prefixes = ["ai_visibility:provider-failures"]
 
     for provider in providers:
         if provider.get("name") not in ENDPOINTS:
             failures.append({"provider": provider.get("name"), "error": "Proveedor no soportado"})
             continue
         for prompt in prompts:
-            previous = store.previous_ai_visibility(prompt["id"], provider["name"])
+            history = store.ai_visibility_history(
+                prompt["id"],
+                provider["name"],
+                limit=max(1, absence_confirmations - 1),
+            )
+            previous = history[0] if history else None
             if prompt.get("priority") != "P0" and not _is_due(previous, secondary_interval_days):
                 deferred += 1
                 continue
@@ -125,9 +169,15 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
                 continue
 
             response_text, citations = _extract_response(api_result)
+            brand_id, brand_name, brand_aliases, target_domains = _brand_target(config, prompt)
+            brand_mentioned, brand_cited = _brand_presence(
+                response_text,
+                citations,
+                brand_aliases,
+                target_domains,
+            )
+            brand_present = brand_mentioned or brand_cited
             normalized = response_text.casefold()
-            voyager_mentioned = "voyager balloons" in normalized or "voyagerballoons" in normalized
-            voyager_cited = any(_domain(item.get("url")) in target_domains for item in citations)
             competitor_mentions = [
                 competitor["name"]
                 for competitor in competitors
@@ -142,54 +192,72 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
                 "market": prompt["market"],
                 "provider": provider["name"],
                 "model_name": api_result.get("model_name") or provider["model_name"],
-                "voyager_mentioned": voyager_mentioned,
-                "voyager_cited": voyager_cited,
+                # Legacy column names store the prompt's target brand until a schema migration is warranted.
+                "voyager_mentioned": brand_mentioned,
+                "voyager_cited": brand_cited,
                 "competitor_mentions": competitor_mentions,
                 "citations": citations,
                 "response_text": response_text,
                 "web_search": api_result.get("web_search"),
                 "fan_out_queries": api_result.get("fan_out_queries"),
+                "brand_id": brand_id,
+                "brand_name": brand_name,
             }
             store.add_ai_visibility_observation(run_id, payload)
             observations += 1
-            mentions += int(voyager_mentioned)
-            citations_count += int(voyager_cited)
+            mentions += int(brand_mentioned)
+            citations_count += int(brand_cited)
             result.add_metric(
                 "mentioned",
-                int(voyager_mentioned),
+                int(brand_mentioned),
                 source="ai_visibility",
-                dimensions={"provider": provider["name"], "prompt_id": prompt["id"], "market": prompt["market"]},
+                dimensions={"provider": provider["name"], "prompt_id": prompt["id"], "market": prompt["market"], "brand_id": brand_id},
             )
             result.add_metric(
                 "cited",
-                int(voyager_cited),
+                int(brand_cited),
                 source="ai_visibility",
-                dimensions={"provider": provider["name"], "prompt_id": prompt["id"], "market": prompt["market"]},
+                dimensions={"provider": provider["name"], "prompt_id": prompt["id"], "market": prompt["market"], "brand_id": brand_id},
             )
 
-            if previous and not previous.voyager_mentioned and not voyager_mentioned:
+            alert_prefix = f"ai_visibility:{provider['name']}:{prompt['id']}"
+            result.resolution_prefixes.append(alert_prefix)
+            absence_streak = _absence_streak(history, brand_present)
+            if absence_streak >= absence_confirmations:
                 result.alerts.append(AlertSpec(
-                    dedupe_key=f"ai_visibility:{provider['name']}:{prompt['id']}:absent",
+                    dedupe_key=f"{alert_prefix}:absent",
                     severity="P2",
                     category="ai_visibility",
-                    title=f"Voyager ausente en {provider['name']}: {prompt['market']}",
-                    message="La marca no aparece durante dos observaciones consecutivas para una pregunta comercial controlada.",
+                    title=(
+                        f"{brand_name} ausente en {provider['name']} · "
+                        f"{prompt['market']} · {_prompt_label(prompt)}"
+                    ),
+                    message=(
+                        f"La marca no aparece durante {absence_streak} observaciones consecutivas "
+                        "para esta pregunta comercial controlada."
+                    ),
                     action="Analizar empresas y fuentes citadas; reforzar la landing, datos de entidad, menciones editoriales y enlaces que alimentan esta respuesta.",
                     metadata={
+                        "brand_id": brand_id,
+                        "brand_name": brand_name,
+                        "prompt_id": prompt["id"],
+                        "prompt_label": _prompt_label(prompt),
+                        "absence_streak": absence_streak,
+                        "absence_confirmations": absence_confirmations,
                         "prompt": prompt["prompt"],
                         "competitors": competitor_mentions,
                         "citations": citations[:20],
                     },
                 ))
-            if previous and previous.voyager_cited and not voyager_cited:
+            if previous and previous.voyager_cited and not brand_cited:
                 result.alerts.append(AlertSpec(
-                    dedupe_key=f"ai_visibility:{provider['name']}:{prompt['id']}:citation-lost",
-                    severity="P2",
+                    dedupe_key=f"{alert_prefix}:citation-lost",
+                    severity="P3",
                     category="ai_visibility",
-                    title=f"Cita de Voyager perdida en {provider['name']}",
-                    message=f"La web dejó de aparecer como fuente para la consulta controlada de {prompt['market']}.",
-                    action="Comparar fuentes nuevas, comprobar cambios de indexación y actualizar la página que antes era citada.",
-                    metadata={"prompt": prompt["prompt"], "citations": citations[:20]},
+                    title=f"Cita de {brand_name} perdida en {provider['name']}",
+                    message=f"La web de {brand_name} dejó de aparecer como fuente para la consulta controlada de {prompt['market']}.",
+                    action="Observar la siguiente medición y comparar fuentes nuevas; escalar solo si la pérdida persiste.",
+                    metadata={"brand_id": brand_id, "brand_name": brand_name, "prompt": prompt["prompt"], "citations": citations[:20]},
                 ))
         if budget_limited:
             break

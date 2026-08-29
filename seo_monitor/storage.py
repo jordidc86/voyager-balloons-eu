@@ -141,6 +141,11 @@ class Store:
                     )
                 ).all()
                 for alert in open_for_job:
+                    if result.resolution_prefixes is not None and not any(
+                        alert.dedupe_key.startswith(prefix)
+                        for prefix in result.resolution_prefixes
+                    ):
+                        continue
                     if alert.dedupe_key not in seen_keys:
                         alert.status = "resolved"
                         alert.resolved_at = now
@@ -286,8 +291,20 @@ class Store:
                 .limit(limit)
             ).all())
 
-    def previous_keyword_ranking(self, keyword: str, location_name: str, device: str) -> KeywordRanking | None:
-        history = self.keyword_ranking_history(keyword, location_name, device, limit=1)
+    def previous_keyword_ranking(
+        self,
+        keyword: str,
+        location_name: str,
+        device: str,
+        target_url: str | None = None,
+    ) -> KeywordRanking | None:
+        history = self.keyword_ranking_history(
+            keyword,
+            location_name,
+            device,
+            limit=1,
+            target_url=target_url,
+        )
         return history[0] if history else None
 
     def keyword_ranking_history(
@@ -296,15 +313,18 @@ class Store:
         location_name: str,
         device: str,
         limit: int = 7,
+        target_url: str | None = None,
     ) -> list[KeywordRanking]:
         with self.sessions() as session:
+            query = select(KeywordRanking).where(
+                KeywordRanking.keyword == keyword,
+                KeywordRanking.location_name == location_name,
+                KeywordRanking.device == device,
+            )
+            if target_url is not None:
+                query = query.where(KeywordRanking.target_url == target_url)
             return list(session.scalars(
-                select(KeywordRanking)
-                .where(
-                    KeywordRanking.keyword == keyword,
-                    KeywordRanking.location_name == location_name,
-                    KeywordRanking.device == device,
-                )
+                query
                 .order_by(KeywordRanking.observed_at.desc())
                 .limit(limit)
             ).all())
@@ -363,15 +383,25 @@ class Store:
             ))
 
     def previous_ai_visibility(self, prompt_id: str, provider: str) -> AiVisibilityObservation | None:
+        history = self.ai_visibility_history(prompt_id, provider, limit=1)
+        return history[0] if history else None
+
+    def ai_visibility_history(
+        self,
+        prompt_id: str,
+        provider: str,
+        limit: int = 3,
+    ) -> list[AiVisibilityObservation]:
         with self.sessions() as session:
-            return session.scalar(
+            return list(session.scalars(
                 select(AiVisibilityObservation)
                 .where(
                     AiVisibilityObservation.prompt_id == prompt_id,
                     AiVisibilityObservation.provider == provider,
                 )
                 .order_by(AiVisibilityObservation.observed_at.desc())
-            )
+                .limit(limit)
+            ).all())
 
     def latest_success(self, job_name: str) -> JobRun | None:
         with self.sessions() as session:

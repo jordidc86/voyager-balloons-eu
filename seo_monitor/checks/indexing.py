@@ -98,7 +98,7 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
         elif verdict in {"NEUTRAL", "VERDICT_UNSPECIFIED"}:
             result.alerts.append(AlertSpec(
                 dedupe_key=f"indexing:neutral:{page['url']}",
-                severity="P2",
+                severity=page.get("neutral_severity", "P2"),
                 category="indexing",
                 title=f"Indexación pendiente o indeterminada: {page['name']}",
                 message=f"Search Console no confirma indexación: {coverage or verdict}.",

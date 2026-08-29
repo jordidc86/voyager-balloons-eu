@@ -146,6 +146,18 @@ def _performance_action(opportunities: list[dict], lcp_diagnostic: dict) -> str:
             + target_text
         )
     if top["audit"] == "unused-javascript":
+        tracking_targets = [
+            target for target in targets
+            if "googletagmanager.com/gtag/js" in target
+        ]
+        if tracking_targets:
+            return (
+                "No retrasar ni eliminar las etiquetas Google mientras purchase siga sin validarse. "
+                "Comprobar si existe más de una carga base de gtag y consolidarla solo después de validar "
+                "add_to_cart, begin_checkout, purchase, transaction_id, value y currency; priorizar entretanto "
+                "servidor, CSS, fuentes e imágenes."
+                + target_text
+            )
         return "Eliminar cargas duplicadas y retrasar JavaScript no necesario para la primera interacción." + target_text
     if largest_phase.get("subpart") == "elementRenderDelay":
         return "Reducir el retraso de renderizado del elemento LCP y comprobar CSS, fuentes y trabajo de main thread." + target_text
@@ -230,6 +242,13 @@ def _format_field_problem(item: dict) -> str:
         formatted = f"{float(value) / 1000:.2f}s"
     category = "lento" if item["category"] == "SLOW" else "necesita mejora"
     return f"{item['label']} {formatted} ({category})"
+
+
+def _field_alert_severity(lab_assessment: dict | None) -> str:
+    """CrUX is a 28-day signal; only current, confirmed critical lab data makes it urgent."""
+    if lab_assessment and lab_assessment.get("severity") == "P1":
+        return "P1"
+    return "P2"
 
 
 def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckResult:
@@ -391,7 +410,7 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
                     )
                 result.alerts.append(AlertSpec(
                     dedupe_key=f"pagespeed:crux:{field_scope}:{strategy}:{field_target}",
-                    severity="P1" if page.get("severity") == "P0" else "P2",
+                    severity=_field_alert_severity(lab_assessment),
                     category="pagespeed",
                     title=f"Experiencia real lenta en {target_label}",
                     message=(
@@ -410,6 +429,8 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
                         "field_id": field.get("id"),
                         "metrics": field_metrics,
                         "problem_metrics": field_problems,
+                        "lab_corroborated": bool(lab_assessment),
+                        "lab_severity": lab_assessment.get("severity") if lab_assessment else None,
                     },
                 ))
                 field_alerts_seen.add(field_key)

@@ -1,16 +1,59 @@
 {
   "brand": "Voyager Balloons",
   "primary_domain": "www.voyagerballoons.eu",
-  "target_domains": ["www.voyagerballoons.eu", "tienda.voyagerballoons.eu", "www.aosabordovento.net"],
+  "target_domains": ["www.voyagerballoons.eu"],
+  "brands": {
+    "voyager": {
+      "name": "Voyager Balloons",
+      "home_market": "Segovia",
+      "domains": ["www.voyagerballoons.eu"],
+      "aliases": ["voyager balloons", "voyager balloons eu", "voyagerballoons"],
+      "local_name": "Voyager Balloons EU - Paseos en Globo",
+      "local_cid": "3510492992662249273"
+    },
+    "ao_sabor_do_vento": {
+      "name": "Ao Sabor do Vento",
+      "home_market": "Braganca",
+      "domains": ["www.aosabordovento.net", "aosabordovento.net"],
+      "aliases": ["ao sabor do vento", "aosabordovento"],
+      "local_name": "Ao Sabor do Vento"
+    }
+  },
+  "rank_accepted_alternates": {
+    "regalar vuelo en globo segovia": [
+      "https://www.voyagerballoons.eu/articulos/regalar-vuelo-globo"
+    ],
+    "passeio de balao braganca": [
+      "https://www.aosabordovento.net/voo-livre"
+    ],
+    "voo de balao braganca": [
+      "https://www.aosabordovento.net/voo-livre"
+    ]
+  },
+  "gsc_page_groups": {
+    "https://www.voyagerballoons.eu/": [
+      "https://voyagerballoons.eu/"
+    ],
+    "https://www.voyagerballoons.eu/vuelo-en-globo-segovia": [
+      "https://voyagerballoons.eu/producto/oferta-vuelo-en-globo-en-segovia/"
+    ]
+  },
+  "gsc_query_watchlist": [
+    "viaje en globo segovia",
+    "vuelo en globo segovia",
+    "vuelos en globo segovia",
+    "volar en globo segovia"
+  ],
   "tracking": {
     "main_url": "https://www.voyagerballoons.eu/",
     "main_script_url": "https://www.voyagerballoons.eu/js/google-ads-tracking.js",
-    "booking_url": "https://tienda.voyagerballoons.eu/",
+    "store_url": "https://tienda.voyagerballoons.eu/",
     "main_domain": "voyagerballoons.eu",
-    "booking_domain": "tienda.voyagerballoons.eu",
+    "store_domain": "tienda.voyagerballoons.eu",
+    "legacy_shop_domain": "shop.voyagerballoons.eu",
     "google_tag_id": "GT-55NTF5CN",
     "google_ads_id": "AW-11564692382",
-    "funnel_tracking_start_date": "2026-07-17"
+    "funnel_tracking_start_date": "2026-08-29"
   },
   "deployment": {
     "probes": [
@@ -57,14 +100,10 @@
     {"name": "Comfort Segovia", "url": "https://www.voyagerballoons.eu/vuelo-en-globo-segovia-comfort", "canonical": "https://www.voyagerballoons.eu/vuelo-en-globo-segovia-comfort", "required_text": ["169"], "severity": "P0"},
     {"name": "Regalo Segovia", "url": "https://www.voyagerballoons.eu/regalar-vuelo-en-globo-segovia", "canonical": "https://www.voyagerballoons.eu/regalar-vuelo-en-globo-segovia", "severity": "P1"},
     {"name": "Madrid", "url": "https://www.voyagerballoons.eu/vuelo-en-globo-segovia-desde-madrid", "canonical": "https://www.voyagerballoons.eu/vuelo-en-globo-segovia-desde-madrid", "severity": "P1"},
-    {"name": "Braganza ES", "url": "https://www.voyagerballoons.eu/vuelo-en-globo-braganza-portugal", "canonical": "https://www.voyagerballoons.eu/vuelo-en-globo-braganza-portugal", "required_text": ["195"], "severity": "P0"},
-    {"name": "Braganca PT", "url": "https://www.voyagerballoons.eu/pt/passeio-de-balao-braganca", "canonical": "https://www.voyagerballoons.eu/pt/passeio-de-balao-braganca", "required_text": ["195"], "severity": "P0"},
+    {"name": "Braganza ES", "url": "https://www.voyagerballoons.eu/vuelo-en-globo-braganza-portugal", "canonical": "https://www.voyagerballoons.eu/vuelo-en-globo-braganza-portugal", "required_text": ["195"], "severity": "P1", "neutral_severity": "P3", "role": "cross_sell"},
+    {"name": "Braganca PT", "url": "https://www.voyagerballoons.eu/pt/passeio-de-balao-braganca", "canonical": "https://www.voyagerballoons.eu/pt/passeio-de-balao-braganca", "required_text": ["195"], "severity": "P1", "neutral_severity": "P3", "role": "cross_sell"},
     {"name": "Segovia EN", "url": "https://www.voyagerballoons.eu/en/hot-air-balloon-segovia", "canonical": "https://www.voyagerballoons.eu/en/hot-air-balloon-segovia", "severity": "P1"},
-    {"name": "Braganca EN", "url": "https://www.voyagerballoons.eu/en/hot-air-balloon-braganca-portugal", "canonical": "https://www.voyagerballoons.eu/en/hot-air-balloon-braganca-portugal", "required_text": ["195"], "severity": "P0"},
-    {"name": "Booking store home", "url": "https://tienda.voyagerballoons.eu/", "required_text": ["Voyager", "Segovia"], "severity": "P0"},
-    {"name": "Booking store reserve", "url": "https://tienda.voyagerballoons.eu/reservar?producto=classic", "required_text": ["Reserva", "Segovia"], "severity": "P0"},
-    {"name": "Booking store gift", "url": "https://tienda.voyagerballoons.eu/regalar", "required_text": ["regalo"], "severity": "P0"},
-    {"name": "Ao Sabor do Vento Braganca", "url": "https://www.aosabordovento.net/voo-de-balao-braganca", "canonical": "https://www.aosabordovento.net/voo-de-balao-braganca", "required_text": ["195"], "severity": "P0"}
+    {"name": "Braganca EN", "url": "https://www.voyagerballoons.eu/en/hot-air-balloon-braganca-portugal", "canonical": "https://www.voyagerballoons.eu/en/hot-air-balloon-braganca-portugal", "required_text": ["195"], "severity": "P1", "neutral_severity": "P3", "role": "cross_sell"}
   ],
   "competitors": [
     {"name": "Siempre en las Nubes", "domain": "siempreenlasnubes.com", "url": "https://www.siempreenlasnubes.com/rutas-para-volar-en-globo/globo-rutas-segovia/"},
@@ -85,11 +124,11 @@
     "business_name": "Voyager Balloons EU - Paseos en Globo",
     "cid": "3510492992662249273",
     "checks": [
-      {"keyword": "vuelo en globo segovia", "language_code": "es", "location_label": "Segovia centro", "location_coordinate": "40.9429,-4.1088,13z", "required": true, "priority": "P0"},
-      {"keyword": "paseo en globo segovia", "language_code": "es", "location_label": "Segovia centro", "location_coordinate": "40.9429,-4.1088,13z", "required": true, "priority": "P0"},
-      {"keyword": "actividades en segovia", "language_code": "es", "location_label": "Segovia centro", "location_coordinate": "40.9429,-4.1088,13z", "required": false, "priority": "P1"},
-      {"keyword": "vuelo en globo segovia", "language_code": "es", "location_label": "Madrid centro", "location_coordinate": "40.4168,-3.7038,11z", "required": false, "priority": "P1"},
-      {"keyword": "passeio de balao braganca", "language_code": "pt", "location_label": "Braganca centro", "location_coordinate": "41.8061,-6.7567,12z", "required": false, "priority": "P1"}
+      {"keyword": "vuelo en globo segovia", "language_code": "es", "location_label": "Segovia centro", "location_coordinate": "40.9429,-4.1088,13z", "required": true, "priority": "P0", "brand_id": "voyager"},
+      {"keyword": "paseo en globo segovia", "language_code": "es", "location_label": "Segovia centro", "location_coordinate": "40.9429,-4.1088,13z", "required": true, "priority": "P0", "brand_id": "voyager"},
+      {"keyword": "actividades en segovia", "language_code": "es", "location_label": "Segovia centro", "location_coordinate": "40.9429,-4.1088,13z", "required": false, "priority": "P1", "brand_id": "voyager"},
+      {"keyword": "vuelo en globo segovia", "language_code": "es", "location_label": "Madrid centro", "location_coordinate": "40.4168,-3.7038,11z", "required": false, "priority": "P1", "brand_id": "voyager"},
+      {"keyword": "passeio de balao braganca", "language_code": "pt", "location_label": "Braganca centro", "location_coordinate": "41.8061,-6.7567,12z", "required": false, "priority": "P1", "brand_id": "ao_sabor_do_vento"}
     ]
   },
   "keyword_discovery": {
@@ -114,25 +153,24 @@
       {"name": "perplexity", "model_name": "sonar"}
     ],
     "prompts": [
-      {"id": "es-segovia-operadores", "prompt": "¿Qué empresas recomiendas para hacer un vuelo en globo en Segovia? Compara las mejores opciones y enlaza sus webs oficiales.", "language_code": "es", "market": "Segovia", "country": "ES", "city": "Segovia", "priority": "P0"},
-      {"id": "es-segovia-actividades", "prompt": "¿Qué actividades especiales merece la pena reservar directamente para una escapada a Segovia? Incluye experiencias al amanecer.", "language_code": "es", "market": "Segovia", "country": "ES", "city": "Segovia", "priority": "P1"},
-      {"id": "es-madrid-excursion", "prompt": "Quiero reservar desde Madrid una excursión de un día para volar en globo sobre Segovia. ¿Qué operador elegirías y por qué?", "language_code": "es", "market": "Madrid", "country": "ES", "city": "Madrid", "priority": "P0"},
-      {"id": "es-regalo", "prompt": "¿Dónde puedo comprar directamente un billete regalo fiable para volar en globo en Segovia?", "language_code": "es", "market": "Madrid", "country": "ES", "city": "Madrid", "priority": "P1"},
-      {"id": "en-segovia", "prompt": "Which company would you recommend for booking a hot air balloon flight in Segovia directly? Compare the best official options.", "language_code": "en", "market": "Madrid", "country": "ES", "city": "Madrid", "priority": "P0"},
-      {"id": "pt-braganca", "prompt": "Que empresa recomenda para reservar diretamente um passeio de balão em Bragança, Portugal? Compare as melhores opções oficiais.", "language_code": "pt", "market": "Braganca", "country": "PT", "city": "Bragança", "priority": "P0"},
-      {"id": "en-braganca", "prompt": "What is the best official company for booking a hot air balloon ride in Braganca, Portugal?", "language_code": "en", "market": "Braganca", "country": "PT", "city": "Bragança", "priority": "P1"}
+      {"id": "es-segovia-operadores", "label": "Operadores recomendados", "prompt": "¿Qué empresas recomiendas para hacer un vuelo en globo en Segovia? Compara las mejores opciones y enlaza sus webs oficiales.", "language_code": "es", "market": "Segovia", "country": "ES", "city": "Segovia", "priority": "P0", "brand_id": "voyager"},
+      {"id": "es-segovia-actividades", "label": "Escapada y actividades", "prompt": "¿Qué actividades especiales merece la pena reservar directamente para una escapada a Segovia? Incluye experiencias al amanecer.", "language_code": "es", "market": "Segovia", "country": "ES", "city": "Segovia", "priority": "P1", "brand_id": "voyager"},
+      {"id": "es-madrid-excursion", "label": "Excursión desde Madrid", "prompt": "Quiero reservar desde Madrid una excursión de un día para volar en globo sobre Segovia. ¿Qué operador elegirías y por qué?", "language_code": "es", "market": "Madrid", "country": "ES", "city": "Madrid", "priority": "P0", "brand_id": "voyager"},
+      {"id": "es-regalo", "label": "Billete regalo", "prompt": "¿Dónde puedo comprar directamente un billete regalo fiable para volar en globo en Segovia?", "language_code": "es", "market": "Madrid", "country": "ES", "city": "Madrid", "priority": "P1", "brand_id": "voyager"},
+      {"id": "en-segovia", "label": "International booking", "prompt": "Which company would you recommend for booking a hot air balloon flight in Segovia directly? Compare the best official options.", "language_code": "en", "market": "Madrid", "country": "ES", "city": "Madrid", "priority": "P0", "brand_id": "voyager"},
+      {"id": "pt-braganca", "label": "Reserva em Bragança", "prompt": "Que empresa recomenda para reservar diretamente um passeio de balão em Bragança, Portugal? Compare as melhores opções oficiais.", "language_code": "pt", "market": "Braganca", "country": "PT", "city": "Bragança", "priority": "P0", "brand_id": "ao_sabor_do_vento"},
+      {"id": "en-braganca", "label": "Braganca booking", "prompt": "What is the best official company for booking a hot air balloon ride in Braganca, Portugal?", "language_code": "en", "market": "Braganca", "country": "PT", "city": "Bragança", "priority": "P1", "brand_id": "ao_sabor_do_vento"}
     ]
   },
-  "commerce_products": [],
-  "booking_store_products": [
-    {"name": "Booking Classic", "base_url": "https://tienda.voyagerballoons.eu", "url": "https://tienda.voyagerballoons.eu/reservar?producto=classic", "product_code": "classic", "expected_text": "Classic"},
-    {"name": "Booking Comfort", "base_url": "https://tienda.voyagerballoons.eu", "url": "https://tienda.voyagerballoons.eu/reservar?producto=comfort", "product_code": "comfort", "expected_text": "Comfort"}
+  "commerce_probes": [
+    {"name": "Salud tienda", "kind": "json", "url": "https://tienda.voyagerballoons.eu/api/health", "expected_json": {"ok": true, "app": "voyager-booking-store", "mode": "production"}, "severity": "P0"},
+    {"name": "Reserva Classic", "kind": "page", "url": "https://tienda.voyagerballoons.eu/reservar?producto=classic", "expected_text": ["Prepara tu vuelo", "Classic", "120"], "expected_robots": "noindex", "severity": "P0"},
+    {"name": "Reserva Comfort", "kind": "page", "url": "https://tienda.voyagerballoons.eu/reservar?producto=comfort", "expected_text": ["Prepara tu vuelo", "Comfort", "169"], "expected_robots": "noindex", "severity": "P0"},
+    {"name": "Billete regalo", "kind": "page", "url": "https://tienda.voyagerballoons.eu/regalar", "expected_text": ["Billete", "120", "169"], "expected_robots": "noindex", "severity": "P0"},
+    {"name": "Braganca Ao Sabor", "kind": "page", "url": "https://www.aosabordovento.net/voo-de-balao-braganca", "expected_text": ["195", "Adicionar ao carrinho"], "severity": "P0"}
   ],
   "thresholds": {
     "health_timeout_seconds": 25,
-    "commerce_confirmation_attempts": 2,
-    "commerce_retry_delay_seconds": 3,
-    "commerce_alert_recheck_seconds": 900,
     "slow_page_ms": 2500,
     "slow_page_confirmations": 3,
     "performance_score_warning": 80,
@@ -142,11 +180,15 @@
     "lcp_critical_ms": 4000,
     "cls_warning": 0.1,
     "organic_click_drop_percent": 30,
-    "gsc_page_minimum_previous_clicks": 5,
-    "gsc_page_minimum_click_loss": 5,
+    "organic_page_p1_minimum_click_loss": 40,
+    "organic_page_p2_minimum_click_loss": 20,
+    "organic_page_alert_minimum_click_loss": 3,
+    "organic_query_minimum_previous_clicks": 2,
     "organic_conversion_drop_percent": 30,
     "ga4_funnel_minimum_complete_days": 2,
     "ga4_funnel_minimum_shop_sessions": 50,
+    "ga4_purchase_alert_minimum_checkouts": 3,
+    "ga4_technical_sessions_post_fix_warning": 3,
     "rank_drop_positions": 3,
     "rank_drop_history_window": 7,
     "rank_drop_minimum_history": 3,
@@ -168,6 +210,7 @@
     "rank_critical_depth": 20,
     "rank_secondary_depth": 100,
     "rank_secondary_interval_days": 7,
+    "ai_absence_confirmations": 3,
     "ai_secondary_interval_days": 28
   },
   "schedules_seconds": {

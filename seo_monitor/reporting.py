@@ -71,10 +71,15 @@ def _alert_evidence(raw: str) -> list[str]:
             )
         elif item.get("keyword"):
             position = item.get("position") or "fuera del seguimiento"
-            lines.append(
+            details = (
                 f"- Keyword `{item.get('keyword')}` · {item.get('search_volume')} búsquedas/mes · "
                 f"CPC ${item.get('cpc')} · posición {position} · intención {item.get('intent') or 'sin clasificar'}"
             )
+            if item.get("position_location"):
+                details += f" · {item.get('position_location')} ({item.get('position_device') or 'dispositivo sin indicar'})"
+            if item.get("position_observed_at"):
+                details += f" · medición {item.get('position_observed_at')}"
+            lines.append(details)
     for item in metadata.get("performance_opportunities", [])[:4]:
         savings = []
         if item.get("savings_ms"):
@@ -100,6 +105,12 @@ def _alert_evidence(raw: str) -> list[str]:
         )
     for phase in lcp_diagnostic.get("phases", [])[:3]:
         lines.append(f"  - {phase.get('label')} · {phase.get('duration_ms')} ms")
+    if "begin_checkout" in metadata and "purchases" in metadata:
+        lines.append(
+            f"- Embudo observado: {metadata.get('add_to_cart', 0)} add_to_cart · "
+            f"{metadata.get('begin_checkout', 0)} begin_checkout · "
+            f"{metadata.get('purchases', 0)} purchase · {metadata.get('purchase_revenue', 0)} €"
+        )
     return lines
 
 
@@ -141,6 +152,8 @@ def render_markdown(store: Store) -> str:
         f"- P0: {sum(1 for item in alerts if item.severity == 'P0')}",
         f"- P1: {sum(1 for item in alerts if item.severity == 'P1')}",
         f"- P2/P3: {sum(1 for item in alerts if item.severity in {'P2', 'P3'})}",
+        f"- Acciones activas (P0/P1/P2): {sum(1 for item in alerts if item.severity in {'P0', 'P1', 'P2'})}",
+        f"- Señales en observación (P3): {sum(1 for item in alerts if item.severity == 'P3')}",
         f"- P0/P1 resueltas en los últimos 7 días: {len(recently_resolved)}",
         f"- Fuentes operativas: {operational_sources}/{len(JOB_LABELS)}",
         f"- Fuentes pendientes de credenciales o primera ejecución: {pending_sources}",

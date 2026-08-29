@@ -37,40 +37,165 @@ def _rows_by_key(rows: list[dict]) -> dict[str, dict]:
     return {str(row.get("keys", [""])[0]): row for row in rows}
 
 
-def _page_click_declines(
-    previous_rows: list[dict],
-    current_rows: list[dict],
-    drop_threshold: float,
-    minimum_previous_clicks: float,
-    minimum_click_loss: float,
-) -> list[dict]:
-    current_by_page = _rows_by_key(current_rows)
+def _normalize_page_url(page: str, primary_domain: str) -> str:
+    parsed = urlsplit(page)
+    host = parsed.netloc.casefold()
+    primary_domain = primary_domain.casefold()
+    if primary_domain and host == primary_domain.removeprefix("www."):
+        host = primary_domain
+    path = parsed.path or "/"
+    if path != "/":
+        path = path.rstrip("/")
+    return f"https://{host}{path}"
+
+
+def _canonical_page_aliases(config: dict) -> dict[str, str]:
+    primary_domain = str(config.get("primary_domain", ""))
+    aliases: dict[str, str] = {}
+    for canonical, legacy_urls in config.get("gsc_page_groups", {}).items():
+        canonical_url = _normalize_page_url(str(canonical), primary_domain)
+        aliases[canonical_url] = canonical_url
+        for legacy_url in legacy_urls:
+            aliases[_normalize_page_url(str(legacy_url), primary_domain)] = canonical_url
+    return aliases
+
+
+def _aggregate_page_rows(rows: list[dict], config: dict) -> dict[str, dict]:
+    primary_domain = str(config.get("primary_domain", ""))
+    aliases = _canonical_page_aliases(config)
+    grouped: dict[str, dict] = {}
+    for row in rows:
+        source_url = str(row.get("keys", [""])[0])
+        normalized_url = _normalize_page_url(source_url, primary_domain)
+        canonical_url = aliases.get(normalized_url, normalized_url)
+        clicks = float(row.get("clicks", 0) or 0)
+        impressions = float(row.get("impressions", 0) or 0)
+        current = grouped.setdefault(canonical_url, {
+            "keys": [canonical_url],
+            "clicks": 0.0,
+            "impressions": 0.0,
+            "weighted_position": 0.0,
+            "member_urls": set(),
+        })
+        current["clicks"] += clicks
+        current["impressions"] += impressions
+        current["weighted_position"] += float(row.get("position", 0) or 0) * impressions
+        current["member_urls"].add(source_url)
+
+    for current in grouped.values():
+        impressions = current["impressions"]
+        current["ctr"] = current["clicks"] / impressions if impressions else 0.0
+        current["position"] = current.pop("weighted_position") / impressions if impressions else 0.0
+        current["member_urls"] = sorted(current["member_urls"])
+    return grouped
+
+
+def _find_page_declines(current_rows: list[dict], previous_rows: list[dict], config: dict) -> list[dict]:
+    thresholds = config.get("thresholds", {})
+    drop_threshold = float(thresholds.get("organic_click_drop_percent", 30))
+    minimum_click_loss = float(
+        thresholds.get(
+            "organic_page_alert_minimum_click_loss",
+            thresholds.get("organic_page_p2_minimum_click_loss", 3),
+        )
+    )
+    minimum_impressions = float(thresholds.get("minimum_impressions_for_alert", 50))
+    current_pages = _aggregate_page_rows(current_rows, config)
+    previous_pages = _aggregate_page_rows(previous_rows, config)
     declines = []
-    for page, previous_row in _rows_by_key(previous_rows).items():
+    for page, previous_row in previous_pages.items():
+        row = current_pages.get(page, {})
         previous_clicks = float(previous_row.get("clicks", 0))
-        if previous_clicks < minimum_previous_clicks:
-            continue
-        row = current_by_page.get(page, {})
         current_clicks = float(row.get("clicks", 0))
         click_loss = previous_clicks - current_clicks
-        if click_loss < minimum_click_loss:
+        compared_impressions = max(
+            float(previous_row.get("impressions", 0)),
+            float(row.get("impressions", 0)),
+        )
+        if previous_clicks <= 0 or click_loss < minimum_click_loss or compared_impressions < minimum_impressions:
             continue
         drop = click_loss / previous_clicks * 100
-        if drop >= drop_threshold:
-            declines.append({
-                "page": page,
-                "drop_percent": round(drop, 1),
-                "previous_clicks": previous_clicks,
-                "current_clicks": current_clicks,
-                "current_impressions": float(row.get("impressions", 0)),
-            })
-    declines.sort(key=lambda item: item["previous_clicks"] - item["current_clicks"], reverse=True)
+        if drop < drop_threshold:
+            continue
+        declines.append({
+            "page": page,
+            "drop_percent": round(drop, 1),
+            "click_loss": round(click_loss, 1),
+            "previous_clicks": previous_clicks,
+            "current_clicks": current_clicks,
+            "previous_impressions": float(previous_row.get("impressions", 0)),
+            "current_impressions": float(row.get("impressions", 0)),
+            "member_urls": sorted(set(previous_row.get("member_urls", [])) | set(row.get("member_urls", []))),
+        })
+    declines.sort(key=lambda item: item["click_loss"], reverse=True)
     return declines
 
 
-def _page_decline_severity(current: dict[str, float], previous: dict[str, float]) -> str:
-    """A local page decline is urgent only when the whole organic channel declines."""
-    return "P1" if current.get("clicks", 0) < previous.get("clicks", 0) else "P2"
+def _page_decline_severity(click_loss: float, thresholds: dict) -> str:
+    p1_minimum = float(thresholds.get("organic_page_p1_minimum_click_loss", 40))
+    p2_minimum = float(thresholds.get("organic_page_p2_minimum_click_loss", 20))
+    if click_loss >= p1_minimum:
+        return "P1"
+    if click_loss >= p2_minimum:
+        return "P2"
+    return "P3"
+
+
+def _find_commercial_query_declines(
+    current_rows: list[dict],
+    previous_rows: list[dict],
+    config: dict,
+) -> list[dict]:
+    watchlist = {
+        " ".join(str(query).casefold().split())
+        for query in config.get("gsc_query_watchlist", [])
+    }
+    if not watchlist:
+        return []
+    thresholds = config.get("thresholds", {})
+    drop_threshold = float(thresholds.get("organic_click_drop_percent", 30))
+    minimum_previous_clicks = float(thresholds.get("organic_query_minimum_previous_clicks", 2))
+    minimum_impressions = float(thresholds.get("minimum_impressions_for_alert", 50))
+    current_queries = {
+        " ".join(query.casefold().split()): row
+        for query, row in _rows_by_key(current_rows).items()
+    }
+    previous_queries = {
+        " ".join(query.casefold().split()): row
+        for query, row in _rows_by_key(previous_rows).items()
+    }
+    declines = []
+    for query in sorted(watchlist):
+        previous_row = previous_queries.get(query, {})
+        row = current_queries.get(query, {})
+        previous_clicks = float(previous_row.get("clicks", 0) or 0)
+        current_clicks = float(row.get("clicks", 0) or 0)
+        previous_impressions = float(previous_row.get("impressions", 0) or 0)
+        current_impressions = float(row.get("impressions", 0) or 0)
+        if previous_clicks < minimum_previous_clicks or max(previous_impressions, current_impressions) < minimum_impressions:
+            continue
+        drop = (previous_clicks - current_clicks) / previous_clicks * 100
+        if drop < drop_threshold:
+            continue
+        previous_ctr = float(previous_row.get("ctr", 0) or 0)
+        current_ctr = float(row.get("ctr", 0) or 0)
+        previous_position = float(previous_row.get("position", 0) or 0)
+        current_position = float(row.get("position", 0) or 0)
+        declines.append({
+            "query": query,
+            "drop_percent": round(drop, 1),
+            "click_loss": round(previous_clicks - current_clicks, 1),
+            "previous_clicks": previous_clicks,
+            "current_clicks": current_clicks,
+            "previous_impressions": previous_impressions,
+            "current_impressions": current_impressions,
+            "previous_ctr_percent": round(previous_ctr * 100, 2),
+            "current_ctr_percent": round(current_ctr * 100, 2),
+            "previous_position": round(previous_position, 1),
+            "current_position": round(current_position, 1),
+        })
+    declines.sort(key=lambda item: item["click_loss"], reverse=True)
+    return declines
 
 
 def _candidate_route(query: str, page: str) -> dict[str, str]:
@@ -142,7 +267,7 @@ def _discover_keyword_candidates(
         if not any(term in query for term in commercial_terms) or any(term in query for term in excluded_terms):
             continue
         parsed = urlsplit(page)
-        if parsed.netloc != "www.voyagerballoons.eu":
+        if parsed.netloc not in {"www.voyagerballoons.eu", "shop.voyagerballoons.eu"}:
             continue
         blocked_prefixes = (
             "/cart",
@@ -269,36 +394,38 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
                 metadata={"current": current, "previous": previous},
             ))
 
-    page_declines = _page_click_declines(
-        previous_page_rows,
-        page_rows,
-        threshold,
-        float(config["thresholds"].get("gsc_page_minimum_previous_clicks", 5)),
-        float(config["thresholds"].get("gsc_page_minimum_click_loss", 5)),
-    )
+    page_declines = _find_page_declines(page_rows, previous_page_rows, config)
     if page_declines:
-        severity = _page_decline_severity(current, previous)
-        site_clicks_declined = severity == "P1"
+        severity = _page_decline_severity(
+            page_declines[0]["click_loss"],
+            config["thresholds"],
+        )
         result.alerts.append(AlertSpec(
             dedupe_key="gsc:page-click-declines",
             severity=severity,
             category="gsc",
             title="Páginas con pérdida relevante de clics orgánicos",
-            message=(
-                f"Se detectan {len(page_declines)} páginas con una caída superior al {threshold:.0f}% frente al periodo comparable. "
-                + (
-                    "La caída también afecta al total orgánico del sitio."
-                    if site_clicks_declined
-                    else "El total orgánico del sitio no cae, por lo que se mantiene como observación no urgente."
-                )
-            ),
-            action=(
-                "Priorizar las páginas con mayor pérdida absoluta; separar estacionalidad, caída de posición, CTR, indexación y cambios de SERP."
-                if site_clicks_declined
-                else "Observar otro periodo y revisar únicamente si la pérdida se repite o el total del sitio también empieza a caer."
-            ),
+            message=f"Se detectan {len(page_declines)} grupos canónicos con una caída superior al {threshold:.0f}% frente al periodo comparable.",
+            action="Priorizar los destinos canónicos con mayor pérdida absoluta; las URLs antiguas y sus redirecciones ya se contabilizan dentro del mismo grupo.",
             evidence_url="https://search.google.com/search-console/performance/search-analytics?resource_id=sc-domain:voyagerballoons.eu",
-            metadata={"pages": page_declines[:15], "site_clicks_declined": site_clicks_declined},
+            metadata={"pages": page_declines[:15]},
+        ))
+
+    commercial_query_declines = _find_commercial_query_declines(
+        query_rows,
+        previous_query_rows,
+        config,
+    )
+    if commercial_query_declines:
+        result.alerts.append(AlertSpec(
+            dedupe_key="gsc:commercial-query-declines",
+            severity="P2",
+            category="gsc",
+            title="Consultas comerciales con pérdida de clics",
+            message=f"Hay {len(commercial_query_declines)} consultas de compra vigiladas con una caída relevante frente al periodo comparable.",
+            action="Vigilar 7 días y revisar SERP, CTR, posición y landing que recibe impresiones antes de plantear cambios de contenido.",
+            evidence_url="https://search.google.com/search-console/performance/search-analytics?resource_id=sc-domain:voyagerballoons.eu",
+            metadata={"queries": commercial_query_declines[:20]},
         ))
 
     opportunities = []
@@ -389,6 +516,7 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
         "countries": len(country_rows),
         "devices": len(device_rows),
         "page_declines": len(page_declines),
+        "commercial_query_declines": len(commercial_query_declines),
         "ctr_opportunities": len(opportunities),
         "new_queries": len(new_queries),
         "keyword_candidates": len(candidates),
