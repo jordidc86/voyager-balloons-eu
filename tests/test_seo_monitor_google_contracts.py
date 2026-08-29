@@ -3,7 +3,13 @@ from __future__ import annotations
 import unittest
 from datetime import date
 
-from seo_monitor.checks.ga4 import _commerce_diagnostics, _dimension_report, _funnel_window, _report
+from seo_monitor.checks.ga4 import (
+    _campaign_diagnostics,
+    _commerce_diagnostics,
+    _dimension_report,
+    _funnel_window,
+    _report,
+)
 from seo_monitor.checks.gsc import (
     _aggregate_page_rows,
     _discover_keyword_candidates,
@@ -269,6 +275,62 @@ class GoogleContractTests(unittest.TestCase):
         self.assertEqual(diagnostics["purchase_revenue"], 480)
         self.assertEqual(diagnostics["shop_direct_share_percent"], 20.0)
         self.assertEqual(diagnostics["technical_sessions"], 12)
+
+    def test_ga4_commerce_diagnostics_never_mix_store_hosts(self) -> None:
+        diagnostics = _commerce_diagnostics(
+            [
+                {
+                    "eventName": "purchase", "hostName": "shop.voyagerballoons.eu",
+                    "eventCount": 4, "keyEvents": 4, "totalRevenue": 1080,
+                },
+                {
+                    "eventName": "add_to_cart", "hostName": "tienda.voyagerballoons.eu",
+                    "eventCount": 3, "keyEvents": 0, "totalRevenue": 0,
+                },
+            ],
+            [{
+                "sessionDefaultChannelGroup": "Organic Search",
+                "hostName": "tienda.voyagerballoons.eu",
+                "sessions": 20,
+            }],
+            "tienda.voyagerballoons.eu",
+            evaluation_ready=False,
+        )
+
+        self.assertEqual(diagnostics["add_to_cart"], 3)
+        self.assertEqual(diagnostics["purchases"], 0)
+        self.assertEqual(diagnostics["purchase_revenue"], 0)
+
+    def test_ga4_business_profile_diagnostics_only_count_current_store(self) -> None:
+        diagnostics = _campaign_diagnostics(
+            [
+                {
+                    "sessionCampaignName": "google_business_profile",
+                    "sessionSource": "google",
+                    "sessionMedium": "organic",
+                    "hostName": "tienda.voyagerballoons.eu",
+                    "sessions": 6,
+                    "keyEvents": 2,
+                    "totalRevenue": 215,
+                },
+                {
+                    "sessionCampaignName": "google_business_profile",
+                    "sessionSource": "google",
+                    "sessionMedium": "organic",
+                    "hostName": "shop.voyagerballoons.eu",
+                    "sessions": 50,
+                    "keyEvents": 8,
+                    "totalRevenue": 1080,
+                },
+            ],
+            "google_business_profile",
+            "tienda.voyagerballoons.eu",
+        )
+
+        self.assertEqual(diagnostics["sessions"], 6)
+        self.assertEqual(diagnostics["key_events"], 2)
+        self.assertEqual(diagnostics["total_revenue"], 215)
+        self.assertEqual(diagnostics["sources"], ["google"])
 
     def test_ga4_funnel_does_not_alert_during_post_fix_warmup(self) -> None:
         diagnostics = _commerce_diagnostics(

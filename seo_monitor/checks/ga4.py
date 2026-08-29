@@ -110,6 +110,8 @@ def _commerce_diagnostics(
 ) -> dict:
     event_totals: dict[str, dict[str, float]] = {}
     for row in commerce_rows:
+        if row.get("hostName") != shop_domain:
+            continue
         event_name = row.get("eventName", "")
         totals = event_totals.setdefault(event_name, {"eventCount": 0, "keyEvents": 0, "totalRevenue": 0})
         for metric in totals:
@@ -153,6 +155,31 @@ def _commerce_diagnostics(
         "begin_checkout_missing": evaluation_ready and enough_shop_traffic and begin_checkout == 0,
         "funnel_missing": evaluation_ready and enough_shop_traffic and (add_to_cart == 0 or begin_checkout == 0),
         "purchase_missing": purchase_missing,
+    }
+
+
+def _campaign_diagnostics(rows: list[dict], campaign_name: str, store_domain: str) -> dict:
+    campaign_rows = [
+        row for row in rows
+        if row.get("sessionCampaignName") == campaign_name
+        and row.get("hostName") == store_domain
+    ]
+    return {
+        "campaign_name": campaign_name,
+        "store_domain": store_domain,
+        "sessions": sum(float(row.get("sessions", 0) or 0) for row in campaign_rows),
+        "key_events": sum(float(row.get("keyEvents", 0) or 0) for row in campaign_rows),
+        "total_revenue": sum(float(row.get("totalRevenue", 0) or 0) for row in campaign_rows),
+        "sources": sorted({
+            str(row.get("sessionSource") or "")
+            for row in campaign_rows
+            if row.get("sessionSource")
+        }),
+        "mediums": sorted({
+            str(row.get("sessionMedium") or "")
+            for row in campaign_rows
+            if row.get("sessionMedium")
+        }),
     }
 
 
@@ -235,11 +262,39 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
     tracking_config = config.get("tracking", {})
     store_domain = str(tracking_config.get("store_domain") or "tienda.voyagerballoons.eu")
     legacy_shop_domain = str(tracking_config.get("legacy_shop_domain") or "shop.voyagerballoons.eu")
+    business_profile_campaign = str(
+        tracking_config.get("google_business_profile_campaign") or "google_business_profile"
+    )
+    business_profile_rows = _multi_dimension_report(
+        session,
+        settings.ga4_property_id,
+        commerce_start,
+        current_end,
+        ["sessionCampaignName", "sessionSource", "sessionMedium", "hostName"],
+        ["sessions", "keyEvents", "totalRevenue"],
+        dimension_filter={
+            "filter": {
+                "fieldName": "sessionCampaignName",
+                "stringFilter": {"matchType": "EXACT", "value": business_profile_campaign},
+            }
+        },
+    )
+    current_store_diagnostics = _commerce_diagnostics(
+        commerce_rows,
+        channel_host_rows,
+        store_domain,
+        evaluation_ready=False,
+    )
     historical_diagnostics = _commerce_diagnostics(
         commerce_rows,
         channel_host_rows,
         legacy_shop_domain,
         evaluation_ready=False,
+    )
+    business_profile_diagnostics = _campaign_diagnostics(
+        business_profile_rows,
+        business_profile_campaign,
+        store_domain,
     )
     funnel_start, funnel_complete_days, funnel_days_ready = _funnel_window(config, current_end, commerce_start)
     funnel_rows: list[dict] = []
@@ -317,6 +372,19 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
                 "host_name": row.get("hostName", ""),
             },
         )
+    for row in business_profile_rows:
+        for name in ("sessions", "keyEvents", "totalRevenue"):
+            result.add_metric(
+                name,
+                row.get(name, 0),
+                source="ga4_google_business_profile_28d",
+                dimensions={
+                    "campaign": row.get("sessionCampaignName", ""),
+                    "source": row.get("sessionSource", ""),
+                    "medium": row.get("sessionMedium", ""),
+                    "host_name": row.get("hostName", ""),
+                },
+            )
     for row in funnel_rows:
         for name in ("eventCount", "keyEvents", "totalRevenue"):
             result.add_metric(
@@ -437,7 +505,10 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
         "funnel_evaluation_period": [funnel_start.isoformat(), current_end.isoformat()],
         "funnel_evaluation_ready": diagnostics["evaluation_ready"],
         "commerce_diagnostics": diagnostics,
+        "current_store_diagnostics": current_store_diagnostics,
+        "legacy_shop_diagnostics": historical_diagnostics,
         "commerce_baseline_diagnostics": historical_diagnostics,
+        "google_business_profile_diagnostics": business_profile_diagnostics,
         "commerce_events": commerce_rows,
         "funnel_events": funnel_rows,
         "channel_host_rows": channel_host_rows[:30],

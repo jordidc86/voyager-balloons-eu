@@ -201,7 +201,13 @@ def render_markdown(store: Store) -> str:
     gsc_current = gsc_summary.get("current", {})
     ga4_current = ga4_summary.get("current", {})
     ga4_commerce = ga4_summary.get("commerce_diagnostics", {})
-    ga4_baseline = ga4_summary.get("commerce_baseline_diagnostics") or ga4_commerce
+    ga4_current_store = ga4_summary.get("current_store_diagnostics") or ga4_commerce
+    ga4_legacy_shop = (
+        ga4_summary.get("legacy_shop_diagnostics")
+        or ga4_summary.get("commerce_baseline_diagnostics")
+        or {}
+    )
+    ga4_business_profile = ga4_summary.get("google_business_profile_diagnostics", {})
     if ga4_commerce.get("evaluation_ready"):
         ga4_funnel_line = (
             f"- Embudo GA4 post-reparación ({ga4_commerce.get('complete_days', 'sin datos')} días completos): "
@@ -231,8 +237,9 @@ def render_markdown(store: Store) -> str:
         f"- Search Console (7 días): {gsc_current.get('clicks', 'sin datos')} clics, {gsc_current.get('impressions', 'sin datos')} impresiones, CTR {_percent(gsc_current.get('ctr'), 100)}.",
         f"- GA4 orgánico (7 días): {ga4_current.get('sessions', 'sin datos')} sesiones, {ga4_current.get('keyEvents', 'sin datos')} eventos clave, {ga4_current.get('totalRevenue', 'sin datos')} € atribuidos.",
         ga4_funnel_line,
-        f"- Histórico tienda (28 días): {ga4_baseline.get('purchases', 'sin datos')} compras y {ga4_baseline.get('purchase_revenue', 'sin datos')} €.",
-        f"- Atribución tienda (28 días): {ga4_baseline.get('shop_sessions', 'sin datos')} sesiones; Direct representa {_percent(ga4_baseline.get('shop_direct_share_percent'))}.",
+        f"- Tienda directa actual (28 días): {ga4_current_store.get('shop_sessions', 'sin datos')} sesiones, {ga4_current_store.get('add_to_cart', 'sin datos')} add_to_cart, {ga4_current_store.get('begin_checkout', 'sin datos')} begin_checkout, {ga4_current_store.get('purchases', 'sin datos')} compras y {ga4_current_store.get('purchase_revenue', 'sin datos')} €.",
+        f"- Google Business Profile → tienda (28 días): {ga4_business_profile.get('sessions', 'sin datos')} sesiones, {ga4_business_profile.get('key_events', 'sin datos')} eventos clave y {ga4_business_profile.get('total_revenue', 'sin datos')} €.",
+        f"- WordPress retirado, solo histórico (28 días): {ga4_legacy_shop.get('shop_sessions', 'sin datos')} sesiones, {ga4_legacy_shop.get('purchases', 'sin datos')} compras y {ga4_legacy_shop.get('purchase_revenue', 'sin datos')} €.",
         f"- Rankings: {rank_summary.get('found_top_10', 'sin datos')}/{rank_summary.get('keywords_checked', 'sin datos')} keywords comprobadas en top 10.",
         f"- Demanda: datos disponibles para {demand_summary.get('keywords_with_data', 'sin datos')}/{demand_summary.get('keywords_inventory', 'sin datos')} keywords; {demand_summary.get('opportunities', 'sin datos')} oportunidades fuera del top 10.",
         f"- Backlinks: {backlink_gap_summary.get('profile_domains', 'sin datos')} dominios detectados, {backlink_gap_summary.get('profile_dofollow_domains', 'sin datos')} con enlaces dofollow; {backlink_gap_summary.get('profile_new_domains', 'sin datos')} nuevos y {backlink_gap_summary.get('profile_confirmed_lost', 'sin datos')} pérdidas confirmadas en el último control.",

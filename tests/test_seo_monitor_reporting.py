@@ -55,11 +55,23 @@ class ReportingTests(unittest.TestCase):
                 "minimum_shop_sessions": 50,
                 "evaluation_ready": False,
             },
-            "commerce_baseline_diagnostics": {
+            "current_store_diagnostics": {
+                "shop_sessions": 18,
+                "add_to_cart": 5,
+                "begin_checkout": 2,
+                "purchases": 1,
+                "purchase_revenue": 215,
+            },
+            "legacy_shop_diagnostics": {
                 "shop_sessions": 1131,
                 "shop_direct_share_percent": 18.3,
                 "purchases": 2,
                 "purchase_revenue": 480,
+            },
+            "google_business_profile_diagnostics": {
+                "sessions": 6,
+                "key_events": 2,
+                "total_revenue": 215,
             },
         })
         self.save("backlink_gap", {
@@ -77,8 +89,9 @@ class ReportingTests(unittest.TestCase):
         self.assertIn("64 sesiones, 7 eventos clave, 845 € atribuidos", report)
         self.assertIn("Embudo GA4 post-reparación: en calentamiento", report)
         self.assertIn("se evaluará al alcanzar 2 días y 50 sesiones", report)
-        self.assertIn("Histórico tienda (28 días): 2 compras y 480 €", report)
-        self.assertIn("Atribución tienda (28 días): 1131 sesiones", report)
+        self.assertIn("Tienda directa actual (28 días): 18 sesiones, 5 add_to_cart, 2 begin_checkout, 1 compras y 215 €", report)
+        self.assertIn("Google Business Profile → tienda (28 días): 6 sesiones, 2 eventos clave y 215 €", report)
+        self.assertIn("WordPress retirado, solo histórico (28 días): 1131 sesiones, 2 compras y 480 €", report)
         self.assertIn("Backlinks: 18 dominios detectados, 11 con enlaces dofollow; 1 nuevos y 0 pérdidas", report)
         self.assertIn("Consulta `vuelo en globo segovia`", report)
         self.assertIn("brecha estimada 18 clics", report)
