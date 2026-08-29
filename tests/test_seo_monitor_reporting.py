@@ -99,6 +99,13 @@ class ReportingTests(unittest.TestCase):
         self.assertIn("completar el periodo mínimo configurado", report)
         self.assertNotIn("sin datos días", report)
 
+    def test_report_uses_current_commerce_probe_count(self) -> None:
+        self.save("commerce", {"successful_flows": 5, "probes_tested": 5})
+
+        report = render_markdown(self.store)
+
+        self.assertIn("Flujos de compra correctos: 5/5", report)
+
     def test_dynamic_keyword_evidence_does_not_render_missing_values(self) -> None:
         self.save("gsc", {}, alerts=[AlertSpec(
             dedupe_key="gsc:new-commercial-keywords",

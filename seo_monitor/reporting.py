@@ -224,7 +224,7 @@ def render_markdown(store: Store) -> str:
         "## Protección de reservas directas",
         "",
         f"- URLs estratégicas disponibles: {health_summary.get('healthy_2xx', 'sin datos')}/{health_summary.get('pages_checked', 'sin datos')}",
-        f"- Flujos de compra correctos: {commerce_summary.get('successful_flows', 'sin datos')}/{commerce_summary.get('products_tested', 'sin datos')}",
+        f"- Flujos de compra correctos: {commerce_summary.get('successful_flows', 'sin datos')}/{commerce_summary.get('probes_tested', commerce_summary.get('products_tested', 'sin datos'))}",
         "",
         "## Rendimiento orgánico y visibilidad",
         "",
