@@ -1337,6 +1337,43 @@ ul {
 }
 
 @media (max-width: 576px) {
+    /* Skip layout and paint for sections several screens below the fold. */
+    #packages {
+        content-visibility: auto;
+        contain-intrinsic-size: auto 3000px;
+    }
+
+    .direct-booking-section {
+        content-visibility: auto;
+        contain-intrinsic-size: auto 1240px;
+    }
+
+    #destinos {
+        content-visibility: auto;
+        contain-intrinsic-size: auto 1400px;
+    }
+
+    #faq {
+        content-visibility: auto;
+        contain-intrinsic-size: auto 1180px;
+    }
+
+    #blog-preview {
+        content-visibility: auto;
+        contain-intrinsic-size: auto 1790px;
+    }
+
+    #reviews {
+        content-visibility: auto;
+        contain-intrinsic-size: auto 1540px;
+    }
+
+    #booking,
+    .footer {
+        content-visibility: auto;
+        contain-intrinsic-size: auto 900px;
+    }
+
     .footer-grid {
         grid-template-columns: 1fr;
         gap: 2rem;
