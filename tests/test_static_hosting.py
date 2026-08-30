@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import re
 import unittest
 from pathlib import Path
 
@@ -114,6 +115,27 @@ class StaticHostingConfigTests(unittest.TestCase):
         public_content = "\n".join(path.read_text(encoding="utf-8") for path in public_files)
 
         self.assertNotIn("shop.voyagerballoons.eu", public_content)
+
+    def test_primary_navigation_stays_compact(self):
+        public_pages = [
+            *ROOT.glob("*.html"),
+            *(ROOT / "articulos").rglob("*.html"),
+            *(ROOT / "en").rglob("*.html"),
+            *(ROOT / "pt").rglob("*.html"),
+        ]
+        navigation_pattern = re.compile(
+            r'<div class="nav-links" id="primary-navigation">(.*?)</div>',
+            re.DOTALL,
+        )
+
+        for path in public_pages:
+            content = path.read_text(encoding="utf-8")
+            match = navigation_pattern.search(content)
+            if not match:
+                continue
+            link_count = len(re.findall(r"<a\b", match.group(1)))
+            with self.subTest(path=path.relative_to(ROOT)):
+                self.assertLessEqual(link_count, 6)
 
 
 if __name__ == "__main__":
