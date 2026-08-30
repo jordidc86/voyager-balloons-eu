@@ -123,7 +123,7 @@
 
   updateLegacyStoreLinks();
 
-  ['pointerdown', 'keydown', 'touchstart', 'scroll', 'wheel'].forEach(function (eventName) {
+  ['pointerdown', 'keydown', 'touchstart'].forEach(function (eventName) {
     window.addEventListener(eventName, loadOnInteraction, {
       once: true,
       passive: true,

@@ -137,6 +137,19 @@ class StaticHostingConfigTests(unittest.TestCase):
             with self.subTest(path=path.relative_to(ROOT)):
                 self.assertLessEqual(link_count, 6)
 
+    def test_homepage_keeps_mobile_critical_path_lean(self):
+        homepage = (ROOT / "index.html").read_text(encoding="utf-8")
+        tracking = (ROOT / "js" / "google-ads-tracking.js").read_text(encoding="utf-8")
+
+        self.assertIn(
+            '<link rel="preload" href="assets/img/segovia-alcazar.avif" '
+            'as="image" type="image/avif" fetchpriority="high">',
+            homepage,
+        )
+        self.assertEqual(homepage.count('loading="lazy" decoding="async"'), 3)
+        self.assertIn("['pointerdown', 'keydown', 'touchstart']", tracking)
+        self.assertNotIn("'scroll', 'wheel'", tracking)
+
 
 if __name__ == "__main__":
     unittest.main()

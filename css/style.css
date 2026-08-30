@@ -325,6 +325,10 @@ ul {
     width: 100%;
     height: 100%;
     background: url('../assets/img/segovia-alcazar.webp') center/cover no-repeat;
+    background-image: image-set(
+        url('../assets/img/segovia-alcazar.avif') type('image/avif'),
+        url('../assets/img/segovia-alcazar.webp') type('image/webp')
+    );
     z-index: 0;
 }
 
@@ -1238,6 +1242,11 @@ ul {
     
     .section {
         padding: 4rem 1rem;
+    }
+
+    /* Keep the first meaningful paint immediate on constrained mobile devices. */
+    .hero-content.fade-in-up {
+        animation: none;
     }
     
     h1 {

@@ -23,9 +23,10 @@
 <link rel="icon" href="/favicon.ico" sizes="any">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="preload" href="assets/img/segovia-alcazar.avif" as="image" type="image/avif" fetchpriority="high">
     <!-- CSS -->
-    <link rel="preload" href="css/style.css?v=20260830" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="css/style.css?v=20260830"></noscript>
+    <link rel="preload" href="css/style.css?v=20260830-2" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="css/style.css?v=20260830-2"></noscript>
     <style>
         :root{--color-primary:#D4AF37;--color-primary-hover:#b5952f;--color-bg-light:#FAF9F6;--color-text-dark:#2C3539;--font-heading:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;--font-body:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
         *{box-sizing:border-box;margin:0;padding:0}
@@ -39,20 +40,23 @@
         .logo span{color:var(--color-primary);font-weight:600}
         .nav-links{display:flex;align-items:center;gap:1.5rem;white-space:nowrap}
         .nav-links a:not(.btn){color:#fff;font-size:.95rem}
-        .nav-toggle{display:none;width:44px;height:44px;border:1px solid rgba(255,255,255,.35);border-radius:8px;background:rgba(255,255,255,.08)}
+        .nav-toggle{display:none;width:44px;height:44px;border:1px solid rgba(255,255,255,.35);border-radius:8px;background:rgba(255,255,255,.08);padding:0;flex-direction:column;align-items:center;justify-content:center;gap:5px}
+        .nav-toggle span{display:block;width:20px;height:2px;background:#fff;border-radius:2px}
         .hero{min-height:100vh;width:100%;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;text-align:center;color:#fff}
-        .hero-bg-placeholder{position:absolute;inset:0;background:url('assets/img/segovia-alcazar.webp') center/cover no-repeat;z-index:0}
+        .hero-bg-placeholder{position:absolute;inset:0;background:url('assets/img/segovia-alcazar.webp') center/cover no-repeat;background-image:image-set(url('assets/img/segovia-alcazar.avif') type('image/avif'),url('assets/img/segovia-alcazar.webp') type('image/webp'));z-index:0}
         .hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(11,15,25,.7) 0%,rgba(11,15,25,.6) 60%,rgba(250,249,246,1) 100%);z-index:1}
         .hero-content{position:relative;z-index:2;max-width:900px;padding:0 20px}
         .eyebrow{display:block;color:var(--color-primary);font-size:.875rem;text-transform:uppercase;letter-spacing:2px;margin-bottom:1rem;font-weight:600}
         h1{font-size:clamp(2.5rem,8vw,6rem);margin-bottom:1.5rem;color:#fff;text-shadow:0 4px 20px rgba(0,0,0,.45)}
         .hero-subtitle{font-size:1.25rem;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.5);max-width:600px;margin:0 auto 2.5rem;font-weight:500}
-        .btn{display:inline-flex;align-items:center;justify-content:center;padding:.75rem 1.5rem;border-radius:8px;font-weight:500;font-family:var(--font-body)}
+        .btn{display:inline-flex;align-items:center;justify-content:center;padding:.75rem 1.5rem;border:0;border-radius:8px;font-weight:500;font-family:var(--font-body);font-size:1rem}
         .btn-large{padding:1rem 2.5rem;font-size:1.125rem}
         .btn-primary{background:var(--color-primary);color:var(--color-text-dark);font-weight:600}
+        .hero .btn-outline{background:rgba(11,15,25,.32);border:1px solid rgba(255,255,255,.82);color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.35)}
+        .hero-actions{margin-bottom:3rem}
         .scroll-down-indicator{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);z-index:2;width:30px;height:50px;border:2px solid rgba(0,0,0,.2);border-radius:15px;display:flex;justify-content:center}
         .scroll-down-indicator span{display:block;width:4px;height:8px;background:var(--color-primary);border-radius:2px;margin-top:6px}
-        @media (max-width:768px){.navbar{padding:1rem 0}.nav-toggle{display:flex}.nav-links{position:absolute;top:calc(100% + .75rem);left:20px;right:20px;display:none;flex-direction:column;align-items:stretch;gap:0;padding:.75rem;background:rgba(250,249,246,.98);border:1px solid rgba(44,53,57,.1);border-radius:8px;box-shadow:0 14px 35px rgba(44,53,57,.12);opacity:0;pointer-events:none;transform:translateY(-8px);white-space:normal}.navbar.nav-open .nav-links{display:flex;opacity:1;pointer-events:auto;transform:translateY(0)}.nav-links a:not(.btn){color:var(--color-text-dark);padding:.9rem .75rem;font-size:1rem}.nav-links .btn{margin-top:.5rem;width:100%}h1{font-size:3rem}.hero-subtitle{font-size:1.1rem}.hero-actions .btn{width:100%;max-width:320px}.scroll-down-indicator{display:none}}
+        @media (max-width:768px){.navbar{padding:1rem 0}.nav-toggle{display:flex}.nav-links{position:absolute;top:calc(100% + .75rem);left:20px;right:20px;display:none;flex-direction:column;align-items:stretch;gap:0;padding:.75rem;background:rgba(250,249,246,.98);border:1px solid rgba(44,53,57,.1);border-radius:8px;box-shadow:0 14px 35px rgba(44,53,57,.12);opacity:0;pointer-events:none;transform:translateY(-8px);white-space:normal}.navbar.nav-open .nav-links{display:flex;opacity:1;pointer-events:auto;transform:translateY(0)}.nav-links a:not(.btn){color:var(--color-text-dark);padding:.9rem .75rem;font-size:1rem}.nav-links .btn{margin-top:.5rem;width:100%}h1{font-size:2rem}.hero-subtitle{font-size:1.1rem}.hero-actions .btn{width:100%;max-width:320px}.scroll-down-indicator{display:none}}
     </style>
     
     <script type="application/ld+json">
@@ -577,7 +581,7 @@
                 <article class="blog-card fade-in slide-up delay-1">
                     <div class="blog-card-image">
                         <!-- Placeholder until real photos are uploaded -->
-                        <img src="assets/img/segovia-alcazar-card-800.webp" srcset="assets/img/segovia-alcazar-card-400.webp 400w, assets/img/segovia-alcazar-card-600.webp 600w, assets/img/segovia-alcazar-card-800.webp 800w" sizes="(max-width: 480px) 55vw, (max-width: 768px) 100vw, 33vw" width="800" height="450" alt="Vista del Alcázar de Segovia desde globo aerostático">
+                        <img src="assets/img/segovia-alcazar-card-800.webp" srcset="assets/img/segovia-alcazar-card-400.webp 400w, assets/img/segovia-alcazar-card-600.webp 600w, assets/img/segovia-alcazar-card-800.webp 800w" sizes="(max-width: 480px) 55vw, (max-width: 768px) 100vw, 33vw" width="800" height="450" loading="lazy" decoding="async" alt="Vista del Alcázar de Segovia desde globo aerostático">
                         <div class="blog-tag">Inspiración</div>
                     </div>
                     <div class="blog-card-content">
@@ -590,7 +594,7 @@
                 <!-- Article Card 2 -->
                 <article class="blog-card fade-in slide-up delay-2">
                     <div class="blog-card-image">
-                        <img src="assets/img/passengers-view-card-800.webp" srcset="assets/img/passengers-view-card-400.webp 400w, assets/img/passengers-view-card-600.webp 600w, assets/img/passengers-view-card-800.webp 800w" sizes="(max-width: 480px) 55vw, (max-width: 768px) 100vw, 33vw" width="800" height="450" alt="Pasajeros disfrutando del vuelo en globo">
+                        <img src="assets/img/passengers-view-card-800.webp" srcset="assets/img/passengers-view-card-400.webp 400w, assets/img/passengers-view-card-600.webp 600w, assets/img/passengers-view-card-800.webp 800w" sizes="(max-width: 480px) 55vw, (max-width: 768px) 100vw, 33vw" width="800" height="450" loading="lazy" decoding="async" alt="Pasajeros disfrutando del vuelo en globo">
                         <div class="blog-tag">Guías Prácticas</div>
                     </div>
                     <div class="blog-card-content">
@@ -603,7 +607,7 @@
                 <!-- Article Card 3 -->
                 <article class="blog-card fade-in slide-up delay-3">
                     <div class="blog-card-image">
-                        <img src="assets/img/balloon-takeoff-card-800.webp" srcset="assets/img/balloon-takeoff-card-400.webp 400w, assets/img/balloon-takeoff-card-600.webp 600w, assets/img/balloon-takeoff-card-800.webp 800w" sizes="(max-width: 480px) 55vw, (max-width: 768px) 100vw, 33vw" width="800" height="450" alt="Globo preparándose para volar">
+                        <img src="assets/img/balloon-takeoff-card-800.webp" srcset="assets/img/balloon-takeoff-card-400.webp 400w, assets/img/balloon-takeoff-card-600.webp 600w, assets/img/balloon-takeoff-card-800.webp 800w" sizes="(max-width: 480px) 55vw, (max-width: 768px) 100vw, 33vw" width="800" height="450" loading="lazy" decoding="async" alt="Globo preparándose para volar">
                         <div class="blog-tag">Regalos</div>
                     </div>
                     <div class="blog-card-content">
