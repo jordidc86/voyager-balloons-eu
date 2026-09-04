@@ -36,6 +36,9 @@
     ],
     "https://www.voyagerballoons.eu/vuelo-en-globo-segovia": [
       "https://voyagerballoons.eu/producto/oferta-vuelo-en-globo-en-segovia/"
+    ],
+    "https://www.voyagerballoons.eu/vuelo-en-globo-madrid": [
+      "https://www.voyagerballoons.eu/vuelo-en-globo-segovia-desde-madrid"
     ]
   },
   "gsc_query_watchlist": [
@@ -100,7 +103,7 @@
     {"name": "Landing Segovia", "url": "https://www.voyagerballoons.eu/vuelo-en-globo-segovia", "canonical": "https://www.voyagerballoons.eu/vuelo-en-globo-segovia", "severity": "P0"},
     {"name": "Comfort Segovia", "url": "https://www.voyagerballoons.eu/vuelo-en-globo-segovia-comfort", "canonical": "https://www.voyagerballoons.eu/vuelo-en-globo-segovia-comfort", "required_text": ["169"], "severity": "P0"},
     {"name": "Regalo Segovia", "url": "https://www.voyagerballoons.eu/regalar-vuelo-en-globo-segovia", "canonical": "https://www.voyagerballoons.eu/regalar-vuelo-en-globo-segovia", "severity": "P1"},
-    {"name": "Madrid", "url": "https://www.voyagerballoons.eu/vuelo-en-globo-segovia-desde-madrid", "canonical": "https://www.voyagerballoons.eu/vuelo-en-globo-segovia-desde-madrid", "severity": "P1"},
+    {"name": "Madrid", "url": "https://www.voyagerballoons.eu/vuelo-en-globo-madrid", "canonical": "https://www.voyagerballoons.eu/vuelo-en-globo-madrid", "severity": "P1"},
     {"name": "Braganza ES", "url": "https://www.voyagerballoons.eu/vuelo-en-globo-braganza-portugal", "canonical": "https://www.voyagerballoons.eu/vuelo-en-globo-braganza-portugal", "required_text": ["195"], "severity": "P1", "neutral_severity": "P3", "role": "cross_sell"},
     {"name": "Braganca PT", "url": "https://www.voyagerballoons.eu/pt/passeio-de-balao-braganca", "canonical": "https://www.voyagerballoons.eu/pt/passeio-de-balao-braganca", "required_text": ["195"], "severity": "P1", "neutral_severity": "P3", "role": "cross_sell"},
     {"name": "Segovia EN", "url": "https://www.voyagerballoons.eu/en/hot-air-balloon-segovia", "canonical": "https://www.voyagerballoons.eu/en/hot-air-balloon-segovia", "severity": "P1"},

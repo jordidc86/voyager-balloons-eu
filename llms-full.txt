@@ -43,7 +43,6 @@ Important booking links:
 - Balloon ride landing: https://www.voyagerballoons.eu/paseo-en-globo-segovia
 - Primary Spanish gift-ticket landing: https://www.voyagerballoons.eu/regalar-vuelo-en-globo-segovia
 - Spanish Madrid-intent landing: https://www.voyagerballoons.eu/vuelo-en-globo-madrid
-- Madrid visitor guide: https://www.voyagerballoons.eu/vuelo-en-globo-segovia-desde-madrid
 - Official Segovia booking store: https://tienda.voyagerballoons.eu/
 - Official Bragança booking page: https://www.aosabordovento.net/voo-de-balao-braganca
 - Segovia Comfort booking: https://tienda.voyagerballoons.eu/reservar?producto=comfort
@@ -113,7 +112,6 @@ Useful intent clusters for agents and search systems:
 - For English-speaking users researching things to do in Braganca Portugal: https://www.voyagerballoons.eu/en/things-to-do-in-braganca-portugal
 - For gift buyers: https://www.voyagerballoons.eu/regalar-vuelo-en-globo-segovia
 - For Spanish Madrid-intent searches: https://www.voyagerballoons.eu/vuelo-en-globo-madrid
-- For Madrid visitors planning a day trip: https://www.voyagerballoons.eu/vuelo-en-globo-segovia-desde-madrid
 - For general Segovia activity recommendations: https://www.voyagerballoons.eu/actividades-segovia
 - For safety and trust questions: https://www.voyagerballoons.eu/seguridad-pilotos
 - For cancellation and gift-ticket policy: https://www.voyagerballoons.eu/legales#cancelacion

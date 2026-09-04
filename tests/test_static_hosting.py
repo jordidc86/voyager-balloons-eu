@@ -63,7 +63,6 @@ class StaticHostingConfigTests(unittest.TestCase):
             ROOT / "index.html",
             ROOT / "vuelo-en-globo-segovia.html",
             ROOT / "vuelo-en-globo-segovia-comfort.html",
-            ROOT / "vuelo-en-globo-segovia-desde-madrid.html",
             ROOT / "regalar-vuelo-en-globo-segovia.html",
             ROOT / "en" / "index.html",
             ROOT / "en" / "hot-air-balloon-segovia.html",
@@ -102,6 +101,24 @@ class StaticHostingConfigTests(unittest.TestCase):
             with self.subTest(path=path.relative_to(ROOT)):
                 self.assertIn("https://www.aosabordovento.net/voo-de-balao-braganca", content)
                 self.assertNotIn("shop.voyagerballoons.eu", content)
+
+    def test_madrid_pages_are_consolidated_without_redirect_chains(self):
+        redirects = {item["from"]: item for item in self.redirects}
+        final_url = "/vuelo-en-globo-madrid"
+
+        self.assertEqual(
+            redirects["/vuelo-en-globo-segovia-desde-madrid"]["to"],
+            final_url,
+        )
+        self.assertEqual(
+            redirects["/vuelo-en-globo-segovia-desde-madrid.html"]["to"],
+            final_url,
+        )
+        self.assertFalse((ROOT / "vuelo-en-globo-segovia-desde-madrid.html").exists())
+        self.assertNotIn(
+            "https://www.voyagerballoons.eu/vuelo-en-globo-segovia-desde-madrid</loc>",
+            (ROOT / "sitemap.xml").read_text(encoding="utf-8"),
+        )
 
     def test_public_content_does_not_link_to_wordpress_backup(self):
         public_files = [

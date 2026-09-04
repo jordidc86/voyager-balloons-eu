@@ -267,7 +267,7 @@ def _discover_keyword_candidates(
         if not any(term in query for term in commercial_terms) or any(term in query for term in excluded_terms):
             continue
         parsed = urlsplit(page)
-        if parsed.netloc not in {"www.voyagerballoons.eu", "shop.voyagerballoons.eu"}:
+        if parsed.netloc != "www.voyagerballoons.eu":
             continue
         blocked_prefixes = (
             "/cart",
