@@ -1410,3 +1410,7 @@ ul {
   .with-mobile-cta .cookie-banner p { font-size:.875rem; }
   .with-mobile-cta .cookie-actions .btn { min-height:44px; }
 }
+
+@media (max-width:576px) {
+  .grid-3-col,.pricing-grid,.blog-grid { grid-template-columns:minmax(0,1fr); }
+}
