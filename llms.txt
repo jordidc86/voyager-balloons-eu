@@ -38,6 +38,8 @@ Voyager Balloons EU opera experiencias de vuelo en globo en Segovia, Espana, y B
 
 ## Policies and important facts
 
+Los billetes regalo se compran sin fecha. Para reservar el vuelo, el destinatario debe contactar por WhatsApp al +34 614 007 056 (https://wa.me/34614007056), indicando la referencia del billete y las fechas que le interesan. El equipo confirma disponibilidad y reserva; no se realiza canje online automático. La compra no reserva fecha ni plazas.
+
 - [Legal and cancellation terms](https://www.voyagerballoons.eu/legales#cancelacion): Cancellation policy, gift-ticket conditions and legal information.
 - [Sitemap](https://www.voyagerballoons.eu/sitemap.xml): XML list of canonical pages for crawlers.
 - [Robots policy](https://www.voyagerballoons.eu/robots.txt): Crawl policy for search engines and agents.
