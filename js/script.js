@@ -74,6 +74,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // An open answer can become taller after rotating a phone or loading fonts.
+    const resizeOpenAnswers = () => {
+        document.querySelectorAll('.faq-item.active .faq-answer').forEach(answer => {
+            answer.style.maxHeight = `${answer.scrollHeight}px`;
+        });
+    };
+    window.addEventListener('resize', () => window.requestAnimationFrame(resizeOpenAnswers));
+    if (document.fonts?.ready) document.fonts.ready.then(resizeOpenAnswers);
+
     const fadeInObserver = new IntersectionObserver((entries, observer) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
