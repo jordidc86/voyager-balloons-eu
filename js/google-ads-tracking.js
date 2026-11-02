@@ -78,30 +78,39 @@
     window.gtag('event',name,Object.assign({},params,{event_callback:function(){try{sessionStorage.setItem(key,'sent');}catch(e){}}}));
   }
 
-  var partnerLoaded=false;
+  var partnerLoaded=false,partnerReady={openai:false,meta:false};
   function partnerConsent(){
-    if(window.oaiq)window.oaiq('consent',consent.ads);
-    if(window.fbq)window.fbq('consent',consent.ads?'grant':'revoke');
+    try{if(window.oaiq)window.oaiq('consent',consent.ads);}catch(e){}
+    try{if(window.fbq)window.fbq('consent',consent.ads?'grant':'revoke');}catch(e){}
     if(!consent.ads||partnerLoaded)return;
     partnerLoaded=true;
     if(!window.oaiq){var q=function(){q.q.push(arguments);};q.q=[];window.oaiq=q;
-      var o=document.createElement('script');o.async=true;o.src='https://bzrcdn.openai.com/sdk/oaiq.min.js';document.head.appendChild(o);}
+      var o=document.createElement('script');o.async=true;o.onload=function(){partnerReady.openai=true;if(pending)partnerPurchase(pending);};o.src='https://bzrcdn.openai.com/sdk/oaiq.min.js';document.head.appendChild(o);}
     window.oaiq('consent',true);window.oaiq('init',{pixelId:'1Ctd288nhCPeqfiwRb9eXp'});
     window.oaiq('measure','page_viewed',{type:'contents'},{opt_out:true});
     if(!window.fbq){var f=function(){f.callMethod?f.callMethod.apply(f,arguments):f.queue.push(arguments);};
       f.queue=[];f.push=f;f.loaded=true;f.version='2.0';window.fbq=f;window._fbq=f;
-      var m=document.createElement('script');m.async=true;m.src='https://connect.facebook.net/en_US/fbevents.js';document.head.appendChild(m);}
+      var m=document.createElement('script');m.async=true;m.onload=function(){partnerReady.meta=true;if(pending)partnerPurchase(pending);};m.src='https://connect.facebook.net/en_US/fbevents.js';document.head.appendChild(m);}
     window.fbq('consent','grant');window.fbq('set','autoConfig',false,'231034488264198');
     window.fbq('init','231034488264198');window.fbq('trackSingle','231034488264198','PageView');
   }
   function partnerPurchase(p){
     if(!consent.ads)return;partnerConsent();
-    var key='voyager_purchase_partners_'+p.transaction_id;
-    try{if(sessionStorage.getItem(key)==='sent')return;}catch(e){}
-    if(sent[key])return;sent[key]=true;
-    window.oaiq('measure','order_created',{type:'contents',amount:Math.round(p.value*100),currency:p.currency},{event_id:p.transaction_id,opt_out:true});
-    window.fbq('trackSingle','231034488264198','Purchase',{value:p.value,currency:p.currency},{eventID:p.transaction_id});
-    try{sessionStorage.setItem(key,'sent');}catch(e){}
+    // A queued SDK command is not delivery. Keep a failed/blocked load retryable
+    // on receipt reload; each provider is independent. This records dispatch,
+    // never an acknowledgement from Meta/OpenAI.
+    ['openai','meta'].forEach(function(provider){
+      if(!partnerReady[provider])return;
+      var key='voyager_purchase_dispatched_'+provider+'_'+p.transaction_id;
+      try{if(sessionStorage.getItem(key)==='dispatched')return;}catch(e){}
+      if(sent[key])return;
+      try{
+        if(provider==='openai')window.oaiq('measure','order_created',{type:'contents',amount:Math.round(p.value*100),currency:p.currency},{event_id:p.transaction_id,opt_out:true});
+        else window.fbq('trackSingle','231034488264198','Purchase',{value:p.value,currency:p.currency},{eventID:p.transaction_id});
+        sent[key]=true;
+        try{sessionStorage.setItem(key,'dispatched');}catch(e){}
+      }catch(e){/* Leave this provider retryable; do not suppress the other. */}
+    });
   }
 
   function purchase(p){

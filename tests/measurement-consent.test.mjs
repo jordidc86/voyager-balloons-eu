@@ -3,14 +3,15 @@ import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
 const measurementBootstrap=readFileSync(new URL('../js/google-ads-tracking.js',import.meta.url),'utf8');
-function setup(cookie='2.0.0',storage=new Map()) {
- const events={},scripts=[],jar=new Map([['voyager_measurement_v1',cookie]]);
- const document={readyState:'loading',head:{appendChild:s=>scripts.push(s.src)},documentElement:{setAttribute(){}},createElement:()=>({}),getElementById:()=>null,querySelectorAll:()=>[],addEventListener(){}};
+function setup(cookie='2.0.0',storage=new Map(),autoLoad=true) {
+ const events={},scripts=[],elements=[],jar=new Map([['voyager_measurement_v1',cookie]]);
+ const document={readyState:'loading',head:{appendChild:s=>{scripts.push(s.src);elements.push(s)}},documentElement:{setAttribute(){}},createElement:()=>({}),getElementById:()=>null,querySelectorAll:()=>[],addEventListener(){}};
  Object.defineProperty(document,'cookie',{get:()=>[...jar].map(([k,v])=>k+'='+v).join('; '),set:s=>{let [k,v]=s.split(';')[0].split('=');if(s.includes('Max-Age=0'))jar.delete(k);else jar.set(k,v)}});
  const location={hostname:'www.voyagerballoons.eu',pathname:'/reservar',href:'https://www.voyagerballoons.eu/reservar?fbclid=valid_click&oppref=oa_click'};
  const window={addEventListener:(n,f)=>events[n]=f,dispatchEvent(){}};
  vm.runInNewContext(measurementBootstrap,{window,document,location,URL,Promise,sessionStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v),removeItem:k=>storage.delete(k)},CustomEvent:class{},setTimeout(){}});
- return {window,scripts,events,jar,storage};
+ if(autoLoad)elements.forEach(s=>s.onload?.());
+ return {window,scripts,events,jar,storage,elements};
 }
 const purchase={transaction_id:'vbs-1234567',value:240,currency:'EUR',items:[]};
 test('no partner request before explicit consent; old cookie is not consent for Meta',()=>{for(const c of ['2.0.0','1.1.1']){let b=setup(c);b.events['voyager:purchase']({detail:purchase});assert.deepEqual(b.scripts,[]);assert.equal(b.window.fbq,undefined)}});
@@ -19,3 +20,27 @@ test('revocation stops further purchases and removes advertising attribution',()
 test('invalid purchase is never sent',()=>{let b=setup('2.0.1');for(const p of [{...purchase,value:0},{...purchase,currency:'USD'},{...purchase,transaction_id:'bad'}])b.events['voyager:purchase']({detail:p});assert.equal(b.window.oaiq.q.map(x=>[...x]).some(x=>x[1]==='order_created'),false)});
 
 test('purchase is not repeated after reloading the receipt in the same session',()=>{const a=setup('2.0.1');a.events['voyager:purchase']({detail:purchase});const b=setup('2.0.1',a.storage);b.events['voyager:purchase']({detail:purchase});assert.equal(b.window.fbq.queue.map(x=>[...x]).filter(x=>x[2]==='Purchase').length,0)});
+
+test('blocked SDK does not poison persisted deduplication and reload retries',()=>{
+ const a=setup('2.0.1',new Map(),false);
+ a.events['voyager:purchase']({detail:purchase});
+ assert.equal([...a.storage.keys()].some(k=>k.startsWith('voyager_purchase_')),false);
+ const b=setup('2.0.1',a.storage);
+ b.events['voyager:purchase']({detail:purchase});
+ assert.equal(b.window.fbq.queue.filter(x=>x[2]==='Purchase').length,1);
+});
+test('late SDK readiness dispatches the pending purchase once',()=>{
+ const a=setup('2.0.1',new Map(),false);a.events['voyager:purchase']({detail:purchase});
+ a.elements.forEach(s=>s.onload?.());a.elements.forEach(s=>s.onload?.());
+ assert.equal(a.window.fbq.queue.filter(x=>x[2]==='Purchase').length,1);
+});
+test('one provider failure does not suppress the other',()=>{
+ const a=setup('2.0.1');a.window.oaiq=()=>{throw Error('blocked')};
+ a.events['voyager:purchase']({detail:purchase});
+ assert.equal(a.window.fbq.queue.filter(x=>x[2]==='Purchase').length,1);
+});
+test('revocation before SDK readiness prevents late purchase dispatch',()=>{
+ const a=setup('2.0.1',new Map(),false);a.events['voyager:purchase']({detail:purchase});
+ a.window.voyagerMeasurement.choose(false,false);a.elements.forEach(s=>s.onload?.());
+ assert.equal(a.window.fbq.queue.filter(x=>x[2]==='Purchase').length,0);
+});
