@@ -157,20 +157,62 @@
             color: var(--color-text-muted);
         }
 
-        .price-panel {
-            background: #fff;
+        /* Scoped to this price comparison; other pages keep their existing styles. */
+        .flight-price-comparison #precio {
+            max-width: 900px;
+            margin: 0 auto 1rem;
+            scroll-margin-top: 110px;
+        }
+        .flight-price-comparison .price-intro {
+            max-width: 880px;
+            margin: 0 auto 2rem;
+            color: var(--color-text-muted);
+            text-align: center;
+        }
+        .flight-price-comparison .flight-price-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 1.25rem;
+        }
+        .flight-price-comparison .flight-price-card {
+            min-width: 0;
+            padding: 1.5rem;
             border: 1px solid rgba(212, 175, 55, 0.35);
             border-radius: 16px;
-            box-shadow: 0 16px 38px rgba(212, 175, 55, 0.14);
-            padding: 2rem;
-            display: grid;
-            grid-template-columns: minmax(0, 1fr) auto;
-            gap: 2rem;
-            align-items: center;
+            background: #fff;
+            box-shadow: 0 12px 30px rgba(44, 53, 57, 0.06);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            scroll-margin-top: 110px;
         }
-
-        .price-panel .price {
-            margin: 0;
+        .flight-price-comparison .flight-price-card h3 {
+            margin: .5rem 0 1rem;
+            font-size: 1.5rem;
+        }
+        .flight-price-comparison .flight-price-card p { margin: 0 0 1rem; }
+        .flight-price-comparison .flight-price-card .flight-price-amount {
+            color: var(--color-text-dark);
+            font-size: 1.1rem;
+        }
+        .flight-price-comparison .flight-price-amount strong { font-size: 2rem; }
+        .flight-price-comparison .flight-price-unit {
+            display: block;
+            color: var(--color-text-muted);
+            font-size: 1rem;
+        }
+        .flight-price-comparison .flight-price-note { color: var(--color-text-muted); }
+        .flight-price-comparison .flight-price-card .btn {
+            width: 100%;
+            min-height: 48px;
+            padding: .8rem 1rem;
+            white-space: normal;
+            text-align: center;
+        }
+        .flight-price-comparison .flight-price-card .price-booking { margin-top: auto; }
+        .flight-price-comparison .flight-price-card .price-details { margin-top: .75rem; }
+        @media (max-width: 1000px) {
+            .flight-price-comparison .flight-price-grid { grid-template-columns: minmax(0, 1fr); }
         }
 
         .sales-cta {
@@ -211,9 +253,6 @@
                 padding: 1.5rem;
             }
 
-            .price-panel {
-                grid-template-columns: 1fr;
-            }
         }
     </style>
     <script type="application/ld+json">
@@ -254,6 +293,8 @@
           "offers": {
             "@type": "Offer",
             "url": "https://tienda.voyagerballoons.eu/reservar?producto=classic",
+            "description": "Desde 120 EUR por persona. El precio final y la disponibilidad se consultan para la fecha elegida.",
+            "priceSpecification": {"@type": "UnitPriceSpecification", "price": "120", "priceCurrency": "EUR", "referenceQuantity": {"@type": "QuantitativeValue", "value": 1, "unitText": "persona"}},
             "priceCurrency": "EUR",
             "price": "120",
             "availability": "https://schema.org/InStock",
@@ -286,6 +327,8 @@
           "offers": {
             "@type": "Offer",
             "url": "https://tienda.voyagerballoons.eu/reservar?producto=comfort",
+            "description": "169 EUR por persona. Vuelo compartido, con máximo cuatro personas por compartimento.",
+            "priceSpecification": {"@type": "UnitPriceSpecification", "price": "169", "priceCurrency": "EUR", "referenceQuantity": {"@type": "QuantitativeValue", "value": 1, "unitText": "persona"}},
             "priceCurrency": "EUR",
             "price": "169",
             "availability": "https://schema.org/InStock",
@@ -302,6 +345,37 @@
           }
         },
         {
+          "@type": "Service",
+          "@id": "https://www.voyagerballoons.eu/vuelo-en-globo-segovia#private-suite",
+          "name": "Vuelo en globo privado en Segovia Private Suite",
+          "serviceType": "Vuelo en globo privado con piloto",
+          "description": "Globo privado con piloto para parejas, familias o grupos. Incluye brindis con cava y coordinación directa con el equipo. Precio desde 1.200 EUR por globo privado; presupuesto y disponibilidad por consulta.",
+          "areaServed": {
+            "@type": "City",
+            "name": "Segovia"
+          },
+          "provider": {
+            "@type": "Organization",
+            "name": "Voyager Balloons",
+            "url": "https://www.voyagerballoons.eu/"
+          },
+          "offers": {
+            "@type": "Offer",
+            "url": "https://www.voyagerballoons.eu/vuelo-en-globo-segovia#private-suite",
+            "description": "Desde 1.200 EUR por globo privado; presupuesto y disponibilidad por consulta.",
+            "priceSpecification": {
+              "@type": "UnitPriceSpecification",
+              "minPrice": "1200",
+              "priceCurrency": "EUR",
+              "referenceQuantity": {
+                "@type": "QuantitativeValue",
+                "value": 1,
+                "unitText": "globo privado"
+              }
+            }
+          }
+        },
+        {
           "@type": "FAQPage",
           "@id": "https://www.voyagerballoons.eu/vuelo-en-globo-segovia#faq",
           "mainEntity": [
@@ -310,7 +384,7 @@
               "name": "¿Cuánto cuesta un vuelo en globo en Segovia?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "El vuelo Classic Adventure de Voyager Balloons cuesta desde 120 euros por pasajero."
+                "text": "En Voyager Balloons, Classic Adventure cuesta desde 120 € por persona, Comfort Flight cuesta 169 € por persona y Private Suite parte de 1.200 € por globo privado. En Classic, consulta el precio final y la disponibilidad para la fecha elegida; los vuelos privados se confirman por consulta."
               }
             },
             {
@@ -511,30 +585,38 @@
             </div>
         </section>
 
-        <section class="section" aria-labelledby="precio">
+        <section class="section flight-price-comparison" aria-labelledby="precio">
             <div class="container">
-                <div class="price-panel fade-in slide-up">
-                    <div>
-                        <span class="eyebrow">Compra directa</span>
-                        <h2 id="precio">Classic Adventure</h2>
-                        <p>La experiencia compartida más sencilla para reservar o regalar un vuelo en globo en Segovia.</p>
-                    </div>
-                    <div>
-                        <div class="price">120€ <span>/ pasajero</span></div>
-                        <a href="https://tienda.voyagerballoons.eu/reservar?producto=classic" class="btn btn-primary btn-full mt-6">Reservar ahora</a>
-                    </div>
+                <div class="section-header">
+                    <span class="eyebrow">Compara las modalidades</span>
+                    <h2 id="precio">¿Cuánto cuesta un vuelo en globo en Segovia y qué opción elegir?</h2>
                 </div>
-                <div class="price-panel fade-in slide-up mt-8">
-                    <div>
+                <p class="price-intro">En Voyager Balloons puedes reservar un vuelo compartido Classic desde 120 € por persona, elegir Comfort por 169 € por persona o consultar un globo privado desde 1.200 € por globo. Compara las modalidades y elige cómo quieres vivir la experiencia.</p>
+                <div class="flight-price-grid">
+                    <article class="flight-price-card" id="classic-adventure" aria-labelledby="classic-price-title">
+                        <span class="eyebrow">Vuelo compartido</span>
+                        <h3 id="classic-price-title">Classic Adventure</h3>
+                        <p class="flight-price-amount">Desde <strong>120 €</strong><span class="flight-price-unit">por persona</span></p>
+                        <p>Vuelo compartido para disfrutar de la experiencia al amanecer sobre Segovia, con brindis con cava, diploma y fotos de la tripulación para complementar las tuyas.</p>
+                        <p class="flight-price-note">Consulta el precio final y la disponibilidad para la fecha elegida.</p>
+                        <a href="https://tienda.voyagerballoons.eu/reservar?producto=classic" class="btn btn-primary price-booking">Ver fechas y precio</a>
+                    </article>
+                    <article class="flight-price-card" id="comfort" aria-labelledby="comfort-price-title">
                         <span class="eyebrow">Más amplitud</span>
-                        <h2>Comfort Flight</h2>
-                        <p>La opción recomendada si quieres disfrutar del vuelo compartido con más espacio: máximo 4 personas por compartimento.</p>
-                    </div>
-                    <div>
-                        <div class="price">169€ <span>/ pasajero</span></div>
-                        <a href="https://tienda.voyagerballoons.eu/reservar?producto=comfort" class="btn btn-primary btn-full mt-6">Reservar Comfort</a>
-                        <a href="/vuelo-en-globo-segovia-comfort" class="btn btn-outline btn-full mt-6">Ver detalles</a>
-                    </div>
+                        <h3 id="comfort-price-title">Comfort Flight</h3>
+                        <p class="flight-price-amount"><strong>169 €</strong><span class="flight-price-unit">por persona</span></p>
+                        <p>Vuelo compartido con más espacio: máximo cuatro personas por compartimento. Incluye vuelo al amanecer, brindis con cava y diploma.</p>
+                        <a href="https://tienda.voyagerballoons.eu/reservar?producto=comfort" class="btn btn-primary price-booking">Reservar Comfort</a>
+                        <a href="/vuelo-en-globo-segovia-comfort" class="btn btn-outline price-details">Ver detalles de Comfort</a>
+                    </article>
+                    <article class="flight-price-card" id="private-suite" aria-labelledby="private-price-title">
+                        <span class="eyebrow">Globo privado</span>
+                        <h3 id="private-price-title">Private Suite</h3>
+                        <p class="flight-price-amount">Desde <strong>1.200 €</strong><span class="flight-price-unit">precio total por globo privado</span></p>
+                        <p>Globo privado con piloto para vuestra pareja, familia o grupo. Una experiencia personalizada con brindis con cava y coordinación directa con nuestro equipo.</p>
+                        <p class="flight-price-note">Consulta el presupuesto y la disponibilidad para vuestro grupo.</p>
+                        <a href="https://wa.me/34614007056?text=Hola%2C%20quiero%20consultar%20un%20vuelo%20privado" class="btn btn-primary price-booking">Consultar vuelo privado</a>
+                    </article>
                 </div>
             </div>
         </section>
@@ -646,7 +728,7 @@
                             <div class="faq-icon">+</div>
                         </button>
                         <div class="faq-answer">
-                            <p>El vuelo Classic Adventure cuesta desde 120 euros por pasajero.</p>
+                            <p>En Voyager Balloons, Classic Adventure cuesta desde 120 € por persona, Comfort Flight cuesta 169 € por persona y Private Suite parte de 1.200 € por globo privado. En Classic, consulta el precio final y la disponibilidad para la fecha elegida; los vuelos privados se confirman por consulta.</p>
                         </div>
                     </div>
                     <div class="faq-item">
