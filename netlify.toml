@@ -1,6 +1,20 @@
 [build]
   publish = "."
 
+# English checkout links must resolve to the current legal document.
+# Keep fragments (#cancelacion, #privacidad, #cookies) on navigation.
+[[redirects]]
+  from = "/en/legal"
+  to = "/legales"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/en/legal/"
+  to = "/legales"
+  status = 301
+  force = true
+
 [[redirects]]
   from = "/index.html"
   to = "/"
