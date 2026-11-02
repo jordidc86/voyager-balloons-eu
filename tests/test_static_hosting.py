@@ -164,7 +164,7 @@ class StaticHostingConfigTests(unittest.TestCase):
             homepage,
         )
         self.assertEqual(homepage.count('loading="lazy" decoding="async"'), 3)
-        self.assertIn("['pointerdown', 'keydown', 'touchstart']", tracking)
+        self.assertRegex(tracking, r"\['pointerdown',\s*'keydown',\s*'touchstart'\]")
         self.assertNotIn("'scroll', 'wheel'", tracking)
 
 

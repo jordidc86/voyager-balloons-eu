@@ -100,50 +100,24 @@ document.addEventListener('DOMContentLoaded', () => {
         fadeInObserver.observe(element);
     });
 
-    const cookieBanner = document.querySelector('.cookie-banner');
+    // The shared consent notice is the single source of optional-cookie choices.
     const reviewsConsentNote = document.querySelector('.reviews-consent-note');
+    const reviewsWidget = document.querySelector('[class^="elfsight-app-"]');
     const cookieScripts = document.querySelectorAll('script[data-cookie-src]');
-    const consentKey = 'voyagerCookieConsent';
-
-    const setCookieBannerVisible = isVisible => {
-        document.body.classList.toggle('cookie-visible', isVisible);
-        if (cookieBanner) cookieBanner.hidden = !isVisible;
-    };
-
-    const loadThirdPartyScripts = () => {
+    const applyReviewsConsent = () => {
+        const accepted = !!window.voyagerMeasurement?.consent().ads;
+        if (reviewsConsentNote) reviewsConsentNote.hidden = accepted;
+        if (reviewsWidget) reviewsWidget.hidden = !accepted;
+        if (!accepted) return;
         cookieScripts.forEach(scriptPlaceholder => {
             if (scriptPlaceholder.dataset.loaded === 'true') return;
-
             const script = document.createElement('script');
             script.src = scriptPlaceholder.dataset.cookieSrc;
             if (scriptPlaceholder.dataset.cookieDefer === 'true') script.defer = true;
             document.body.appendChild(script);
             scriptPlaceholder.dataset.loaded = 'true';
         });
-
-        if (reviewsConsentNote) reviewsConsentNote.hidden = true;
     };
-
-    const applyCookieChoice = choice => {
-        window.localStorage.setItem(consentKey, choice);
-        setCookieBannerVisible(false);
-        if (choice === 'accept') loadThirdPartyScripts();
-    };
-
-    if (cookieBanner && cookieScripts.length > 0) {
-        const storedChoice = window.localStorage.getItem(consentKey);
-
-        if (storedChoice === 'accept') {
-            setCookieBannerVisible(false);
-            loadThirdPartyScripts();
-        } else if (storedChoice === 'reject') {
-            setCookieBannerVisible(false);
-        } else {
-            setCookieBannerVisible(true);
-        }
-
-        cookieBanner.querySelectorAll('[data-cookie-choice]').forEach(button => {
-            button.addEventListener('click', () => applyCookieChoice(button.dataset.cookieChoice));
-        });
-    }
+    applyReviewsConsent();
+    window.addEventListener('voyager:consent', applyReviewsConsent);
 });
