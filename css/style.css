@@ -1403,3 +1403,10 @@ ul {
         transform: none !important;
     }
 }
+
+/* Leave the mobile booking buttons unobstructed while consent is requested. */
+@media (max-width:768px) {
+  .with-mobile-cta .cookie-banner { bottom:calc(92px + env(safe-area-inset-bottom)); padding:1rem; gap:.75rem; }
+  .with-mobile-cta .cookie-banner p { font-size:.875rem; }
+  .with-mobile-cta .cookie-actions .btn { min-height:44px; }
+}
