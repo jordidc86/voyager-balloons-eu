@@ -168,9 +168,9 @@
   },
   "commerce_probes": [
     {"name": "Salud tienda", "kind": "json", "url": "https://tienda.voyagerballoons.eu/api/health", "expected_json": {"ok": true, "app": "voyager-booking-store", "mode": "production"}, "severity": "P0"},
-    {"name": "Reserva Classic", "kind": "page", "url": "https://tienda.voyagerballoons.eu/reservar?producto=classic", "expected_text": ["Prepara tu vuelo", "Classic", "120"], "expected_robots": "noindex", "severity": "P0"},
+    {"name": "Reserva Classic", "kind": "page", "url": "https://tienda.voyagerballoons.eu/reservar?producto=classic", "expected_text": ["Prepara tu vuelo", "Classic", "129"], "expected_robots": "noindex", "severity": "P0"},
     {"name": "Reserva Comfort", "kind": "page", "url": "https://tienda.voyagerballoons.eu/reservar?producto=comfort", "expected_text": ["Prepara tu vuelo", "Comfort", "169"], "expected_robots": "noindex", "severity": "P0"},
-    {"name": "Billete regalo", "kind": "page", "url": "https://tienda.voyagerballoons.eu/regalar", "expected_text": ["Billete", "120", "169"], "expected_robots": "noindex", "severity": "P0"},
+    {"name": "Billete regalo", "kind": "page", "url": "https://tienda.voyagerballoons.eu/regalar", "expected_text": ["Billete", "129", "169"], "expected_robots": "noindex", "severity": "P0"},
     {"name": "Braganca Ao Sabor", "kind": "page", "url": "https://www.aosabordovento.net/voo-de-balao-braganca", "expected_text": ["195", "Adicionar ao carrinho"], "severity": "P0"}
   ],
   "thresholds": {

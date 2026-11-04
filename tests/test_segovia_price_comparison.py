@@ -39,7 +39,7 @@ class SegoviaPriceComparisonTests(unittest.TestCase):
             self.assertIn('<a href=', card)
 
     def test_prices_and_units_do_not_confuse_a_person_with_a_private_balloon(self):
-        self.assertIn('Desde 120 € por persona', text(self.cards['classic-adventure']))
+        self.assertIn('Desde 129 € por persona', text(self.cards['classic-adventure']))
         self.assertIn('169 € por persona', text(self.cards['comfort']))
         self.assertIn('máximo cuatro personas por compartimento', text(self.cards['comfort']))
         private = text(self.cards['private-suite'])
@@ -59,11 +59,11 @@ class SegoviaPriceComparisonTests(unittest.TestCase):
         answer = next(q for q in faq['mainEntity'] if q['name'] == '¿Cuánto cuesta un vuelo en globo en Segovia?')['acceptedAnswer']['text']
         match = re.search(r'<span>¿Cuánto cuesta un vuelo en globo en Segovia\?</span>.*?<div class="faq-answer">\s*<p>(.*?)</p>', self.html, re.S)
         self.assertEqual(text(match[1]), answer)
-        for amount in ['120 € por persona', '169 € por persona', '1.200 € por globo privado']:
+        for amount in ['129 € por persona', '169 € por persona', '1.200 € por globo privado']:
             self.assertIn(amount, answer)
 
     def test_structured_offers_keep_prices_and_explicit_units(self):
-        for fragment, amount, unit in [('classic-adventure', '120', 'persona'), ('comfort', '169', 'persona'), ('private-suite', '1200', 'globo privado')]:
+        for fragment, amount, unit in [('classic-adventure', '129', 'persona'), ('comfort', '169', 'persona'), ('private-suite', '1200', 'globo privado')]:
             node = next(n for n in self.nodes if n.get('@id', '').endswith('#' + fragment))
             offer = node['offers']
             price = offer['priceSpecification']
