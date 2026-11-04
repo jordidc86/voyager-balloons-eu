@@ -107,12 +107,22 @@ def _commerce_diagnostics(
     minimum_shop_sessions: float = 100,
     evaluation_ready: bool = True,
     minimum_checkout_events_for_purchase_alert: float = 3,
+    include_unassigned_purchases: bool = False,
 ) -> dict:
     event_totals: dict[str, dict[str, float]] = {}
+    unassigned_purchases = 0.0
+    unassigned_purchase_revenue = 0.0
     for row in commerce_rows:
-        if row.get("hostName") != shop_domain:
-            continue
         event_name = row.get("eventName", "")
+        # Measurement Protocol purchases can have no hostname. Only include
+        # these for the explicitly configured current store, never the legacy
+        # shop or traffic/funnel events. Keep their provenance in the summary.
+        unassigned = event_name == "purchase" and row.get("hostName") in {"(not set)", "", None}
+        if row.get("hostName") != shop_domain:
+            if not (include_unassigned_purchases and unassigned):
+                continue
+            unassigned_purchases += float(row.get("eventCount", 0) or 0)
+            unassigned_purchase_revenue += float(row.get("totalRevenue", 0) or 0)
         totals = event_totals.setdefault(event_name, {"eventCount": 0, "keyEvents": 0, "totalRevenue": 0})
         for metric in totals:
             totals[metric] += float(row.get(metric, 0) or 0)
@@ -148,6 +158,8 @@ def _commerce_diagnostics(
         "begin_checkout": begin_checkout,
         "purchases": purchases.get("eventCount", 0),
         "purchase_revenue": purchases.get("totalRevenue", 0),
+        "unassigned_purchases": unassigned_purchases,
+        "unassigned_purchase_revenue": unassigned_purchase_revenue,
         "minimum_shop_sessions": minimum_shop_sessions,
         "minimum_checkout_events_for_purchase_alert": minimum_checkout_events_for_purchase_alert,
         "evaluation_ready": evaluation_ready and enough_shop_traffic,
@@ -262,6 +274,9 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
     tracking_config = config.get("tracking", {})
     store_domain = str(tracking_config.get("store_domain") or "tienda.voyagerballoons.eu")
     legacy_shop_domain = str(tracking_config.get("legacy_shop_domain") or "shop.voyagerballoons.eu")
+    include_unassigned_purchases = (
+        tracking_config.get("ga4_unassigned_purchase_store_domain") == store_domain
+    )
     business_profile_campaign = str(
         tracking_config.get("google_business_profile_campaign") or "google_business_profile"
     )
@@ -284,6 +299,7 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
         channel_host_rows,
         store_domain,
         evaluation_ready=False,
+        include_unassigned_purchases=include_unassigned_purchases,
     )
     historical_diagnostics = _commerce_diagnostics(
         commerce_rows,
@@ -337,6 +353,7 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
         minimum_shop_sessions=minimum_funnel_sessions,
         evaluation_ready=funnel_days_ready,
         minimum_checkout_events_for_purchase_alert=minimum_checkout_events,
+        include_unassigned_purchases=include_unassigned_purchases,
     )
     diagnostics["complete_days"] = funnel_complete_days
     diagnostics["minimum_complete_days"] = int(
