@@ -105,10 +105,10 @@
     {"name": "Comfort Segovia", "url": "https://www.voyagerballoons.eu/vuelo-en-globo-segovia-comfort", "canonical": "https://www.voyagerballoons.eu/vuelo-en-globo-segovia-comfort", "required_text": ["169"], "severity": "P0"},
     {"name": "Regalo Segovia", "url": "https://www.voyagerballoons.eu/regalar-vuelo-en-globo-segovia", "canonical": "https://www.voyagerballoons.eu/regalar-vuelo-en-globo-segovia", "severity": "P1"},
     {"name": "Madrid", "url": "https://www.voyagerballoons.eu/vuelo-en-globo-madrid", "canonical": "https://www.voyagerballoons.eu/vuelo-en-globo-madrid", "severity": "P1"},
-    {"name": "Braganza ES", "url": "https://www.voyagerballoons.eu/vuelo-en-globo-braganza-portugal", "canonical": "https://www.voyagerballoons.eu/vuelo-en-globo-braganza-portugal", "required_text": ["195"], "severity": "P1", "neutral_severity": "P3", "role": "cross_sell"},
-    {"name": "Braganca PT", "url": "https://www.voyagerballoons.eu/pt/passeio-de-balao-braganca", "canonical": "https://www.voyagerballoons.eu/pt/passeio-de-balao-braganca", "required_text": ["195"], "severity": "P1", "neutral_severity": "P3", "role": "cross_sell"},
+    {"name": "Braganza ES", "url": "https://www.voyagerballoons.eu/vuelo-en-globo-braganza-portugal", "canonical": "https://www.voyagerballoons.eu/vuelo-en-globo-braganza-portugal", "required_text": ["205"], "severity": "P1", "neutral_severity": "P3", "role": "cross_sell"},
+    {"name": "Braganca PT", "url": "https://www.voyagerballoons.eu/pt/passeio-de-balao-braganca", "canonical": "https://www.voyagerballoons.eu/pt/passeio-de-balao-braganca", "required_text": ["205"], "severity": "P1", "neutral_severity": "P3", "role": "cross_sell"},
     {"name": "Segovia EN", "url": "https://www.voyagerballoons.eu/en/hot-air-balloon-segovia", "canonical": "https://www.voyagerballoons.eu/en/hot-air-balloon-segovia", "severity": "P1"},
-    {"name": "Braganca EN", "url": "https://www.voyagerballoons.eu/en/hot-air-balloon-braganca-portugal", "canonical": "https://www.voyagerballoons.eu/en/hot-air-balloon-braganca-portugal", "required_text": ["195"], "severity": "P1", "neutral_severity": "P3", "role": "cross_sell"}
+    {"name": "Braganca EN", "url": "https://www.voyagerballoons.eu/en/hot-air-balloon-braganca-portugal", "canonical": "https://www.voyagerballoons.eu/en/hot-air-balloon-braganca-portugal", "required_text": ["205"], "severity": "P1", "neutral_severity": "P3", "role": "cross_sell"}
   ],
   "competitors": [
     {"name": "Siempre en las Nubes", "domain": "siempreenlasnubes.com", "url": "https://www.siempreenlasnubes.com/rutas-para-volar-en-globo/globo-rutas-segovia/"},
@@ -169,10 +169,10 @@
   },
   "commerce_probes": [
     {"name": "Salud tienda", "kind": "json", "url": "https://tienda.voyagerballoons.eu/api/health", "expected_json": {"ok": true, "app": "voyager-booking-store", "mode": "production"}, "severity": "P0"},
-    {"name": "Reserva Classic", "kind": "page", "url": "https://tienda.voyagerballoons.eu/reservar?producto=classic", "expected_text": ["Prepara tu vuelo", "Classic", "129"], "expected_robots": "noindex", "severity": "P0"},
-    {"name": "Reserva Comfort", "kind": "page", "url": "https://tienda.voyagerballoons.eu/reservar?producto=comfort", "expected_text": ["Prepara tu vuelo", "Comfort", "169"], "expected_robots": "noindex", "severity": "P0"},
+    {"name": "Reserva Classic", "kind": "page", "url": "https://tienda.voyagerballoons.eu/reservar?producto=classic", "expected_text": ["Reserva tu vuelo en Segovia", "Classic", "129"], "expected_robots": "noindex", "severity": "P0"},
+    {"name": "Reserva Comfort", "kind": "page", "url": "https://tienda.voyagerballoons.eu/reservar?producto=comfort", "expected_text": ["Reserva tu vuelo en Segovia", "Comfort", "169"], "expected_robots": "noindex", "severity": "P0"},
     {"name": "Billete regalo", "kind": "page", "url": "https://tienda.voyagerballoons.eu/regalar", "expected_text": ["Billete", "129", "169"], "expected_robots": "noindex", "severity": "P0"},
-    {"name": "Braganca Ao Sabor", "kind": "page", "url": "https://www.aosabordovento.net/voo-de-balao-braganca", "expected_text": ["195", "Adicionar ao carrinho"], "severity": "P0"}
+    {"name": "Braganca Ao Sabor", "kind": "page", "url": "https://www.aosabordovento.net/voo-de-balao-braganca", "expected_text": ["205", "Reservar por", "Pagamento por transferência bancária"], "severity": "P0"}
   ],
   "thresholds": {
     "health_timeout_seconds": 25,
