@@ -3,6 +3,8 @@ from __future__ import annotations
 from datetime import datetime, timedelta, timezone
 from statistics import median
 import time
+import json
+import re
 from urllib.parse import urlsplit
 
 import requests
@@ -26,6 +28,51 @@ def _domain(url: str | None) -> str | None:
     if not url:
         return None
     return urlsplit(url).netloc.lower().removeprefix("www.")
+
+
+def _google_wrapper(url: str | None) -> bool:
+    parts = urlsplit(url or "")
+    host = (parts.hostname or "").lower().removeprefix("www.")
+    return host in {"google.com", "google.es", "google.pt"} and parts.path in {"/goto", "/url"}
+
+
+def _organic_identity(item: dict) -> tuple[str | None, str | None, str]:
+    url = item.get("url")
+    if not _google_wrapper(url):
+        return _domain(url), url, "url"
+    # Breadcrumbs establish a hostname, never an exact landing URL.
+    breadcrumb = str(item.get("breadcrumb") or "")
+    match = re.match(r"^https?://([a-zA-Z0-9.-]+)(?=/|\s|$)", breadcrumb)
+    if match:
+        host = match.group(1).lower().removeprefix("www.")
+        if "." in host and host not in {"google.com", "google.es", "google.pt"}:
+            return host, None, "breadcrumb_domain"
+    return None, None, "unresolved_google_redirect"
+
+
+def _valid_history(item) -> bool:
+    raw = getattr(item, "payload_json", "{}")
+    payload = json.loads(raw) if isinstance(raw, str) else {}
+    if payload.get("serp_identity_version") == 1:
+        return True
+    return not any(_google_wrapper(r.get("url")) for r in payload.get("top_results", []))
+
+
+def _interpret_serp(serp: dict, target_domains: set[str]):
+    organic = [i for i in (serp.get("items") or []) if i.get("type") == "organic"]
+    if not organic:
+        raise SearchError("Respuesta sin resultados orgánicos verificables; no acredita ausencia de la marca")
+    interpreted = []
+    for item in organic:
+        domain, url, source = _organic_identity(item)
+        interpreted.append({**item, "resolved_domain": domain, "resolved_url": url, "identity_source": source})
+    matching = next((i for i in interpreted if i["resolved_domain"] in target_domains), None)
+    considered = interpreted[:interpreted.index(matching) + 1] if matching else interpreted
+    if any(not i["resolved_domain"] for i in considered):
+        raise SearchError("Resultados con redirecciones Google sin dominio verificable; posición no verificable")
+    if matching and not isinstance(matching.get("rank_absolute"), (int, float)):
+        raise SearchError("Resultado de la marca sin posición válida")
+    return interpreted, matching
 
 
 def _normalized_url(url: str | None) -> str | None:
@@ -157,10 +204,13 @@ def _search(settings: Settings, row: dict[str, str], depth: int) -> tuple[dict, 
             raise
 
         data = response.json()
-        task = data.get("tasks", [{}])[0]
+        task = (data.get("tasks") or [{}])[0]
         total_cost += float(task.get("cost") or 0)
         if task.get("status_code") == 20000:
-            result = task.get("result", [{}])[0]
+            results = task.get("result")
+            if not results or not isinstance(results[0], dict):
+                raise SearchError("Respuesta sin SERP verificable", total_cost)
+            result = results[0]
             return (
                 {"request": payload, "items": result.get("items", []), "check_url": result.get("check_url")},
                 total_cost,
@@ -229,6 +279,7 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
             limit=int(thresholds.get("rank_drop_history_window", 7)),
             target_url=row["target_url"],
         )
+        history = [item for item in history if _valid_history(item)]
         previous = history[0] if history else None
         depth = _depth_for(row, previous, thresholds)
         if depth is None:
@@ -244,24 +295,28 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
             total_cost += float(getattr(exc, "cost", 0) or 0)
             failures.append({"keyword": row["keyword"], "error": str(exc)})
             continue
-        checked += 1
-
         brand_id, brand_name, target_domains = _brand_target(config, row)
-
-        organic = [item for item in serp["items"] if item.get("type") == "organic"]
-        matching = next((item for item in organic if _domain(item.get("url")) in target_domains), None)
+        try:
+            organic, matching = _interpret_serp(serp, target_domains)
+        except SearchError as exc:
+            failures.append({"keyword": row["keyword"], "error": str(exc)})
+            continue
+        checked += 1
         position = float(matching.get("rank_absolute")) if matching else None
-        ranking_url = matching.get("url") if matching else None
-        top_domain = _domain(organic[0].get("url")) if organic else None
+        ranking_url = matching.get("resolved_url") if matching else None
+        top_domain = organic[0]["resolved_domain"] if organic else None
         payload = {
             **row,
+            "serp_identity_version": 1,
+            "ranking_domain": matching["resolved_domain"] if matching else None,
+            "identity_source": matching["identity_source"] if matching else None,
             "position": position,
             "ranking_url": ranking_url,
             "top_domain": top_domain,
             "check_url": serp.get("check_url"),
             "depth": depth,
             "top_results": [
-                {"position": item.get("rank_absolute"), "domain": _domain(item.get("url")), "url": item.get("url")}
+                {"position": item.get("rank_absolute"), "domain": item["resolved_domain"], "url": item["resolved_url"], "identity_source": item["identity_source"]}
                 for item in organic[:10]
             ],
         }
@@ -269,7 +324,7 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
         found += int(position is not None)
         top_ten += int(position is not None and position <= 10)
         result.add_metric(
-            "position", position or 101, source="rank",
+            "position", position if position is not None else depth + 1, source="rank",
             dimensions={"keyword": row["keyword"], "location": row["location_name"], "device": row["device"], "cluster": row["cluster"]},
         )
 
@@ -402,12 +457,13 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
             dedupe_key="rank:provider-failures", severity="P1", category="rank",
             title="Fallos parciales en el seguimiento de posiciones",
             message=f"No se pudieron consultar {len(failures)} de {len(keywords)} palabras clave.",
-            action="Revisar saldo, credenciales, ubicaciones admitidas y respuesta de DataForSEO antes de reintentar.",
+            action="Revisar el error concreto y la respuesta de DataForSEO: resultados parciales o dominios no verificables no acreditan una caída SEO. Comprobar saldo, credenciales o ubicación solo si el error lo indica.",
             metadata={"failures": failures[:20]},
         ))
     result.summary = {
         "keywords_inventory": len(keywords),
         "keywords_checked": checked,
+        "measurement_complete": not failures and not budget_limited,
         "keywords_deferred": deferred,
         "found_in_requested_depth": found,
         "found_top_10": top_ten,

@@ -70,7 +70,7 @@ class SeoMonitorCadenceTests(unittest.TestCase):
         self.assertEqual(_drop_severity("P0", True, 10, 10, 5, 15), "P1")
         self.assertEqual(_drop_severity("P1", True, 100, 10, 5, 15), "P2")
 
-    @patch("seo_monitor.checks.rank._search", return_value=({"items": []}, 0.01))
+    @patch("seo_monitor.checks.rank._search", return_value=({"items": [{"type": "organic", "url": "https://example.com/", "rank_absolute": 1}]}, 0.01))
     @patch("seo_monitor.checks.rank.load_keyword_inventory")
     def test_rank_run_passes_thresholds_to_cadence_logic(self, load_keywords, search):
         load_keywords.return_value = [{

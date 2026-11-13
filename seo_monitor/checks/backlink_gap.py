@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import re
+from urllib.parse import urlsplit
 
 import requests
 
@@ -264,6 +265,33 @@ def _evidence(record: dict) -> tuple[str, str | None]:
     return str(source), str(target) if target else None
 
 
+def _legacy_only_loss(record: dict, config: dict) -> bool:
+    legacy = config.get("tracking", {}).get("legacy_shop_domain")
+    links = record.get("links") or []
+    return bool(legacy and links) and all(
+        (urlsplit(link.get("target_url") or "").hostname or "").lower() == legacy.lower()
+        for link in links
+    )
+
+
+def _lost_alert(lost: dict, config: dict) -> AlertSpec:
+    source_url, target_url = _evidence(lost)
+    legacy_only = _legacy_only_loss(lost, config)
+    return AlertSpec(
+        dedupe_key=f"backlink_gap:lost:{lost['domain']}",
+        severity="P3" if legacy_only else "P1",
+        category="backlink_gap",
+        title=("Enlaces históricos a la tienda retirada: " if legacy_only else "Dominio de calidad perdido: ") + lost['domain'],
+        message=(f"DataForSEO no detecta enlaces vivos desde {lost['domain']} tras "
+                 f"{lost['miss_streak']} controles consecutivos."
+                 + (f" El enlace apuntaba a {target_url}." if target_url else "")
+                 + (" Todos los destinos documentados corresponden a la tienda retirada; no acredita pérdida de enlaces a páginas vigentes." if legacy_only else "")),
+        action=("Conservar como observación histórica. Revisar si conviene un enlace editorial vigente, sin restaurar el carrito antiguo ni dar por recuperado el enlace." if legacy_only else "Comprobar la página de origen y contactar solo si existía una colaboración real que merezca recuperarse."),
+        evidence_url=source_url,
+        metadata={**lost, "legacy_targets_only": legacy_only},
+    )
+
+
 def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckResult:
     result = CheckResult(job_name="backlink_gap")
     if not settings.dataforseo_login or not settings.dataforseo_password:
@@ -412,21 +440,7 @@ def run(config: dict, store: Store, run_id: int, settings: Settings) -> CheckRes
                 metadata={"domains": profile["new_domains"][:30]},
             ))
         for lost in profile["confirmed_lost"]:
-            source_url, target_url = _evidence(lost)
-            result.alerts.append(AlertSpec(
-                dedupe_key=f"backlink_gap:lost:{lost['domain']}",
-                severity="P1",
-                category="backlink_gap",
-                title=f"Dominio de calidad perdido: {lost['domain']}",
-                message=(
-                    f"DataForSEO no detecta enlaces vivos desde {lost['domain']} tras "
-                    f"{lost['miss_streak']} controles consecutivos."
-                    + (f" El enlace apuntaba a {target_url}." if target_url else "")
-                ),
-                action="Comprobar la página de origen y contactar solo si existía una colaboración real que merezca recuperarse.",
-                evidence_url=source_url,
-                metadata=lost,
-            ))
+            result.alerts.append(_lost_alert(lost, config))
     if failures:
         result.alerts.append(AlertSpec(
             dedupe_key="backlink_gap:provider-failures",
