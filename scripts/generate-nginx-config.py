@@ -60,14 +60,21 @@ def render_redirects(redirects: list[dict[str, object]]) -> str:
             continue
 
         rendered_target = target.replace(":splat", "$1")
-        lines.append(f"    # redirect: {source}")
-        if "*" in source:
-            lines.append(f"    location ~ {_nginx_regex(source)} {{")
-        else:
-            lines.append(f"    location = {source} {{")
-        lines.append(f"        return {status} {rendered_target};")
-        lines.append("    }")
-        lines.append("")
+        sources = [source]
+        # Match Netlify normalization for these two restored legacy URLs only.
+        # Preserve their query strings without changing existing redirect policy.
+        if source in {"/regala-experiencia-vuelos-en-globo/", "/tag/vuelo-en-globo-segovia-es/"}:
+            sources.append(source.rstrip("/"))
+            rendered_target += "$is_args$args"
+        for compatible_source in sources:
+            lines.append(f"    # redirect: {compatible_source}")
+            if "*" in compatible_source:
+                lines.append(f"    location ~ {_nginx_regex(compatible_source)} {{")
+            else:
+                lines.append(f"    location = {compatible_source} {{")
+            lines.append(f"        return {status} {rendered_target};")
+            lines.append("    }")
+            lines.append("")
 
     return "\n".join(lines).rstrip()
 
@@ -119,6 +126,12 @@ def render_config(redirects: list[dict[str, object]]) -> str:
     location ~* \\.(?:txt|xml)$ {{
         expires -1;
         try_files $uri =404;
+    }}
+
+    # Native Nginx compatibility for the new English legal HTML page.
+    # Keep this out of netlify.toml, where slash normalization precedes redirects.
+    location = /en/legal/ {{
+        return 301 /en/legal$is_args$args;
     }}
 
     location / {{

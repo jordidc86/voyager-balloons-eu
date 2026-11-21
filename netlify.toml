@@ -1,19 +1,8 @@
 [build]
   publish = "."
 
-# English checkout links must resolve to the current legal document.
-# Keep fragments (#cancelacion, #privacidad, #cookies) on navigation.
-[[redirects]]
-  from = "/en/legal"
-  to = "/legales"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "/en/legal/"
-  to = "/legales"
-  status = 301
-  force = true
+# English legal HTML is served directly.
+# Netlify normalizes trailing slashes; do not redirect a path to itself.
 
 [[redirects]]
   from = "/index.html"
@@ -409,6 +398,19 @@
 [[redirects]]
   from = "/shop/*"
   to = "https://tienda.voyagerballoons.eu/"
+  status = 301
+  force = true
+
+# Two observed legacy-shop search destinations. Exact aliases only.
+[[redirects]]
+  from = "/regala-experiencia-vuelos-en-globo/"
+  to = "https://www.voyagerballoons.eu/regalar-vuelo-en-globo-segovia"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tag/vuelo-en-globo-segovia-es/"
+  to = "https://www.voyagerballoons.eu/vuelo-en-globo-segovia"
   status = 301
   force = true
 
