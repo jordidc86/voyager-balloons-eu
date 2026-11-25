@@ -16,12 +16,12 @@
     <meta property="og:description" content="Vuela al amanecer sobre Braganza con Voyager Balloons. Reserva directa por 205€ por persona.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://www.voyagerballoons.eu/vuelo-en-globo-braganza-portugal">
-    <meta property="og:image" content="https://www.voyagerballoons.eu/assets/img/balloon-mountains.webp">
+    <meta property="og:image" content="https://www.voyagerballoons.eu/assets/img/braganca-voo-balao.webp">
     <meta name="twitter:card" content="summary_large_image">
     <link rel="icon" href="/favicon.ico" sizes="any">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-    <link rel="preload" href="/assets/img/balloon-mountains.avif" as="image" type="image/avif" fetchpriority="high">
+    <link rel="preload" href="/assets/img/braganca-voo-balao.webp" as="image" type="image/webp" fetchpriority="high">
     <link rel="preload" href="/css/style.css?v=20261102-mobile-3" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="/css/style.css?v=20261102-mobile-3"></noscript>
     <style>
@@ -45,7 +45,7 @@
         .nav-toggle{display:none;width:44px;height:44px;border:1px solid rgba(255,255,255,.35);border-radius:8px;background:rgba(255,255,255,.08);align-items:center;justify-content:center;flex-direction:column;gap:5px}
         .nav-toggle span{display:block;width:20px;height:2px;background:#fff;border-radius:2px}
         @media(max-width:768px){.navbar{padding:1rem 0}.nav-toggle{display:flex}#primary-navigation{display:none}.navbar.nav-open #primary-navigation{display:flex}.nav-links{position:absolute;top:calc(100% + .75rem);left:20px;right:20px;flex-direction:column;align-items:stretch;gap:0;padding:.75rem;background:rgba(250,249,246,.98);border:1px solid rgba(44,53,57,.1);border-radius:8px;box-shadow:0 14px 35px rgba(44,53,57,.12);white-space:normal}.nav-links a:not(.btn){color:var(--color-text-dark);padding:.9rem .75rem;font-size:1rem}.nav-links .btn{margin-top:.5rem;width:100%}}
-        .destination-hero{min-height:82vh;display:flex;align-items:center;position:relative;overflow:hidden;background-image:linear-gradient(rgba(11,15,25,.72),rgba(11,15,25,.42)),image-set(url('/assets/img/balloon-mountains.avif') type('image/avif'),url('/assets/img/balloon-mountains.webp') type('image/webp'));background-position:center;background-size:cover;background-repeat:no-repeat;color:#fff}
+        .destination-hero{min-height:82vh;display:flex;align-items:center;position:relative;overflow:hidden;background-image:linear-gradient(rgba(11,15,25,.72),rgba(11,15,25,.42)),url('/assets/img/braganca-voo-balao.webp');background-position:center;background-size:cover;background-repeat:no-repeat;color:#fff}
         .destination-hero .container{position:relative;z-index:1;padding-top:6rem;padding-bottom:4rem}
         .destination-hero h1{max-width:900px;font-size:3.5rem;color:#fff;margin-bottom:1.25rem;text-shadow:0 4px 18px rgba(0,0,0,.42)}
         .destination-hero p{max-width:740px;font-size:1.2rem;color:rgba(255,255,255,.92);margin-bottom:2rem}
@@ -64,6 +64,20 @@
         .destination-cta h2{color:#fff}
         .destination-cta p{color:rgba(255,255,255,.78);max-width:720px;margin:0 auto 2rem}
         @media (max-width:768px){.destination-hero .container{max-width:100%;overflow:hidden}.destination-hero h1{font-size:2.2rem;overflow-wrap:anywhere}.destination-hero p{font-size:1.05rem;overflow-wrap:anywhere}.destination-proof{max-width:330px}.destination-hero .hero-actions{display:flex;flex-direction:column;align-items:stretch;max-width:340px}.destination-hero .btn{width:100%;white-space:normal}.answer-panel{margin-top:-2rem;padding:1.5rem;overflow:hidden}.answer-panel h2,.answer-panel p{overflow-wrap:anywhere}}
+
+        /* Product photographs: isolated, responsive and independent of JavaScript. */
+        .product-photos{padding:3rem 0;background:#FAF9F6}
+        .product-photos h2{margin-bottom:.75rem}
+        .product-photos-intro{max-width:760px;margin:0 auto 1.5rem;color:#526072}
+        .product-photos-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem}
+        .product-photos figure{min-width:0;margin:0}
+        .product-photos a{display:block;border-radius:12px;overflow:hidden}
+        .product-photos a:focus-visible{outline:3px solid #6f570e;outline-offset:4px}
+        .product-photos img{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover}
+        .product-photos figcaption{padding:.65rem 0;font-size:.9rem;line-height:1.5;color:#526072}
+        .product-photos-grid-two{grid-template-columns:repeat(2,minmax(0,1fr))}
+        @media(max-width:768px){.product-photos-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:.85rem}}
+        @media(max-width:359px){.product-photos-grid{grid-template-columns:minmax(0,1fr)}}
     </style>
     <script type="application/ld+json">
     {
@@ -110,7 +124,7 @@
           "@type": "Product",
           "@id": "https://www.voyagerballoons.eu/vuelo-en-globo-braganza-portugal#producto",
           "name": "Vuelo en globo en Braganza Portugal",
-          "image": "https://www.voyagerballoons.eu/assets/img/balloon-mountains.webp",
+          "image": ["https://www.voyagerballoons.eu/assets/img/braganca-voo-balao.webp", "https://www.voyagerballoons.eu/assets/img/braganca-balao-paisagem.webp"],
           "description": "Vuelo en globo al amanecer en Braganza, Portugal, con brindis con cava, diploma y fotos de la tripulación cuando estén disponibles.",
           "brand": { "@type": "Brand", "name": "Voyager Balloons" },
           "category": "Vuelo en globo aerostático",
@@ -338,6 +352,30 @@
                 </div>
             </div>
         </section>
+
+        <section class="product-photos" aria-labelledby="product-photos-title">
+            <div class="container">
+                <div class="text-center">
+                    <h2 id="product-photos-title">El vuelo en imágenes</h2>
+                    <p class="product-photos-intro">Fotografías de Ao Sabor do Vento, operador del vuelo de Bragança. El recorrido y las vistas dependen del viento de cada día.</p>
+                </div>
+                <div class="product-photos-grid product-photos-grid-two">
+                    <figure>
+                        <a href="/assets/img/braganca-voo-balao.webp" aria-label="Ver fotografía completa: Globo de Ao Sabor do Vento en vuelo">
+                            <img src="/assets/img/braganca-voo-balao.webp" width="2200" height="1477" loading="lazy" decoding="async" alt="Globo de Ao Sabor do Vento en vuelo">
+                        </a>
+                        <figcaption>Globo de Ao Sabor do Vento en vuelo</figcaption>
+                    </figure>
+                    <figure>
+                        <a href="/assets/img/braganca-balao-paisagem.webp" aria-label="Ver fotografía completa: El globo de Ao Sabor do Vento sobre el paisaje">
+                            <img src="/assets/img/braganca-balao-paisagem.webp" width="1800" height="1208" loading="lazy" decoding="async" alt="El globo de Ao Sabor do Vento sobre el paisaje">
+                        </a>
+                        <figcaption>El globo de Ao Sabor do Vento sobre el paisaje</figcaption>
+                    </figure>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <footer class="footer">
