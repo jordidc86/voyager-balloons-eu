@@ -61,6 +61,19 @@
         .sales-cta{background:var(--color-bg-dark);color:#fff;text-align:center}
         .sales-cta h2{color:#fff}.sales-cta p{color:rgba(255,255,255,.78);max-width:720px;margin:0 auto 2rem}
         @media(max-width:768px){.sales-hero h1{font-size:2.25rem;overflow-wrap:anywhere}.sales-hero p{font-size:1.05rem}.hero-actions{flex-direction:column;align-items:stretch;max-width:340px}.sales-hero .btn{width:100%;white-space:normal}.quick-summary{margin-top:-2rem;padding:1.5rem}.comfort-panel{grid-template-columns:1fr}}
+
+        /* Product photographs: isolated, responsive and independent of JavaScript. */
+        .product-photos{padding:3rem 0;background:#FAF9F6}
+        .product-photos h2{margin-bottom:.75rem}
+        .product-photos-intro{max-width:760px;margin:0 auto 1.5rem;color:#526072}
+        .product-photos-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem}
+        .product-photos figure{min-width:0;margin:0}
+        .product-photos a{display:block;border-radius:12px;overflow:hidden}
+        .product-photos a:focus-visible{outline:3px solid #6f570e;outline-offset:4px}
+        .product-photos img{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover}
+        .product-photos figcaption{padding:.65rem 0;font-size:.9rem;line-height:1.5;color:#526072}
+        @media(max-width:768px){.product-photos-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:.85rem}}
+        @media(max-width:359px){.product-photos-grid{grid-template-columns:minmax(0,1fr)}}
     </style>
     <script type="application/ld+json">
     {
@@ -79,7 +92,7 @@
           "@type": "Product",
           "@id": "https://www.voyagerballoons.eu/en/comfort-hot-air-balloon-segovia#product",
           "name": "Comfort hot air balloon flight in Segovia",
-          "image": "https://www.voyagerballoons.eu/assets/img/passengers-view.webp",
+          "image": ["https://www.voyagerballoons.eu/assets/img/segovia-voyager-globos.jpg", "https://www.voyagerballoons.eu/assets/img/segovia-globo-alcazar.jpg", "https://www.voyagerballoons.eu/assets/img/segovia-globo-campos.jpg", "https://www.voyagerballoons.eu/assets/img/segovia-globo-amanecer.jpg"],
           "description": "A more spacious shared hot air balloon flight in Segovia: maximum 4 passengers per basket compartment, cava toast and diploma.",
           "brand": { "@type": "Brand", "name": "Voyager Balloons" },
           "category": "Hot air balloon ride",
@@ -219,6 +232,42 @@
                         <a href="https://tienda.voyagerballoons.eu/reservar?producto=comfort&amp;lang=en" class="btn btn-primary btn-full mt-6">Book Comfort</a>
                         <a href="/en/hot-air-balloon-segovia" class="btn btn-outline btn-full mt-6">Compare with Classic</a>
                     </div>
+                </div>
+            </div>
+        </section>
+
+
+        <section class="product-photos" aria-labelledby="product-photos-title">
+            <div class="container">
+                <div class="text-center">
+                    <h2 id="product-photos-title">The flight in pictures</h2>
+                    <p class="product-photos-intro">Photographs of Voyager Balloons flights in Segovia. The route and views depend on the wind on the day.</p>
+                </div>
+                <div class="product-photos-grid">
+                    <figure>
+                        <a href="/assets/img/segovia-voyager-globos.jpg" aria-label="View full photograph: Voyager balloons in the countryside around Segovia">
+                            <img src="/assets/img/segovia-voyager-globos.jpg" width="1600" height="1200" loading="lazy" decoding="async" alt="Voyager balloons in the countryside around Segovia">
+                        </a>
+                        <figcaption>Voyager balloons in the countryside around Segovia</figcaption>
+                    </figure>
+                    <figure>
+                        <a href="/assets/img/segovia-globo-alcazar.jpg" aria-label="View full photograph: A balloon with Segovia’s Alcázar and cathedral in the background">
+                            <img src="/assets/img/segovia-globo-alcazar.jpg" width="1536" height="2048" loading="lazy" decoding="async" alt="A balloon with Segovia’s Alcázar and cathedral in the background">
+                        </a>
+                        <figcaption>A balloon with Segovia’s Alcázar and cathedral in the background</figcaption>
+                    </figure>
+                    <figure>
+                        <a href="/assets/img/segovia-globo-campos.jpg" aria-label="View full photograph: Balloon flight over the fields around Segovia">
+                            <img src="/assets/img/segovia-globo-campos.jpg" width="1200" height="1600" loading="lazy" decoding="async" alt="Balloon flight over the fields around Segovia">
+                        </a>
+                        <figcaption>Balloon flight over the fields around Segovia</figcaption>
+                    </figure>
+                    <figure>
+                        <a href="/assets/img/segovia-globo-amanecer.jpg" aria-label="View full photograph: A balloon beside Segovia at sunrise">
+                            <img src="/assets/img/segovia-globo-amanecer.jpg" width="1200" height="1600" loading="lazy" decoding="async" alt="A balloon beside Segovia at sunrise">
+                        </a>
+                        <figcaption>A balloon beside Segovia at sunrise</figcaption>
+                    </figure>
                 </div>
             </div>
         </section>

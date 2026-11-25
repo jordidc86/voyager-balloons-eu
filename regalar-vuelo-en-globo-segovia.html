@@ -42,6 +42,19 @@
         .gift-cta h2{color:#fff}
         .gift-cta p{color:rgba(255,255,255,.78);max-width:720px;margin:0 auto 2rem}
         @media (max-width:768px){.gift-hero .container{max-width:100%;overflow:hidden}.gift-hero h1{font-size:2.2rem;overflow-wrap:anywhere}.gift-hero p{font-size:1.05rem;overflow-wrap:anywhere}.gift-proof{max-width:320px}.gift-hero .hero-actions{display:flex;flex-direction:column;align-items:stretch;max-width:320px}.gift-hero .btn{width:100%;white-space:normal}.gift-panel{margin-top:-2rem;padding:1.5rem;overflow:hidden}.gift-panel h2,.gift-panel p{overflow-wrap:anywhere}}
+
+        /* Product photographs: isolated, responsive and independent of JavaScript. */
+        .product-photos{padding:3rem 0;background:#FAF9F6}
+        .product-photos h2{margin-bottom:.75rem}
+        .product-photos-intro{max-width:760px;margin:0 auto 1.5rem;color:#526072}
+        .product-photos-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem}
+        .product-photos figure{min-width:0;margin:0}
+        .product-photos a{display:block;border-radius:12px;overflow:hidden}
+        .product-photos a:focus-visible{outline:3px solid #6f570e;outline-offset:4px}
+        .product-photos img{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover}
+        .product-photos figcaption{padding:.65rem 0;font-size:.9rem;line-height:1.5;color:#526072}
+        @media(max-width:768px){.product-photos-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:.85rem}}
+        @media(max-width:359px){.product-photos-grid{grid-template-columns:minmax(0,1fr)}}
     </style>
     <script type="application/ld+json">
     {
@@ -60,7 +73,7 @@
           "@type": "Product",
           "@id": "https://www.voyagerballoons.eu/regalar-vuelo-en-globo-segovia#producto",
           "name": "Billete regalo de vuelo en globo en Segovia",
-          "image": "https://www.voyagerballoons.eu/assets/img/balloon-takeoff.webp",
+          "image": ["https://www.voyagerballoons.eu/assets/img/segovia-voyager-globos.jpg", "https://www.voyagerballoons.eu/assets/img/segovia-globo-alcazar.jpg", "https://www.voyagerballoons.eu/assets/img/segovia-globo-campos.jpg", "https://www.voyagerballoons.eu/assets/img/segovia-globo-amanecer.jpg"],
           "description": "Billete regalo para vuelo en globo sobre Segovia al amanecer. Los billetes regalo no caducan y permiten solicitar el reembolso durante los 15 días naturales siguientes a la compra si el vuelo no se ha realizado.",
           "brand": { "@type": "Brand", "name": "Voyager Balloons" },
           "category": "Experiencia regalo",
@@ -287,6 +300,42 @@
                 </div>
             </div>
         </section>
+
+        <section class="product-photos" aria-labelledby="product-photos-title">
+            <div class="container">
+                <div class="text-center">
+                    <h2 id="product-photos-title">El vuelo en imágenes</h2>
+                    <p class="product-photos-intro">Fotografías de vuelos de Voyager Balloons en Segovia. El recorrido y las vistas dependen del viento de cada día.</p>
+                </div>
+                <div class="product-photos-grid">
+                    <figure>
+                        <a href="/assets/img/segovia-voyager-globos.jpg" aria-label="Ver fotografía completa: Globos de Voyager en el entorno de Segovia">
+                            <img src="/assets/img/segovia-voyager-globos.jpg" width="1600" height="1200" loading="lazy" decoding="async" alt="Globos de Voyager en el entorno de Segovia">
+                        </a>
+                        <figcaption>Globos de Voyager en el entorno de Segovia</figcaption>
+                    </figure>
+                    <figure>
+                        <a href="/assets/img/segovia-globo-alcazar.jpg" aria-label="Ver fotografía completa: Un globo con el Alcázar y la catedral de Segovia al fondo">
+                            <img src="/assets/img/segovia-globo-alcazar.jpg" width="1536" height="2048" loading="lazy" decoding="async" alt="Un globo con el Alcázar y la catedral de Segovia al fondo">
+                        </a>
+                        <figcaption>Un globo con el Alcázar y la catedral de Segovia al fondo</figcaption>
+                    </figure>
+                    <figure>
+                        <a href="/assets/img/segovia-globo-campos.jpg" aria-label="Ver fotografía completa: Vuelo sobre los campos segovianos">
+                            <img src="/assets/img/segovia-globo-campos.jpg" width="1200" height="1600" loading="lazy" decoding="async" alt="Vuelo sobre los campos segovianos">
+                        </a>
+                        <figcaption>Vuelo sobre los campos segovianos</figcaption>
+                    </figure>
+                    <figure>
+                        <a href="/assets/img/segovia-globo-amanecer.jpg" aria-label="Ver fotografía completa: Un globo junto a Segovia al amanecer">
+                            <img src="/assets/img/segovia-globo-amanecer.jpg" width="1200" height="1600" loading="lazy" decoding="async" alt="Un globo junto a Segovia al amanecer">
+                        </a>
+                        <figcaption>Un globo junto a Segovia al amanecer</figcaption>
+                    </figure>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <footer class="footer">
